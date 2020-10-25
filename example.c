@@ -110,7 +110,7 @@ void appendTag(tag *parent, tag *child){
 
 char *itoa2(int i){
 
-    char * buffer = malloc(MAX_INT_SIZE)
+    char * buffer = malloc(MAX_INT_SIZE);
 
     sprintf(buffer,"%d",i);
 
