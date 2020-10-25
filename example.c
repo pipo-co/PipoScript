@@ -24,8 +24,7 @@
 #define MAX_TAGS 50
 #define MAX_INT_SIZE 12 //Basdao en 2147483647
 
-typedef struct 
-{
+typedef struct {
     char * name;
     // map attributes;
     char * body;
@@ -33,14 +32,13 @@ typedef struct
 
 } tag;
 
-typedef struct
-{
+typedef struct {
     tag *tag;
     node *next;
 
 } node;
 
-typedef struct{
+typedef struct {
     
     node *first;
     node *last;
