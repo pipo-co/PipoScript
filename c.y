@@ -5,10 +5,10 @@
 	extern char yytext[];
 	extern int yylineno;
 
-	int printed = 0;
-
 	void yyerror(char const *s);
 	int yylex();
+
+	int sym[26]; 
 %}
 
 %error-verbose
@@ -28,6 +28,8 @@
 %left '*' '/'
 %right '!'
 %left INC DEC
+%left ')'
+%right '('
 %nonassoc UMINUS
 
 %nonassoc IFX
@@ -41,6 +43,8 @@ P
 	: STATEMENT_LIST
 		{ 
 			if(yychar == YYEOF) {
+				printf("%d\n", yylen);
+				printf("%s\n", yytext);
 				printf("Input accepted\n");
 			 	exit(0);
 			}
@@ -120,6 +124,7 @@ ARITH
 	| NUM AND NUM
 	| '!' NUM
 	| '-' NUM %prec UMINUS
+	| '(' NUM ')'
 	;
 
 NUM
@@ -154,8 +159,16 @@ FUNCTION_TYPES
 
 void yyerror(char const *s)
 {
-	printf("Error in line %d: ", yylineno);
-	printf("\"%s\"\n",s);
-	printed = 1;
-	exit (3);
+	fprintf(stderr, "Error in line %d: ", yylineno);
+	fprintf(stderr, "\"%s\"\n",s);
+	exit(3);
+}
+
+int main(void) {
+
+	printf("int main() {\n");
+
+
+	yyparse();
+	return 0;
 }
