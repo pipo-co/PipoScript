@@ -19,7 +19,7 @@ void multiLineComment(void);
 "/*"							{ multiLineComment(); }
 "//"[^\n]*              		{ /* consume //-comment */ }
 
-"do"							{ return DO; }
+"do"							{ printf("%d  %s\n", yyleng, yytext); return DO; }
 "else"							{ return ELSE; }
 "for"							{ return FOR; }
 "if"							{ return IF; }
@@ -27,7 +27,7 @@ void multiLineComment(void);
 "string"						{ return STRING; }
 "return"						{ return RETURN; }
 "void"							{ return VOID; }
-"while"							{ return WHILE; }
+"while"							{ printf("%d  %s\n", yyleng, yytext); return WHILE; }
 
 {LETTER}({LETTER}|{DIGIT})*		{ return ID; }
 
@@ -58,11 +58,6 @@ int yywrap(void) {
 	return 1;
 }
 
-int main (void) {
-	yyparse();
-	return 0;
-}
-
 void multiLineComment(void) {
 	char c, prev = 0;
 
@@ -74,6 +69,6 @@ void multiLineComment(void) {
 		prev = c;
 
 	}
-	printf("Error in line %d : unterminated comment\n", yylineno);
+	fprintf(stderr, "Error in line %d : unterminated comment\n", yylineno);
 	exit(2);
 }
