@@ -1,12 +1,15 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
+	#include "astNodes.h"
 
 	extern char yytext[];
 	extern int yylineno;
 
 	void yyerror(char const *s);
 	int yylex();
+
+	AstNode *astTree;
 
 	int sym[26]; 
 %}
@@ -34,6 +37,7 @@
 
 %nonassoc IFX
 %nonassoc ELSE
+%nonassoc STATEMENT_LIST_CONST
 
 %start P
 
@@ -43,10 +47,8 @@ P
 	: STATEMENT_LIST
 		{ 
 			if(yychar == YYEOF) {
-				printf("%d\n", yylen);
-				printf("%s\n", yytext);
 				printf("Input accepted\n");
-			 	exit(0);
+			 	astTree = $1;
 			}
 			else
 				yyerror("Unexpected end of program. Invalid statement.");
@@ -54,33 +56,41 @@ P
 	;
 
 STATEMENT_LIST
-	: STATEMENT_LIST STATEMENT
-	|
+	: STATEMENT_LIST STATEMENT	{ $$ = new_ast_node(STATEMENT_LIST_CONST, $1, $2); }
+	|							{ $$ = NULL; }
 	;
 
 STATEMENT
-	: if_statement
-	| iteration_statement
-	| return_statement
-	| declaration_statement
-	| assignment_statement
+	: if_statement				{ $$ = $1; }
+	| iteration_statement		{ $$ = $1; }
+	| return_statement			{ $$ = $1; }
+	| declaration_statement		{ $$ = $1; }
+	| assignment_statement		{ $$ = $1; }
 	;
 
 BLOCK    	
-	: '{' STATEMENT_LIST '}'
-	| STATEMENT 
-	| ';'
+	: '{' STATEMENT_LIST '}'	{ $$ = $2; }
+	| STATEMENT 				{ $$ = $1; }
+	| ';'						{ $$ = NULL; }
 	;
 
 if_statement
 	: IF '(' NUM ')' BLOCK %prec IFX
+								{ $$ = new_ast_if_node ($3, $5, NULL); }
+
 	| IF '(' NUM ')' BLOCK ELSE BLOCK
+								{ $$ = new_ast_if_node ($3, $5, $7); }
 	;
 
 iteration_statement
 	: WHILE '(' NUM ')' BLOCK
+								{ $$ = new_ast_while_node(WHILE, $3, $5); }
+
 	| DO BLOCK WHILE '(' NUM ')' ';'
+								{ $$ = new_ast_while_node(DO, $5, $2); }
+
 	| FOR '(' DO_ASSIGNMENT ';' NUM ';' DO_ASSIGNMENT ')' BLOCK
+								{ $$ = new_ast_for_node($3, $5, $7, $9); }
 	;
 
 return_statement
@@ -89,69 +99,69 @@ return_statement
 	;
 
 declaration_statement
-	: ID_TYPES ID ';'
-	| ID_TYPES ID '=' VALUE ';'
+	: ID_TYPES ID ';'			{ //declare }
+	| ID_TYPES ID '=' VALUE ';'	{ //declare and fill }
 	;
 
 assignment_statement
-	: ASSIGNMENT ';'
+	: ASSIGNMENT ';'			{ $$ = $1; }
 	;
 
 ASSIGNMENT
-	: ID '=' VALUE
-	| ID INC
-	| ID DEC
+	: ID '=' VALUE				{ //$$ = new_ast_assignment_node(lookup($1), $3); }
+	| ID INC					{ $$ = new_ast_inc_assignment_node($1); }
+	| ID DEC					{ $$ = new_ast_dec_assignment_node($1); }
 	;
 
 DO_ASSIGNMENT
-	: ASSIGNMENT
-	| ID_TYPES ASSIGNMENT
-	|
+	: ASSIGNMENT				{ $$ = $1; }
+	| ID_TYPES ASSIGNMENT		{ $$ = $1; //TODO }
+	|							{ $$ = NULL; }
 	;
         
 ARITH
-	: NUM '+' NUM 
-	| NUM '-' NUM
-	| NUM '*' NUM
-	| NUM '/' NUM
-	| NUM '<' NUM
-	| NUM '>' NUM
-	| NUM LE NUM
-	| NUM GE NUM
-	| NUM EQ NUM
-	| NUM NE NUM
-	| NUM OR NUM
-	| NUM AND NUM
-	| '!' NUM
-	| '-' NUM %prec UMINUS
-	| '(' NUM ')'
+	: NUM '+' NUM 				{ $$ = new_ast_node($2, $1, $3); }
+	| NUM '-' NUM				{ $$ = new_ast_node($2, $1, $3); }
+	| NUM '*' NUM				{ $$ = new_ast_node($2, $1, $3); }
+	| NUM '/' NUM				{ $$ = new_ast_node($2, $1, $3); }
+	| NUM '<' NUM				{ $$ = new_ast_node($2, $1, $3); }
+	| NUM '>' NUM				{ $$ = new_ast_node($2, $1, $3); }
+	| NUM LE NUM				{ $$ = new_ast_node($2, $1, $3); }
+	| NUM GE NUM				{ $$ = new_ast_node($2, $1, $3); }
+	| NUM EQ NUM				{ $$ = new_ast_node($2, $1, $3); }
+	| NUM NE NUM				{ $$ = new_ast_node($2, $1, $3); }
+	| NUM OR NUM				{ $$ = new_ast_node($2, $1, $3); }
+	| NUM AND NUM				{ $$ = new_ast_node($2, $1, $3); }
+	| '!' NUM					{ $$ = new_ast_node($1, $2, NULL); }
+	| '-' NUM %prec UMINUS		{ $$ = new_ast_node(UMINUS, $2, NULL); }
+	| '(' NUM ')'				{ $$ = $2; }
 	;
 
 NUM
-	: ID
-	| NON_ID_NUM
+	: ID						{ //$$ = new_ast_symbol_reference_node(lookup($1)); }
+	| NON_ID_NUM				{ $$ = $1; }
 	;
 
 NON_ID_NUM
-	: INT_LITERAL
-	| ARITH
+	: INT_LITERAL				{ $$ = new_ast_int_node($1); }
+	| ARITH						{ $$ = $1; }
 	;
 
 VALUE
-	: ID
-	| STRING_LITERAL
-	| NON_ID_NUM
+	: ID						{ //$$ = new_ast_symbol_reference_node(lookup($1)); }
+	| STRING_LITERAL			{ $$ = new_ast_string_node($1); }
+	| NON_ID_NUM				{ $$ = $1; }
 	;
 
 ID_TYPES
-	: INT
-	| STRING
+	: INT						{ $$ = $1; }
+	| STRING					{ $$ = $1; }
 	;
 
 FUNCTION_TYPES
-	: VOID
-	| INT
-	| STRING
+	: VOID						{ $$ = $1; }
+	| INT						{ $$ = $1; }
+	| STRING					{ $$ = $1; }
 	;
 
 %%
@@ -166,9 +176,11 @@ void yyerror(char const *s)
 
 int main(void) {
 
-	printf("int main() {\n");
-
-
 	yyparse();
+
+	// execute(astTree);
+
+	// ast_tree_free(astTree);
+
 	return 0;
 }
