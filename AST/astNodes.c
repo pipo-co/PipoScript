@@ -1,24 +1,6 @@
 
 #include "astNodes.h"
 
-static void * emalloc(size_t size);
-
-
-SymbolNode * new_symbol_node(char *name, int type, int intValue, char *stringValue) {
-
-    SymbolNode * symbolNode = emalloc(sizeof(*symbolNode));
-
-    symbolNode->name = name;
-
-    symbolNode->type = type;
-
-    symbolNode->intValue;
-
-    symbolNode->stringValue = stringValue;
-
-    return symbolNode;
-}
-
 
 AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right) {
 
@@ -89,7 +71,7 @@ AstNode * new_ast_for_node(AstNode *firstAssignment, AstNode *condition, AstNode
 
 AstNode * new_ast_assignment_node(SymbolNode *symbol, AstNode *value) {
 
-    AstAssignmentNode * astNode = emalloc (sizeof(*astNode));
+    AstAssignmentNode * astNode = emalloc(sizeof(*astNode));
 
     astNode->nodeType = '=';
 
@@ -119,17 +101,4 @@ AstNode * new_ast_string_node(char *value) {
     astNode->value = value;
 
     return (AstNode *) astNode;
-}
-
-static void * emalloc(size_t size) {
-
-    void * pointer = malloc (size);
-
-    if (!pointer) {
-
-        eprintf ("Error: malloc(%u) failed!\n", size);
-        abort();
-    }
-
-    return pointer;
 }

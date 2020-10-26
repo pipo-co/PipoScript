@@ -1,7 +1,7 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include "astNodes.h"
+	#include "AST/astNodes.h"
 
 	extern char yytext[];
 	extern int yylineno;
@@ -10,13 +10,26 @@
 	int yylex();
 
 	AstNode *astTree;
-
-	int sym[26]; 
 %}
+
+%union {
+
+  int intValue;
+
+  char *stringValue;
+
+  SymbolNode *symbol;
+
+  AstNode * astNode;
+}
 
 %error-verbose
 
-%token ID INT_LITERAL STRING_LITERAL
+%token <symbol> ID
+
+%token <intValue> INT_LITERAL
+%token <stringValue> STRING_LITERAL
+
 %token INC DEC LEFT RIGHT LE GE EQ NE
 %token AND OR
 
@@ -38,6 +51,9 @@
 %nonassoc IFX
 %nonassoc ELSE
 %nonassoc STATEMENT_LIST_CONST
+
+%type <astNode> STATEMENT_LIST STATEMENT BLOCK if_statement iteration_statement return_statement declaration_statement
+%type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE ID_TYPES FUNCTION_TYPES
 
 %start P
 
@@ -94,8 +110,8 @@ iteration_statement
 	;
 
 return_statement
-	: RETURN ';'
-	| RETURN VALUE ';'
+	: RETURN ';'				{ $$ = NULL; }
+	| RETURN VALUE ';'			{ $$ = NULL; }
 	;
 
 declaration_statement

@@ -3,17 +3,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "y.tab.h"
 
-typedef struct SymbolNode {
-  char * name;
-
-  int type;
-
-  int intValue;
-
-  char *stringValue;
-} SymbolNode;
+#include "../pipoUtils/pipoUtils.h"
+#include "../y.tab.h"
+#include "../symbolTable/symbolTable.h"
 
 // Generic AstNode
 typedef struct AstNode {
@@ -79,8 +72,6 @@ typedef struct AstStringNode {
 
   char *value;
 } AstStringNode;
-
-SymbolNode * new_symbol_node(char *name, int type, int intValue, char *stringValue);
 
 AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right);
 
