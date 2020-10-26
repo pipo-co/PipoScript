@@ -102,3 +102,7 @@ AstNode * new_ast_string_node(char *value) {
 
     return (AstNode *) astNode;
 }
+
+void free_ast_tree(AstNode *root) {
+    return;
+}

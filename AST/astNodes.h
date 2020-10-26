@@ -5,7 +5,6 @@
 #include <stdio.h>
 
 #include "../pipoUtils/pipoUtils.h"
-#include "../y.tab.h"
 #include "../symbolTable/symbolTable.h"
 
 // Generic AstNode
@@ -16,6 +15,8 @@ typedef struct AstNode {
 
   struct AstNode * right;
 } AstNode;
+
+#include "../y.tab.h"
 
 typedef struct AstIfNode {
   int nodeType;
@@ -72,6 +73,8 @@ typedef struct AstStringNode {
 
   char *value;
 } AstStringNode;
+
+void free_ast_tree(AstNode *root);
 
 AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right);
 

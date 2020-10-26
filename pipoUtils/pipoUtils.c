@@ -6,7 +6,7 @@ void * emalloc(size_t size) {
 
     if (!pointer) {
 
-        printf("Error: malloc(%u) failed!\n", size);
+        printf("Error: malloc(%lu) failed!\n", size);
         abort();
     }
 
@@ -19,7 +19,7 @@ void * ecalloc(size_t n, size_t size) {
 
     if (!pointer) {
 
-        printf("Error: calloc(%u) failed!\n", size);
+        printf("Error: calloc(%lu) failed!\n", size);
         abort();
     }
 

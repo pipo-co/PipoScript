@@ -1,26 +1,20 @@
 %{
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include "AST/astNodes.h"
 
-	extern char yytext[];
-	extern int yylineno;
+	#include "yaccUtils.h"
 
-	void yyerror(char const *s);
-	int yylex();
-
-	AstNode *astTree;
 %}
 
 %union {
 
-  int intValue;
+	int operation;
 
-  char *stringValue;
+	int intValue;
 
-  SymbolNode *symbol;
+	char *stringValue;
 
-  AstNode * astNode;
+	char *symbol;
+
+	AstNode *astNode;
 }
 
 %error-verbose
@@ -30,12 +24,9 @@
 %token <intValue> INT_LITERAL
 %token <stringValue> STRING_LITERAL
 
-%token INC DEC LEFT RIGHT LE GE EQ NE
-%token AND OR
-
-%token INT VOID STRING
-
-%token IF ELSE WHILE DO FOR RETURN
+%token <operation> LEFT RIGHT
+%token <operation> INT VOID STRING
+%token <operation> IF ELSE WHILE DO FOR RETURN
 
 %right '='
 %left OR AND
@@ -48,12 +39,16 @@
 %right '('
 %nonassoc UMINUS
 
+%type <operation> AND OR '=' '>' '<' LE GE EQ NE '+' '-' '*' '/' '!' INC DEC ')' '(' UMINUS
+
 %nonassoc IFX
 %nonassoc ELSE
 %nonassoc STATEMENT_LIST_CONST
 
 %type <astNode> STATEMENT_LIST STATEMENT BLOCK if_statement iteration_statement return_statement declaration_statement
-%type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE ID_TYPES FUNCTION_TYPES
+%type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE 
+
+%type <operation> ID_TYPES FUNCTION_TYPES
 
 %start P
 
@@ -115,8 +110,13 @@ return_statement
 	;
 
 declaration_statement
-	: ID_TYPES ID ';'			{ //declare }
-	| ID_TYPES ID '=' VALUE ';'	{ //declare and fill }
+	: ID_TYPES ID ';'			{ symbol_table_add(globalSt, $2, $1); $$ = NULL; }
+	| ID_TYPES ID '=' VALUE ';'	{ 
+									SymbolNode *symbol = symbol_table_add(globalSt, $2, $1);
+									assign_symbol(symbol, $4);
+									// TODO: get synthetized value
+									$$ = new_ast_assignment_node(symbol, $4);
+								 }
 	;
 
 assignment_statement
@@ -124,14 +124,30 @@ assignment_statement
 	;
 
 ASSIGNMENT
-	: ID '=' VALUE				{ //$$ = new_ast_assignment_node(lookup($1), $3); }
-	| ID INC					{ $$ = new_ast_inc_assignment_node($1); }
-	| ID DEC					{ $$ = new_ast_dec_assignment_node($1); }
+	: ID '=' VALUE				{ 
+									SymbolNode *symbol = symbol_table_get(globalSt, $1);
+									assign_symbol(symbol, $3);
+									// TODO: get synthetized value
+									$$ = new_ast_assignment_node(symbol, $3);
+								}
+	| ID INC					{ 
+									SymbolNode *symbol = symbol_table_get(globalSt, $1);
+									$$ = create_inc_assignment_node(symbol); 
+								}
+	| ID DEC					{ 
+									SymbolNode *symbol = symbol_table_get(globalSt, $1);
+									$$ = create_dec_assignment_node(symbol); 
+								}
 	;
 
 DO_ASSIGNMENT
 	: ASSIGNMENT				{ $$ = $1; }
-	| ID_TYPES ASSIGNMENT		{ $$ = $1; //TODO }
+	| ID_TYPES ID '=' VALUE		{ 
+									SymbolNode *symbol = symbol_table_add(globalSt, $2, $1);
+									assign_symbol(symbol, $4);
+									// TODO: get synthetized value
+									$$ = new_ast_assignment_node(symbol, $4);
+								 }
 	|							{ $$ = NULL; }
 	;
         
@@ -154,7 +170,7 @@ ARITH
 	;
 
 NUM
-	: ID						{ //$$ = new_ast_symbol_reference_node(lookup($1)); }
+	: ID						{ $$ = new_ast_symbol_reference_node(symbol_table_get(globalSt, $1)); }
 	| NON_ID_NUM				{ $$ = $1; }
 	;
 
@@ -164,7 +180,7 @@ NON_ID_NUM
 	;
 
 VALUE
-	: ID						{ //$$ = new_ast_symbol_reference_node(lookup($1)); }
+	: ID						{ $$ = new_ast_symbol_reference_node(symbol_table_get(globalSt, $1)); }
 	| STRING_LITERAL			{ $$ = new_ast_string_node($1); }
 	| NON_ID_NUM				{ $$ = $1; }
 	;
@@ -182,21 +198,21 @@ FUNCTION_TYPES
 
 %%
 
-
-void yyerror(char const *s)
-{
-	fprintf(stderr, "Error in line %d: ", yylineno);
-	fprintf(stderr, "\"%s\"\n",s);
-	exit(3);
-}
-
 int main(void) {
+
+	extern FILE *yyin, *yyout; 
+  
+    yyin = fopen("test.c", "r"); 
+
+	yyout = fopen("result.txt", "w");
+
+	initialize();
 
 	yyparse();
 
 	// execute(astTree);
 
-	// ast_tree_free(astTree);
+	finalize();
 
 	return 0;
 }

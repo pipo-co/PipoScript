@@ -7,7 +7,7 @@ typedef struct SymbolTableCDT {
 } SymbolTableCDT;
 
 
-static SymbolNode * new_symbol_node(char *name, int type, SymbolValue value);
+static SymbolNode * new_symbol_node(char *name, int type);
 
 
 SymbolTable symbol_table_create() {
@@ -17,21 +17,21 @@ SymbolTable symbol_table_create() {
     return st;
 }
 
-SymbolNode * symbol_table_add(SymbolTable st, char *name, int type, SymbolValue value) {
+SymbolNode * symbol_table_add(SymbolTable st, char *name, int type) {
 
-    SymbolNode *node = new_symbol_node(name, type, value);
+    SymbolNode *node = new_symbol_node(name, type);
 
-    st->sym[node->name[0]] = node;
+    st->sym[(int)node->name[0] - 'a'] = node;
 
     return node;
 }
 
 SymbolNode * symbol_table_get(SymbolTable st, char* name) {
 
-    return st->sym[name[0]];
+    return st->sym[(int)name[0] - 'a'];
 }
 
-SymbolNode * symbol_table_free(SymbolTable st) {
+void symbol_table_free(SymbolTable st) {
 
     for(int i = 0; i < SYMBOL_TABLE_SIZE; i++) {
         if(st->sym[i] != NULL)
@@ -41,13 +41,12 @@ SymbolNode * symbol_table_free(SymbolTable st) {
     free(st);
 }
 
-static SymbolNode * new_symbol_node(char *name, int type, SymbolValue value) {
+static SymbolNode * new_symbol_node(char *name, int type) {
 
     SymbolNode *node = emalloc(sizeof(*node));
 
     node->name = name;
     node->type = type;
-    node->value = value;
 
     return node;
 }

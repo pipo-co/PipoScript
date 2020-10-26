@@ -22,11 +22,11 @@ typedef struct SymbolNode {
 
 SymbolTable symbol_table_create();
 
-SymbolNode * symbol_table_add(SymbolTable st, char *name, int type, SymbolValue value);
+SymbolNode * symbol_table_add(SymbolTable st, char *name, int type);
 
 SymbolNode * symbol_table_get(SymbolTable st, char* name);
 
-SymbolNode * symbol_table_free(SymbolTable st);
+void symbol_table_free(SymbolTable st);
 
 
 #endif
