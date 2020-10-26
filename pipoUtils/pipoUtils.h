@@ -8,4 +8,6 @@ void * emalloc(size_t size);
 
 void * ecalloc(size_t n, size_t size);
 
+void print_and_abort(char *message);
+
 #endif

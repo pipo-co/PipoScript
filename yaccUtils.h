@@ -21,16 +21,10 @@ AstNode *astTree;
 SymbolTable globalSt;
 
 
-
 void yyerror(char const *s);
 
 void initialize(void);
 
 void finalize();
-
-void assign_symbol(SymbolNode *symbol, AstNode *valueTree);
-
-AstNode * create_inc_assignment_node(SymbolNode *symbol);
-AstNode * create_dec_assignment_node(SymbolNode *symbol);
 
 #endif

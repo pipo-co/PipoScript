@@ -21,51 +21,61 @@ typedef struct AstNode {
 typedef struct AstIfNode {
   int nodeType;
 
-  struct AstNode * condition;
+  AstNode * condition;
 
-  struct AstNode * ifBranch;
+  AstNode * ifBranch;
 
-  struct AstNode * elseBranch;
+  AstNode * elseBranch;
 } AstIfNode;
 
 typedef struct AstWhileNode {
   int nodeType;
 
-  struct AstNode * condition;
+  AstNode * condition;
 
-  struct AstNode * whileBranch;
+  AstNode * whileBranch;
 } AstWhileNode;
 
 typedef struct AstForNode {
   int nodeType;
 
-  struct AstNode * firstAssignment;
+  AstNode * firstAssignment;
 
-  struct AstNode * condition;
+  AstNode * condition;
 
-  struct AstNode * lastAssignment;
+  AstNode * lastAssignment;
 
-  struct AstNode * forBranch;
+  AstNode * forBranch;
 } AstForNode;
 
 typedef struct AstSymbolReferenceNode {
   int nodeType;
   
-  SymbolNode * symbol;
+  char *symbolName;
 } AstSymbolReferenceNode;
 
 typedef struct AstAssignmentNode {
   int nodeType;
 
-  struct SymbolNode * symbol;
+  char *symbolName;
 
-  struct AstNode * value;
+  AstNode * value;
 } AstAssignmentNode;
+
+typedef struct AstDeclarationNode {
+  int nodeType;
+
+  int type;
+
+  char *symbolName;
+
+  AstNode * value;
+} AstDeclarationNode;
 
 typedef struct AstIntNode {
   int nodeType;
 
-  double value;
+  int value;
 } AstIntNode;
 
 typedef struct AstStringNode {
@@ -74,11 +84,15 @@ typedef struct AstStringNode {
   char *value;
 } AstStringNode;
 
+void initialize_ast_node_functions();
+
+AstNode * execute_ast_tree(AstNode *root, SymbolTable st);
+
 void free_ast_tree(AstNode *root);
 
 AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right);
 
-AstNode * new_ast_symbol_reference_node(SymbolNode * symbol);
+AstNode * new_ast_symbol_reference_node(char *symbolName);
 
 AstNode * new_ast_if_node (AstNode * condition, AstNode * ifBranch, AstNode * elseBranch);
 
@@ -86,7 +100,11 @@ AstNode * new_ast_while_node(int nodeType, AstNode * condition, AstNode * whileB
 
 AstNode * new_ast_for_node(AstNode *firstAssignment, AstNode *condition, AstNode *lastAssignment, AstNode *forBranch);
 
-AstNode * new_ast_assignment_node(SymbolNode * symbol, AstNode * value);
+AstNode * new_ast_declaration_node(int type, char *symbolName, AstNode *value);
+
+AstNode * new_ast_assignment_node(char *symbolName, AstNode *value);
+
+AstNode * new_ast_inc_dec_assignment_node(int type, char *symbolName);
 
 AstNode * new_ast_int_node(int value);
 

@@ -43,7 +43,7 @@ void symbol_table_free(SymbolTable st) {
 
 static SymbolNode * new_symbol_node(char *name, int type) {
 
-    SymbolNode *node = emalloc(sizeof(*node));
+    SymbolNode *node = ecalloc(1, sizeof(*node));
 
     node->name = name;
     node->type = type;

@@ -19,6 +19,8 @@
 
 %error-verbose
 
+%token <operation> FIRST
+
 %token <symbol> ID
 
 %token <intValue> INT_LITERAL
@@ -49,6 +51,10 @@
 %type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE 
 
 %type <operation> ID_TYPES FUNCTION_TYPES
+
+%token DECLARATION
+
+%token LAST
 
 %start P
 
@@ -87,10 +93,10 @@ BLOCK
 
 if_statement
 	: IF '(' NUM ')' BLOCK %prec IFX
-								{ $$ = new_ast_if_node ($3, $5, NULL); }
+								{ $$ = new_ast_if_node($3, $5, NULL); }
 
 	| IF '(' NUM ')' BLOCK ELSE BLOCK
-								{ $$ = new_ast_if_node ($3, $5, $7); }
+								{ $$ = new_ast_if_node($3, $5, $7); }
 	;
 
 iteration_statement
@@ -110,13 +116,8 @@ return_statement
 	;
 
 declaration_statement
-	: ID_TYPES ID ';'			{ symbol_table_add(globalSt, $2, $1); $$ = NULL; }
-	| ID_TYPES ID '=' VALUE ';'	{ 
-									SymbolNode *symbol = symbol_table_add(globalSt, $2, $1);
-									assign_symbol(symbol, $4);
-									// TODO: get synthetized value
-									$$ = new_ast_assignment_node(symbol, $4);
-								 }
+	: ID_TYPES ID ';'			{ $$ = new_ast_declaration_node($1, $2, NULL); }
+	| ID_TYPES ID '=' VALUE ';'	{ $$ = new_ast_declaration_node($1, $2, $4);}
 	;
 
 assignment_statement
@@ -124,30 +125,14 @@ assignment_statement
 	;
 
 ASSIGNMENT
-	: ID '=' VALUE				{ 
-									SymbolNode *symbol = symbol_table_get(globalSt, $1);
-									assign_symbol(symbol, $3);
-									// TODO: get synthetized value
-									$$ = new_ast_assignment_node(symbol, $3);
-								}
-	| ID INC					{ 
-									SymbolNode *symbol = symbol_table_get(globalSt, $1);
-									$$ = create_inc_assignment_node(symbol); 
-								}
-	| ID DEC					{ 
-									SymbolNode *symbol = symbol_table_get(globalSt, $1);
-									$$ = create_dec_assignment_node(symbol); 
-								}
+	: ID '=' VALUE				{ $$ = new_ast_assignment_node($1, $3);}
+	| ID INC					{ $$ = new_ast_inc_dec_assignment_node($2, $1);}
+	| ID DEC					{ $$ = new_ast_inc_dec_assignment_node($2, $1);}
 	;
 
 DO_ASSIGNMENT
 	: ASSIGNMENT				{ $$ = $1; }
-	| ID_TYPES ID '=' VALUE		{ 
-									SymbolNode *symbol = symbol_table_add(globalSt, $2, $1);
-									assign_symbol(symbol, $4);
-									// TODO: get synthetized value
-									$$ = new_ast_assignment_node(symbol, $4);
-								 }
+	| ID_TYPES ID '=' VALUE		{ $$ = new_ast_declaration_node($1, $2, $4);}
 	|							{ $$ = NULL; }
 	;
         
@@ -170,7 +155,7 @@ ARITH
 	;
 
 NUM
-	: ID						{ $$ = new_ast_symbol_reference_node(symbol_table_get(globalSt, $1)); }
+	: ID						{ $$ = new_ast_symbol_reference_node($1); }
 	| NON_ID_NUM				{ $$ = $1; }
 	;
 
@@ -180,7 +165,7 @@ NON_ID_NUM
 	;
 
 VALUE
-	: ID						{ $$ = new_ast_symbol_reference_node(symbol_table_get(globalSt, $1)); }
+	: ID						{ $$ = new_ast_symbol_reference_node($1); }
 	| STRING_LITERAL			{ $$ = new_ast_string_node($1); }
 	| NON_ID_NUM				{ $$ = $1; }
 	;
@@ -200,17 +185,17 @@ FUNCTION_TYPES
 
 int main(void) {
 
-	extern FILE *yyin, *yyout; 
+	// extern FILE *yyin, *yyout; 
   
-    yyin = fopen("test.c", "r"); 
+    // yyin = fopen("test.c", "r");
 
-	yyout = fopen("result.txt", "w");
+	// yyout = fopen("result.txt", "w");
 
 	initialize();
 
 	yyparse();
 
-	// execute(astTree);
+	execute_ast_tree(astTree, globalSt);
 
 	finalize();
 
