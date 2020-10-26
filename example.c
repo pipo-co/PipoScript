@@ -30,6 +30,7 @@ int main(int argc, char const *argv[]) {
     // Tag div2 = new_tag "div";
     tag_t *div = newTag("div");
 
+    putAttribute(div, "id", "div-id");
     // String s = "h";
     char * s = "h";
 
@@ -62,7 +63,7 @@ int main(int argc, char const *argv[]) {
         putAttribute(aux_title, "id", joinStrings("id-", itoa2(i)));
 
         putAttribute(aux_title, "color", i % 2 == 0? "red":"blue");
-        // append_child_to div = aux_title;
+        // // append_child_to div = aux_title;
         appendTag(div, aux_title);
 
         // i++;

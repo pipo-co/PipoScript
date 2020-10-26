@@ -4,21 +4,24 @@
 #include "mm.h"
 
 
-MemoryManagerHeader mm;
+MemoryManagerHeader mm_tag;
+MemoryManagerHeader mm_tag_node;
 
 
 void tag_service_init() {
-    mm = memory_manager_init(freeTag);
+    mm_tag = memory_manager_init(freeTag);
+    mm_tag_node = memory_manager_init(free);
 }
 
 
 void tag_service_fin() {
-    memory_manager_free_all(&mm);
+    memory_manager_free_all(&mm_tag);
+    memory_manager_free_all(&mm_tag_node);
 }
 
 tag_t *newTag(char *name) {
     
-    tag_t *t = memory_manager_alloc(&mm, sizeof(*t));
+    tag_t *t = memory_manager_alloc(&mm_tag, sizeof(*t));
     t->name = name;
     t->attributes = kh_init(att);
     t->body = NULL;
@@ -29,7 +32,7 @@ tag_t *newTag(char *name) {
 
 void appendTag(tag_t *parent, tag_t *child) {
 
-    tag_node_t * newNode = memory_manager_alloc(&mm,sizeof(tag_node_t));
+    tag_node_t * newNode = memory_manager_alloc(&mm_tag_node, sizeof(tag_node_t));
     newNode->tag = child;
     newNode->next = NULL;
 
@@ -41,10 +44,26 @@ void appendTag(tag_t *parent, tag_t *child) {
 }
 
 int putAttribute(tag_t *tag, char *attributeName, char *attributeValue){
-    int ret;
-    khiter_t k = kh_put(att, tag->attributes, attributeName, &ret);  // Obtengo el puntero par la llave "attributeName"
-    kh_value(tag->attributes, k) = attributeValue;  // Asigno el valor "attributeValue" a la llave anterior          
-    return ret;              
+    khiter_t k;
+    int ret, flag = 1;
+
+    for (k = kh_begin(tag->attributes); flag && k != kh_end(tag->attributes); ++k)
+        if (kh_exist(tag->attributes, k) && !strcmp((char *) kh_key(tag->attributes, k), (char *) attributeName))
+            flag = 0;
+            
+    
+    if(flag){
+        khiter_t k = kh_put(att, tag->attributes, attributeName, &ret);  // Obtengo el puntero par la llave "attributeName"
+        kh_value(tag->attributes, k) = attributeValue;  // Asigno el valor "attributeValue" a la llave anterior             
+        return ret;      
+    }
+    else
+    {
+        kh_value(tag->attributes, k - 1) = attributeValue;
+        return 0;
+    }
+    
+    return -1;        
 }
 
 char *getAttribute(tag_t *tag, const char *attributeName){
@@ -104,18 +123,27 @@ void renderAttributes(tag_t *t){
 
 
     for (k = kh_begin(t->attributes); k != end; ++k){
-        attribute = kh_key(t->attributes, k);
+        
+        if(kh_exist(t->attributes, k)){
+            attribute = kh_key(t->attributes, k);
         //Por alguna razon se asigna a cualquier valor dentro del hash y arranca en 4 por lo que todos los del medio quedan en null
         //habria que probar usar el foreach de khash
-        if(attribute != NULL)
             printf(" %s=\"%s\"", attribute, getAttribute(t, attribute));
+        }
     }
 }
 
 void freeTag(void * ptr){
 
     tag_t * t = (tag_t *) ptr;
-
+    
+    if(t == NULL)
+        return;
+    printf("Destroying attributes\n");
+    renderAttributes(t);
+    putchar('\n');
+    //kh_clear(att, t->attributes);
     kh_destroy(att, t->attributes);
+    printf("Finished destroying\n");
     free(ptr);
 }

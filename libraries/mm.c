@@ -6,7 +6,7 @@ MemoryManagerHeader memory_manager_init(NodeFreer freer){
     MemoryManagerHeader mm;
     mm.first = NULL;
     mm.last = NULL;
-    mm.freer = free;
+    mm.freer = freer;
 
     return mm;
 }
