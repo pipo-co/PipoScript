@@ -58,7 +58,10 @@ int main(int argc, char const *argv[]) {
             // set body from aux_title = call joinString("Titulo par", call intToString(i));
             aux_title->body = joinStrings("Titulo impar", itoa2(i));
         }
-        
+
+        putAttribute(aux_title, "id", joinStrings("id-", itoa2(i)));
+
+        putAttribute(aux_title, "color", i % 2 == 0? "red":"blue");
         // append_child_to div = aux_title;
         appendTag(div, aux_title);
 
