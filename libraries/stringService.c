@@ -9,7 +9,7 @@
 static MemoryManagerHeader mm;
 
 void string_service_init() {
-    mm = memory_manager_init();
+    mm = memory_manager_init(free);
 }
 
 void string_service_fin() {
