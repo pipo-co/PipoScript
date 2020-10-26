@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 
+typedef void (*NodeFreer)(void *);
 typedef struct MemoryManagerNode{
     void *ptr;
     struct MemoryManagerNode * next;
@@ -11,14 +12,15 @@ typedef struct MemoryManagerNode{
 typedef struct MemoryManagerHeader{
     struct MemoryManagerNode * first;
     struct MemoryManagerNode * last;
+    NodeFreer freer;
 } MemoryManagerHeader;
 
-MemoryManagerHeader memory_manager_init();
+MemoryManagerHeader memory_manager_init(NodeFreer freer);
 
 void *memory_manager_alloc(MemoryManagerHeader *mm, size_t size);
 
 void memory_manager_free_all(MemoryManagerHeader *mm);
 
-void memory_manager_free_node(MemoryManagerNode *n);
+void memory_manager_free_node(MemoryManagerNode *n, NodeFreer freer);
 
 #endif

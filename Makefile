@@ -13,6 +13,6 @@ all:
 	gcc lex.yy.c y.tab.c $(LIBS_TOBI) -ll $(CCFLAGS) 
 
 test: $(SOURCES) 
-	$(CC) $(CCFLAGS) example.c -o example $^ -I $(LIB_PATH)
+	$(CC) $(CCFLAGS_PICHI) example.c -o example $^ -I $(LIB_PATH)
 	./example > example.html
 	rm example
