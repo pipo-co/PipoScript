@@ -131,16 +131,16 @@ AstNode * new_ast_string_node(char *value) {
 
 #include "astNodeFunctions.c"
 
-AstNode * execute_ast_tree(AstNode *root, SymbolTable st) {
-
-    if(root == NULL)
-        return NULL;
-
-    int nodeType = root->nodeType;
-
-    return nodeProcessors[AST_OP_POSITION(nodeType)](root, st);
+void execute_ast_tree(AstNode *tree, SymbolTable st) {
+    execute_ast_node(tree, st);
 }
 
-void free_ast_tree(AstNode *root) {
-    return;
+void free_ast_tree(AstNode *node) {
+
+    if(node == NULL)
+        return;
+
+    int nodeType = node->nodeType;
+
+    astNodeFunctions[AST_OP_POSITION(nodeType)].destroyer(node);
 }

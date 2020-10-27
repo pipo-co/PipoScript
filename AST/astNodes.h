@@ -86,7 +86,7 @@ typedef struct AstStringNode {
 
 void initialize_ast_node_functions();
 
-AstNode * execute_ast_tree(AstNode *root, SymbolTable st);
+void execute_ast_tree(AstNode *tree, SymbolTable st);
 
 void free_ast_tree(AstNode *root);
 

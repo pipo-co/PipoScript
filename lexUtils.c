@@ -16,9 +16,11 @@ void multiLineComment(int (*input)(void)) {
 }
 
 char * lex_copy_string(char* string, int len) {
+
     char *ans = (char*)emalloc(sizeof(*ans)*len + 1);
 
-    strncpy(ans, string, len + 1);
+    strncpy(ans, string, len);
+	ans[len] = 0;
 
     return ans;
 }

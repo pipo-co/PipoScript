@@ -29,7 +29,7 @@ HEX				[a-fA-F0-9]
 {LETTER}({LETTER}|{DIGIT})*		{ yylval.symbol = lex_copy_string(yytext, yyleng); return ID; }
 
 0|[1-9]{DIGIT}*					{ yylval.intValue = atoi(yytext); return INT_LITERAL; }
-\"(\\.|[^\\"\n])*\"				{ yylval.stringValue = lex_copy_string(yytext, yyleng); return STRING_LITERAL; }
+\"(\\.|[^\\"\n])*\"				{ yylval.stringValue = lex_copy_string(yytext + 1, yyleng - 2); return STRING_LITERAL; }
 
 
 ">>"							{ yylval.operation = RIGHT; return RIGHT; }
