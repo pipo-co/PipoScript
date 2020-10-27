@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// Function to call before exiting with errors
+extern void finalize(void);
+
 void * emalloc(size_t size);
 
 void * ecalloc(size_t n, size_t size);

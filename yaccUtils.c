@@ -4,6 +4,8 @@ void yyerror(char const *s) {
 
 	fprintf(stderr, "Error in line %d: ", yylineno);
 	fprintf(stderr, "\"%s\"\n",s);
+
+	finalize();
 	exit(3);
 }
 

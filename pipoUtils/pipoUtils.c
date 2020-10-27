@@ -25,5 +25,5 @@ void * ecalloc(size_t n, size_t size) {
 void print_and_abort(char *message) {
 
     fprintf(stderr, "%s\n", message);
-    abort();
+    finalize();
 }
