@@ -117,7 +117,7 @@ return_statement
 
 declaration_statement
 	: ID_TYPES ID ';'			{ $$ = new_ast_declaration_node($1, $2, NULL); }
-	| ID_TYPES ID '=' VALUE ';'	{ $$ = new_ast_declaration_node($1, $2, $4);}
+	| ID_TYPES ID '=' VALUE ';'	{ $$ = new_ast_declaration_node($1, $2, $4); }
 	;
 
 assignment_statement
@@ -125,14 +125,14 @@ assignment_statement
 	;
 
 ASSIGNMENT
-	: ID '=' VALUE				{ $$ = new_ast_assignment_node($1, $3);}
-	| ID INC					{ $$ = new_ast_inc_dec_assignment_node($2, $1);}
-	| ID DEC					{ $$ = new_ast_inc_dec_assignment_node($2, $1);}
+	: ID '=' VALUE				{ $$ = new_ast_assignment_node($1, $3); }
+	| ID INC					{ $$ = new_ast_inc_dec_assignment_node($2, $1); }
+	| ID DEC					{ $$ = new_ast_inc_dec_assignment_node($2, $1); }
 	;
 
 DO_ASSIGNMENT
 	: ASSIGNMENT				{ $$ = $1; }
-	| ID_TYPES ID '=' VALUE		{ $$ = new_ast_declaration_node($1, $2, $4);}
+	| ID_TYPES ID '=' VALUE		{ $$ = new_ast_declaration_node($1, $2, $4); }
 	|							{ $$ = NULL; }
 	;
         

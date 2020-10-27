@@ -1,6 +1,6 @@
 # PipoScript
 
-## C Interpreter using Lex and Yacc to create dynamic HTML from custom syntax
+## C Compiler using Lex and Yacc to create HTML from custom syntax
 
 Todo List:
 
