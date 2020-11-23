@@ -7,6 +7,8 @@
 #include "../pipoUtils/pipoUtils.h"
 #include "../symbolTable/symbolTable.h"
 
+#define MAX_FUNC_ARGS 30
+
 // Generic AstNode
 typedef struct AstNode {
   int nodeType;
@@ -79,6 +81,43 @@ typedef struct AstDeclarationNode {
   AstNode * value;
 } AstDeclarationNode;
 
+typedef struct AstFunctionArgNode {
+
+  int type;
+  char* symbolName;
+  AstNode *value;
+
+  struct AstFunctionArgNode *next;
+} AstFunctionArgNode;
+typedef struct AstFunctionArgList {
+
+  AstFunctionArgNode *first;
+  AstFunctionArgNode *last;
+  int argCount;
+  
+} AstFunctionArgList;
+
+typedef struct AstFunctionDeclarationNode {
+  int nodeType;
+  int lineno;
+
+  int returnType;
+  char *functionName;
+
+  AstFunctionArgList *args;
+
+  AstNode * block;
+} AstFunctionDeclarationNode;
+
+typedef struct AstFunctionCallNode {
+  int nodeType;
+  int lineno;
+
+  char *functionName;
+  AstFunctionArgList *args;
+
+} AstFunctionCallNode;
+
 typedef struct AstIntNode {
   int nodeType;
   int lineno;
@@ -119,6 +158,17 @@ AstNode * new_ast_int_node(int value, int lineno);
 
 AstNode * new_ast_string_node(char *value, int lineno);
 
+AstNode * new_ast_function_declaration_node(int returnType, char *name, AstFunctionArgList *args, AstNode *block, int lineno);
 
+AstNode * new_ast_function_call_node(char *name, AstFunctionArgList *args, int lineno);
+
+// Function Auxiliary Functions
+AstFunctionArgList *ast_create_function_arg_list();
+
+AstFunctionArgNode * ast_add_function_arg_declaration(AstFunctionArgList *list, int type, char* name);
+
+AstFunctionArgNode * ast_add_function_arg_value(AstFunctionArgList *list, AstNode *value);
+
+void ast_free_function_arg_list(AstFunctionArgList *list);
 
 #endif

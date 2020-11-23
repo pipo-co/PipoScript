@@ -286,6 +286,73 @@ static void ast_symbol_reference_node_destroyer(AstNode *node) {
     free(symbolRefNode);
 }
 
+static AstOpProcessorReturnNode * ast_function_declaration_node_destroyer(AstNode *node, SymbolTable st) {
+    AstFunctionDeclarationNode * declarationNode = (AstSymbolReferenceNode*) node;
+
+    free(declarationNode->functionName);
+
+    ast_free_function_arg_list(declarationNode->args);
+
+    free_ast_tree(declarationNode->block);
+}
+
+static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node, SymbolTable st) {
+    AstFunctionCallNode * callNode = (AstSymbolReferenceNode*) node;
+
+    AstFunctionDeclarationNode *declarationNode; // Function Symbol Table
+    // AstFunctionDeclarationNode *declarationNode = function_symbol_table_get(callNode->functionName);
+
+    if(declarationNode->args->argCount != callNode->args->argCount)
+        print_lineno_and_abort("Function call with invalid argument count", node->lineno);
+
+    SymbolTable functionST = symbol_table_create();
+
+    AstFunctionArgNode *iterCall = callNode->args->first;
+    AstFunctionArgNode *iterDecl = declarationNode->args->first;
+
+    SymbolValue value;
+
+    for(int i = 0; i < declarationNode->args->argCount; i++) {
+
+        if(iterDecl->type == INT)
+            value.intValue = ast_node_get_int_return_val(execute_ast_node(iterCall->value, st), "Type mismatch on function arguments. Was expecting an int.", node->lineno);
+        
+
+        else if(iterDecl->type == STRING)
+            value.intValue = ast_node_get_string_return_val(execute_ast_node(iterCall->value, st), "Type mismatch on function arguments. Was expecting a string.", node->lineno);
+
+        else
+            print_lineno_and_abort("Invalid function argument type", node->lineno);
+
+        SymbolNode *symbolNode = symbol_table_add(functionST, iterDecl->symbolName, iterDecl->type);
+        symbolNode->value = value;
+
+        iterCall = iterCall->next;
+        iterDecl = iterDecl->next;
+    }
+
+    // Assert
+    if(iterCall != NULL || iterDecl != NULL)
+        print_lineno_and_abort("IterCall or IterDecl weren't null after parsing arguments (assert null)", node->lineno);
+
+    AstOpProcessorReturnNode *returnNode = execute_ast_node(declarationNode->block, functionST);
+
+    symbol_table_free(functionST);
+
+    if(returnNode->returnType != declarationNode->returnType)
+        print_lineno_and_abort("Function return type and actual return value don't match", node->lineno);
+
+    return returnNode;
+}
+
+static AstOpProcessorReturnNode * ast_function_call_node_destroyer(AstNode *node, SymbolTable st) {
+    AstFunctionCallNode * callNode = (AstSymbolReferenceNode*) node;
+
+    free(callNode->functionName);
+
+    ast_free_function_arg_list(callNode->args);
+}
+
 static AstOpProcessorReturnNode * ast_statement_list_node_processor(AstNode *node, SymbolTable st) {
 
     // Execute statement recursion to find first statement
@@ -492,6 +559,12 @@ void initialize_ast_node_functions() {
 
     astNodeFunctions[AST_OP_POSITION(ID)].processor = ast_symbol_reference_node_processor;
     astNodeFunctions[AST_OP_POSITION(ID)].destroyer = ast_symbol_reference_node_destroyer;
+
+    // Doesn't have processor
+    astNodeFunctions[AST_OP_POSITION(FUNCTION_DECLARATION_CONST)].destroyer = ast_function_declaration_node_destroyer;
+
+    astNodeFunctions[AST_OP_POSITION(FUNCTION_CALL_CONST)].processor = ast_function_call_node_processor;
+    astNodeFunctions[AST_OP_POSITION(FUNCTION_CALL_CONST)].destroyer = ast_function_call_node_destroyer;
 
     astNodeFunctions[AST_OP_POSITION(STATEMENT_LIST_CONST)].processor = ast_statement_list_node_processor;
     astNodeFunctions[AST_OP_POSITION(STATEMENT_LIST_CONST)].destroyer = ast_node_destroyer;

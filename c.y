@@ -45,11 +45,11 @@
 
 %nonassoc IFX
 %nonassoc ELSE
-%nonassoc STATEMENT_LIST_CONST
+%nonassoc STATEMENT_LIST_CONST FUNCTION_DECLARATION_CONST FUNCTION_CALL_CONST FUNCTION_DEFINITION_LIST_CONST
 
 %type <astNode> STATEMENT_LIST STATEMENT BLOCK if_statement iteration_statement return_statement declaration_statement
 %type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE 
-%type <astNode> FUNCTION_DEFINITION_LIST FUNCTION_DEFINITION FUNC_DECLARATION_ARG_LIST FUNC_ARG_LIST function_call_statement
+%type <astNode> FUNCTION_DEFINITION FUNC_DECLARATION_ARG_LIST FUNC_ARG_LIST function_call_statement
 
 %type <operation> ID_TYPE FUNCTION_RETURN_TYPE
 
@@ -66,7 +66,6 @@ P
 		{ 
 			if(yychar == YYEOF) {
 				printf("Input accepted\n");
-			 	astTree = $1;
 			}
 			else
 				yyerror("Unexpected end of program");
@@ -74,8 +73,8 @@ P
 	;
 
 FUNCTION_DEFINITION_LIST
-	: FUNCTION_DEFINITION_LIST FUNCTION_DEFINITION	{ $$ = NULL; }
-	|												{ $$ = NULL; }
+	: FUNCTION_DEFINITION_LIST FUNCTION_DEFINITION
+	|
 	;
 
 STATEMENT_LIST
@@ -89,12 +88,15 @@ STATEMENT
 	| return_statement			{ $$ = $1; }
 	| declaration_statement		{ $$ = $1; }
 	| assignment_statement		{ $$ = $1; }
-	| function_call_statement	{ $$ = NULL; }
+	| function_call_statement	{ $$ = $1; }
 	;
 
 FUNCTION_DEFINITION
-	: FUNCTION_RETURN_TYPE ID '(' FUNC_DECLARATION_ARG_LIST ')' '{' STATEMENT_LIST '}'	{ $$ = NULL; }
-	| FUNCTION_RETURN_TYPE ID '(' ')' '{' STATEMENT_LIST '}'							{ $$ = NULL; }
+	: FUNCTION_RETURN_TYPE ID '(' FUNC_DECLARATION_ARG_LIST ')' '{' STATEMENT_LIST '}'	
+								{ $$ = new_ast_function_declaration_node($1, $2, $4, $7, yylineno); }
+
+	| FUNCTION_RETURN_TYPE ID '(' ')' '{' STATEMENT_LIST '}'							
+								{ $$ = new_ast_function_declaration_node($1, $2, NULL, $6, yylineno); }
 	;
 
 BLOCK    	
@@ -137,8 +139,11 @@ assignment_statement
 	;
 
 function_call_statement
-	: ID '(' FUNC_ARG_LIST ')' ';'	{ $$ = NULL; }
-	| ID '(' ')' ';'				{ $$ = NULL; }
+	: ID '(' FUNC_ARG_LIST ')' ';'	
+								{ $$ = new_ast_function_call_node($1, $2, yylineno); }
+
+	| ID '(' ')' ';'
+								{ $$ = new_ast_function_call_node($1, NULL, yylineno); }
 	;
 
 ASSIGNMENT
@@ -154,13 +159,30 @@ DO_ASSIGNMENT
 	;
 
 FUNC_DECLARATION_ARG_LIST
-	: ID_TYPE ID ',' FUNC_DECLARATION_ARG_LIST	{ $$ = NULL; }
-	| ID_TYPE ID								{ $$ = NULL; }
+	: FUNC_DECLARATION_ARG_LIST ',' ID_TYPE ID 	
+								{ 
+								  ast_add_function_arg_declaration($1, $3, $4);
+								  $$ = $1;  
+								}
+
+	| ID_TYPE ID				{ 
+								  AstFunctionArgList *list = ast_create_function_arg_list();
+								  ast_add_function_arg_declaration(list, $1, $2);
+								  $$ = list;  
+								}
 	;
 
 FUNC_ARG_LIST
-	: VALUE ',' FUNC_ARG_LIST	{ $$ = NULL; }
-	| VALUE						{ $$ = NULL; }
+	: FUNC_ARG_LIST ',' VALUE  	{ 
+								  ast_add_function_arg_value($1, $3);
+								  $$ = $1;  
+								}
+
+	| VALUE						{ 
+								  AstFunctionArgList *list = ast_create_function_arg_list();
+								  ast_add_function_arg_value(list, $1);
+								  $$ = list;  
+								}
 	;
         
 ARITH

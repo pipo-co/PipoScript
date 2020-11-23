@@ -139,6 +139,106 @@ AstNode * new_ast_string_node(char *value, int lineno) {
     return (AstNode *) astNode;
 }
 
+AstNode * new_ast_function_declaration_node(int returnType, char *name, AstFunctionArgList *args, AstNode *block, int lineno) {
+
+    AstFunctionDeclarationNode * astNode = emalloc(sizeof(*astNode));
+
+    astNode->nodeType = FUNCTION_DECLARATION_CONST;
+    astNode->lineno = lineno;
+
+    astNode->returnType = returnType;
+    astNode->functionName = name;
+    astNode->args = args;
+    astNode->block = block;
+
+    return (AstNode *) astNode;
+}
+
+AstNode * new_ast_function_call_node(char *name, AstFunctionArgList *args, int lineno) {
+
+    AstFunctionDeclarationNode * astNode = emalloc(sizeof(*astNode));
+
+    astNode->nodeType = FUNCTION_CALL_CONST;
+    astNode->lineno = lineno;
+
+    astNode->functionName = name;
+    astNode->args = args;
+
+    return (AstNode *) astNode;
+}
+
+AstFunctionArgList *ast_create_function_arg_list() {
+
+    AstFunctionArgList *list = emalloc(sizeof(*list));
+
+    list->argCount = 0;
+    list->first = NULL;
+    list->last = NULL;
+
+    return list;
+}
+
+AstFunctionArgNode * ast_add_function_arg_declaration(AstFunctionArgList *list, int type, char* name) {
+
+    AstFunctionArgNode *node = emalloc(sizeof(*node));
+
+    node->symbolName = name;
+    node->type = type;
+    node->next = NULL;
+
+    if(list->first == NULL) {
+        list->first = node;
+        list->last = node;
+    }
+
+    else {
+        list->last->next = node;
+        list->last = node;
+    }
+
+    list->argCount++;
+
+    return node;
+}
+
+AstFunctionArgNode * ast_add_function_arg_value(AstFunctionArgList *list, AstNode *value) {
+
+    AstFunctionArgNode *node = emalloc(sizeof(*node));
+
+    node->value = value;
+    node->next = NULL;
+
+    if(list->first == NULL) {
+        list->first = node;
+        list->last = node;
+    }
+
+    else {
+        list->last->next = node;
+        list->last = node;
+    }
+
+    list->argCount++;
+
+    return node;
+
+}
+
+void ast_free_function_arg_list(AstFunctionArgList *list) {
+
+    AstFunctionArgNode *iter = list->first;
+    AstFunctionArgNode *next;
+
+    while(iter != NULL) {
+
+        next = iter->next;
+        free(iter);
+        iter = next;
+    }
+
+    free(list);
+}
+
 #include "astNodeFunctions.c"
 
 void execute_ast_tree(AstNode *tree, SymbolTable st) {
