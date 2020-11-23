@@ -132,6 +132,10 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
 
     SymbolNode *symbol = symbol_table_add(st, declarationNode->symbolName, declarationNode->type);
 
+    if(symbol == NULL){
+        print_lineno_and_abort("Symbol already declared", node->lineno);
+    }
+
     if(declarationNode->value != NULL) {
         AstOpProcessorReturnNode *valueNode = execute_ast_node(declarationNode->value, st);
 
@@ -160,7 +164,7 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
 static void ast_declaration_node_destroyer(AstNode *node) {
     AstDeclarationNode * declarationNode = (AstDeclarationNode*) node;
 
-    free(declarationNode->symbolName);
+    // STRINGFREE free(declarationNode->symbolName);
     free_ast_tree(declarationNode->value);
 
     free(declarationNode);
@@ -203,7 +207,7 @@ static void ast_assignment_node_destroyer(AstNode *node) {
     AstAssignmentNode * assignmentNode = (AstAssignmentNode*) node;
 
     free_ast_tree(assignmentNode->value);
-    free(assignmentNode->symbolName);
+    // STRINGFREE free(assignmentNode->symbolName);
 
     free(assignmentNode);
 }
@@ -257,7 +261,7 @@ static AstOpProcessorReturnNode * ast_string_node_processor(AstNode *node, Symbo
 static void ast_string_node_destroyer(AstNode *node) {
     AstStringNode * stringNode = (AstStringNode*) node;
 
-    free(stringNode->value);
+    // STRINGFREE free(stringNode->value);
 
     free(stringNode);
 }
@@ -288,7 +292,7 @@ static AstOpProcessorReturnNode * ast_symbol_reference_node_processor(AstNode *n
 static void ast_symbol_reference_node_destroyer(AstNode *node) {
     AstSymbolReferenceNode * symbolRefNode = (AstSymbolReferenceNode*) node;
 
-    free(symbolRefNode->symbolName);
+    // STRINGFREE symbolRefNode->symbolName);
 
     free(symbolRefNode);
 }
