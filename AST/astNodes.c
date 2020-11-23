@@ -242,9 +242,6 @@ void ast_free_function_arg_list(AstFunctionArgList *list) {
 
         next = iter->next;
 
-        if(iter->symbolName != NULL)
-            free(iter->symbolName);
-
         if(iter->value != NULL)
             free_ast_tree(iter->value);
 

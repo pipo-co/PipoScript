@@ -164,7 +164,6 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
 static void ast_declaration_node_destroyer(AstNode *node) {
     AstDeclarationNode * declarationNode = (AstDeclarationNode*) node;
 
-    // STRINGFREE free(declarationNode->symbolName);
     free_ast_tree(declarationNode->value);
 
     free(declarationNode);
@@ -207,7 +206,6 @@ static void ast_assignment_node_destroyer(AstNode *node) {
     AstAssignmentNode * assignmentNode = (AstAssignmentNode*) node;
 
     free_ast_tree(assignmentNode->value);
-    // STRINGFREE free(assignmentNode->symbolName);
 
     free(assignmentNode);
 }
@@ -261,8 +259,6 @@ static AstOpProcessorReturnNode * ast_string_node_processor(AstNode *node, Symbo
 static void ast_string_node_destroyer(AstNode *node) {
     AstStringNode * stringNode = (AstStringNode*) node;
 
-    // STRINGFREE free(stringNode->value);
-
     free(stringNode);
 }
 
@@ -292,15 +288,11 @@ static AstOpProcessorReturnNode * ast_symbol_reference_node_processor(AstNode *n
 static void ast_symbol_reference_node_destroyer(AstNode *node) {
     AstSymbolReferenceNode * symbolRefNode = (AstSymbolReferenceNode*) node;
 
-    // STRINGFREE symbolRefNode->symbolName);
-
     free(symbolRefNode);
 }
 
 static void ast_function_declaration_node_destroyer(AstNode *node) {
     AstFunctionDeclarationNode * declarationNode = (AstFunctionDeclarationNode*) node;
-
-    free(declarationNode->functionName);
 
     ast_free_function_arg_list(declarationNode->args);
 
@@ -363,8 +355,6 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
 
 static void ast_function_call_node_destroyer(AstNode *node) {
     AstFunctionCallNode * callNode = (AstFunctionCallNode*) node;
-
-    free(callNode->functionName);
 
     ast_free_function_arg_list(callNode->args);
 
