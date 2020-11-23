@@ -7,7 +7,7 @@
 
 typedef struct FunctionSymbolTableCDT * FunctionSymbolTable;
 
-FunctionSymbolTable function_symbol_table_create();
+void function_symbol_table_initialize();
 
 bool function_symbol_table_add(AstFunctionDeclarationNode *functionNode);
 

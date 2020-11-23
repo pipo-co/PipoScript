@@ -14,6 +14,8 @@
 
 	char *symbol;
 
+	AstFunctionArgList *functionArgList;
+
 	AstNode *astNode;
 }
 
@@ -48,8 +50,9 @@
 %nonassoc STATEMENT_LIST_CONST FUNCTION_DECLARATION_CONST FUNCTION_CALL_CONST FUNCTION_DEFINITION_LIST_CONST
 
 %type <astNode> STATEMENT_LIST STATEMENT BLOCK if_statement iteration_statement return_statement declaration_statement
-%type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE 
-%type <astNode> FUNC_DECLARATION_ARG_LIST FUNC_ARG_LIST function_call_statement
+%type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE function_call_statement
+
+%type <functionArgList> FUNC_ARG_LIST FUNC_DECLARATION_ARG_LIST
 
 %type <operation> ID_TYPE FUNCTION_RETURN_TYPE
 
@@ -146,7 +149,7 @@ assignment_statement
 
 function_call_statement
 	: ID '(' FUNC_ARG_LIST ')' ';'	
-								{ $$ = new_ast_function_call_node($1, $2, yylineno); }
+								{ $$ = new_ast_function_call_node($1, $3, yylineno); }
 
 	| ID '(' ')' ';'
 								{ $$ = new_ast_function_call_node($1, NULL, yylineno); }
@@ -240,11 +243,11 @@ FUNCTION_RETURN_TYPE
 
 int main(void) {
 
-	// extern FILE *yyin, *yyout; 
+	extern FILE *yyin, *yyout; 
   
-    // yyin = fopen("test.c", "r");
+    yyin = fopen("test.c", "r");
 
-	// yyout = fopen("result.txt", "w");
+	yyout = fopen("result.txt", "w");
 
 	initialize();
 

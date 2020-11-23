@@ -15,6 +15,23 @@ typedef struct AstNode {
   struct AstNode * right;
 } AstNode;
 
+typedef struct AstFunctionArgNode {
+
+  int type;
+  char* symbolName;
+  AstNode *value;
+
+  struct AstFunctionArgNode *next;
+} AstFunctionArgNode;
+
+typedef struct AstFunctionArgList {
+
+  AstFunctionArgNode *first;
+  AstFunctionArgNode *last;
+  int argCount;
+  
+} AstFunctionArgList;
+
 #include "../y.tab.h"
 
 typedef struct AstIfNode {
@@ -76,22 +93,6 @@ typedef struct AstDeclarationNode {
 
   AstNode * value;
 } AstDeclarationNode;
-
-typedef struct AstFunctionArgNode {
-
-  int type;
-  char* symbolName;
-  AstNode *value;
-
-  struct AstFunctionArgNode *next;
-} AstFunctionArgNode;
-typedef struct AstFunctionArgList {
-
-  AstFunctionArgNode *first;
-  AstFunctionArgNode *last;
-  int argCount;
-  
-} AstFunctionArgList;
 
 typedef struct AstFunctionDeclarationNode {
   int nodeType;

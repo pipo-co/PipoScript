@@ -288,8 +288,8 @@ static void ast_symbol_reference_node_destroyer(AstNode *node) {
     free(symbolRefNode);
 }
 
-static AstOpProcessorReturnNode * ast_function_declaration_node_destroyer(AstNode *node, SymbolTable st) {
-    AstFunctionDeclarationNode * declarationNode = (AstSymbolReferenceNode*) node;
+static void ast_function_declaration_node_destroyer(AstNode *node) {
+    AstFunctionDeclarationNode * declarationNode = (AstFunctionDeclarationNode*) node;
 
     free(declarationNode->functionName);
 
@@ -299,55 +299,59 @@ static AstOpProcessorReturnNode * ast_function_declaration_node_destroyer(AstNod
 }
 
 static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node, SymbolTable st) {
-    AstFunctionCallNode * callNode = (AstSymbolReferenceNode*) node;
+    AstFunctionCallNode * callNode = (AstFunctionCallNode*) node;
 
     AstFunctionDeclarationNode *declarationNode = function_symbol_table_get(callNode->functionName);
 
-    if(declarationNode->args->argCount != callNode->args->argCount)
+    if(declarationNode->args != NULL && declarationNode->args->argCount != callNode->args->argCount)
         print_lineno_and_abort("Function call with invalid argument count", node->lineno);
 
     SymbolTable functionST = symbol_table_create();
 
-    AstFunctionArgNode *iterCall = callNode->args->first;
-    AstFunctionArgNode *iterDecl = declarationNode->args->first;
+    if(declarationNode->args != NULL) {
 
-    SymbolValue value;
+        AstFunctionArgNode *iterCall = callNode->args->first;
+        AstFunctionArgNode *iterDecl = declarationNode->args->first;
 
-    for(int i = 0; i < declarationNode->args->argCount; i++) {
+        SymbolValue value;
 
-        if(iterDecl->type == INT)
-            value.intValue = ast_node_get_int_return_val(execute_ast_node(iterCall->value, st), "Type mismatch on function arguments. Was expecting an int.", node->lineno);
-        
+        for(int i = 0; i < declarationNode->args->argCount; i++) {
 
-        else if(iterDecl->type == STRING)
-            value.stringValue = ast_node_get_string_return_val(execute_ast_node(iterCall->value, st), "Type mismatch on function arguments. Was expecting a string.", node->lineno);
+            if(iterDecl->type == INT)
+                value.intValue = ast_node_get_int_return_val(execute_ast_node(iterCall->value, st), "Type mismatch on function arguments. Was expecting an int.", node->lineno);
+            
 
-        else
-            print_lineno_and_abort("Invalid function argument type", node->lineno);
+            else if(iterDecl->type == STRING)
+                value.stringValue = ast_node_get_string_return_val(execute_ast_node(iterCall->value, st), "Type mismatch on function arguments. Was expecting a string.", node->lineno);
 
-        SymbolNode *symbolNode = symbol_table_add(functionST, iterDecl->symbolName, iterDecl->type);
-        symbolNode->value = value;
+            else
+                print_lineno_and_abort("Invalid function argument type", node->lineno);
 
-        iterCall = iterCall->next;
-        iterDecl = iterDecl->next;
+            SymbolNode *symbolNode = symbol_table_add(functionST, iterDecl->symbolName, iterDecl->type);
+            symbolNode->value = value;
+
+            iterCall = iterCall->next;
+            iterDecl = iterDecl->next;
+        }
+
+        // Assert
+        if(iterCall != NULL || iterDecl != NULL)
+            print_lineno_and_abort("IterCall or IterDecl weren't null after parsing arguments (assert null)", node->lineno);
+
     }
-
-    // Assert
-    if(iterCall != NULL || iterDecl != NULL)
-        print_lineno_and_abort("IterCall or IterDecl weren't null after parsing arguments (assert null)", node->lineno);
 
     AstOpProcessorReturnNode *returnNode = execute_ast_node(declarationNode->block, functionST);
 
     symbol_table_free(functionST);
 
-    if(returnNode->returnType != declarationNode->returnType)
+    if((returnNode == NULL && declarationNode->returnType != VOID) || (returnNode != NULL && returnNode->returnType != declarationNode->returnType))
         print_lineno_and_abort("Function return type and actual return value don't match", node->lineno);
 
     return returnNode;
 }
 
-static AstOpProcessorReturnNode * ast_function_call_node_destroyer(AstNode *node, SymbolTable st) {
-    AstFunctionCallNode * callNode = (AstSymbolReferenceNode*) node;
+static void ast_function_call_node_destroyer(AstNode *node) {
+    AstFunctionCallNode * callNode = (AstFunctionCallNode*) node;
 
     free(callNode->functionName);
 

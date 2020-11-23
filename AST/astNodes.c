@@ -160,7 +160,7 @@ AstNode * new_ast_function_declaration_node(int returnType, char *name, AstFunct
 
 AstNode * new_ast_function_call_node(char *name, AstFunctionArgList *args, int lineno) {
 
-    AstFunctionDeclarationNode * astNode = emalloc(sizeof(*astNode));
+    AstFunctionCallNode * astNode = emalloc(sizeof(*astNode));
 
     astNode->nodeType = FUNCTION_CALL_CONST;
     astNode->lineno = lineno;
@@ -230,6 +230,9 @@ AstFunctionArgNode * ast_add_function_arg_value(AstFunctionArgList *list, AstNod
 
 void ast_free_function_arg_list(AstFunctionArgList *list) {
 
+    if(list == NULL)
+        return;
+
     AstFunctionArgNode *iter = list->first;
     AstFunctionArgNode *next;
 
@@ -248,7 +251,7 @@ void ast_free_function_arg_list(AstFunctionArgList *list) {
 int execute_ast_tree(AstNode *tree, SymbolTable st) {
     AstOpProcessorReturnNode *resultNode = execute_ast_node(tree, st);
 
-    if(resultNode->returnType == INT)
+    if(resultNode != NULL && resultNode->returnType == INT)
         return resultNode->value.intValue;
 
     return 0;
