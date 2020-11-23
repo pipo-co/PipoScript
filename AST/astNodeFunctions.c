@@ -1,4 +1,4 @@
-#include "astNodes.h"
+#include "../AST/astNodes.h"
 
 #define ASCII_TABLE_SIZE 128
 #define AST_OP_COUNT (int)(ASCII_TABLE_SIZE + LAST - FIRST)

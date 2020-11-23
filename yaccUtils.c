@@ -1,5 +1,10 @@
 #include "yaccUtils.h"
 
+
+AstNode *astTree;
+SymbolTable globalSt;
+
+
 void yyerror(char const *s) {
 
 	fprintf(stderr, "Error in line %d: ", yylineno);

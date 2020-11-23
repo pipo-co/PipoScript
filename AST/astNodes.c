@@ -1,7 +1,4 @@
-
 #include "astNodes.h"
-
-
 
 AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right, int lineno) {
 
