@@ -10,6 +10,7 @@
 // Generic AstNode
 typedef struct AstNode {
   int nodeType;
+  int lineno;
 
   struct AstNode * left;
 
@@ -20,6 +21,7 @@ typedef struct AstNode {
 
 typedef struct AstIfNode {
   int nodeType;
+  int lineno;
 
   AstNode * condition;
 
@@ -30,6 +32,7 @@ typedef struct AstIfNode {
 
 typedef struct AstWhileNode {
   int nodeType;
+  int lineno;
 
   AstNode * condition;
 
@@ -38,6 +41,7 @@ typedef struct AstWhileNode {
 
 typedef struct AstForNode {
   int nodeType;
+  int lineno;
 
   AstNode * firstAssignment;
 
@@ -50,12 +54,14 @@ typedef struct AstForNode {
 
 typedef struct AstSymbolReferenceNode {
   int nodeType;
+  int lineno;
   
   char *symbolName;
 } AstSymbolReferenceNode;
 
 typedef struct AstAssignmentNode {
   int nodeType;
+  int lineno;
 
   char *symbolName;
 
@@ -64,6 +70,7 @@ typedef struct AstAssignmentNode {
 
 typedef struct AstDeclarationNode {
   int nodeType;
+  int lineno;
 
   int type;
 
@@ -74,12 +81,14 @@ typedef struct AstDeclarationNode {
 
 typedef struct AstIntNode {
   int nodeType;
+  int lineno;
 
   int value;
 } AstIntNode;
 
 typedef struct AstStringNode {
   int nodeType;
+  int lineno;
 
   char *value;
 } AstStringNode;
@@ -90,25 +99,25 @@ void execute_ast_tree(AstNode *tree, SymbolTable st);
 
 void free_ast_tree(AstNode *root);
 
-AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right);
+AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right, int lineno);
 
-AstNode * new_ast_symbol_reference_node(char *symbolName);
+AstNode * new_ast_symbol_reference_node(char *symbolName, int lineno);
 
-AstNode * new_ast_if_node (AstNode * condition, AstNode * ifBranch, AstNode * elseBranch);
+AstNode * new_ast_if_node (AstNode * condition, AstNode * ifBranch, AstNode * elseBranch, int lineno);
 
-AstNode * new_ast_while_node(int nodeType, AstNode * condition, AstNode * whileBranch);
+AstNode * new_ast_while_node(int nodeType, AstNode * condition, AstNode * whileBranch, int lineno);
 
-AstNode * new_ast_for_node(AstNode *firstAssignment, AstNode *condition, AstNode *lastAssignment, AstNode *forBranch);
+AstNode * new_ast_for_node(AstNode *firstAssignment, AstNode *condition, AstNode *lastAssignment, AstNode *forBranch, int lineno);
 
-AstNode * new_ast_declaration_node(int type, char *symbolName, AstNode *value);
+AstNode * new_ast_declaration_node(int type, char *symbolName, AstNode *value, int lineno);
 
-AstNode * new_ast_assignment_node(char *symbolName, AstNode *value);
+AstNode * new_ast_assignment_node(char *symbolName, AstNode *value, int lineno);
 
-AstNode * new_ast_inc_dec_assignment_node(int type, char *symbolName);
+AstNode * new_ast_inc_dec_assignment_node(int type, char *symbolName, int lineno);
 
-AstNode * new_ast_int_node(int value);
+AstNode * new_ast_int_node(int value, int lineno);
 
-AstNode * new_ast_string_node(char *value);
+AstNode * new_ast_string_node(char *value, int lineno);
 
 
 

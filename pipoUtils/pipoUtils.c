@@ -24,6 +24,12 @@ void * ecalloc(size_t n, size_t size) {
 
 void print_and_abort(char *message) {
 
-    fprintf(stderr, "%s\n", message);
-    finalize();
+    fprintf(stderr, "\nFatal Error: %s\n", message);
+    finalize(1);
+}
+
+void print_lineno_and_abort(char *message, int lineno) {
+
+    fprintf(stderr, "\nFatal Error in Line %d: %s\n", lineno, message);
+    finalize(1);
 }

@@ -25,6 +25,6 @@ void yyerror(char const *s);
 
 void initialize(void);
 
-void finalize(void);
+void finalize(int status);
 
 #endif

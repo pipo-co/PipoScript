@@ -73,7 +73,7 @@ P
 	;
 
 STATEMENT_LIST
-	: STATEMENT_LIST STATEMENT	{ $$ = new_ast_node(STATEMENT_LIST_CONST, $1, $2); }
+	: STATEMENT_LIST STATEMENT	{ $$ = new_ast_node(STATEMENT_LIST_CONST, $1, $2, yylineno); }
 	|							{ $$ = NULL; }
 	;
 
@@ -93,21 +93,21 @@ BLOCK
 
 if_statement
 	: IF '(' NUM ')' BLOCK %prec IFX
-								{ $$ = new_ast_if_node($3, $5, NULL); }
+								{ $$ = new_ast_if_node($3, $5, NULL, yylineno); }
 
 	| IF '(' NUM ')' BLOCK ELSE BLOCK
-								{ $$ = new_ast_if_node($3, $5, $7); }
+								{ $$ = new_ast_if_node($3, $5, $7, yylineno); }
 	;
 
 iteration_statement
 	: WHILE '(' NUM ')' BLOCK
-								{ $$ = new_ast_while_node(WHILE, $3, $5); }
+								{ $$ = new_ast_while_node(WHILE, $3, $5, yylineno); }
 
 	| DO BLOCK WHILE '(' NUM ')' ';'
-								{ $$ = new_ast_while_node(DO, $5, $2); }
+								{ $$ = new_ast_while_node(DO, $5, $2, yylineno); }
 
 	| FOR '(' DO_ASSIGNMENT ';' NUM ';' DO_ASSIGNMENT ')' BLOCK
-								{ $$ = new_ast_for_node($3, $5, $7, $9); }
+								{ $$ = new_ast_for_node($3, $5, $7, $9, yylineno); }
 	;
 
 return_statement
@@ -116,8 +116,8 @@ return_statement
 	;
 
 declaration_statement
-	: ID_TYPES ID ';'			{ $$ = new_ast_declaration_node($1, $2, NULL); }
-	| ID_TYPES ID '=' VALUE ';'	{ $$ = new_ast_declaration_node($1, $2, $4); }
+	: ID_TYPES ID ';'			{ $$ = new_ast_declaration_node($1, $2, NULL, yylineno); }
+	| ID_TYPES ID '=' VALUE ';'	{ $$ = new_ast_declaration_node($1, $2, $4, yylineno); }
 	;
 
 assignment_statement
@@ -125,48 +125,48 @@ assignment_statement
 	;
 
 ASSIGNMENT
-	: ID '=' VALUE				{ $$ = new_ast_assignment_node($1, $3); }
-	| ID INC					{ $$ = new_ast_inc_dec_assignment_node($2, $1); }
-	| ID DEC					{ $$ = new_ast_inc_dec_assignment_node($2, $1); }
+	: ID '=' VALUE				{ $$ = new_ast_assignment_node($1, $3, yylineno); }
+	| ID INC					{ $$ = new_ast_inc_dec_assignment_node($2, $1, yylineno); }
+	| ID DEC					{ $$ = new_ast_inc_dec_assignment_node($2, $1, yylineno); }
 	;
 
 DO_ASSIGNMENT
 	: ASSIGNMENT				{ $$ = $1; }
-	| ID_TYPES ID '=' VALUE		{ $$ = new_ast_declaration_node($1, $2, $4); }
+	| ID_TYPES ID '=' VALUE		{ $$ = new_ast_declaration_node($1, $2, $4, yylineno); }
 	|							{ $$ = NULL; }
 	;
         
 ARITH
-	: NUM '+' NUM 				{ $$ = new_ast_node($2, $1, $3); }
-	| NUM '-' NUM				{ $$ = new_ast_node($2, $1, $3); }
-	| NUM '*' NUM				{ $$ = new_ast_node($2, $1, $3); }
-	| NUM '/' NUM				{ $$ = new_ast_node($2, $1, $3); }
-	| NUM '<' NUM				{ $$ = new_ast_node($2, $1, $3); }
-	| NUM '>' NUM				{ $$ = new_ast_node($2, $1, $3); }
-	| NUM LE NUM				{ $$ = new_ast_node($2, $1, $3); }
-	| NUM GE NUM				{ $$ = new_ast_node($2, $1, $3); }
-	| NUM EQ NUM				{ $$ = new_ast_node($2, $1, $3); }
-	| NUM NE NUM				{ $$ = new_ast_node($2, $1, $3); }
-	| NUM OR NUM				{ $$ = new_ast_node($2, $1, $3); }
-	| NUM AND NUM				{ $$ = new_ast_node($2, $1, $3); }
-	| '!' NUM					{ $$ = new_ast_node($1, $2, NULL); }
-	| '-' NUM %prec UMINUS		{ $$ = new_ast_node(UMINUS, $2, NULL); }
+	: NUM '+' NUM 				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| NUM '-' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| NUM '*' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| NUM '/' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| NUM '<' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| NUM '>' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| NUM LE NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| NUM GE NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| NUM EQ NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| NUM NE NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| NUM OR NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| NUM AND NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| '!' NUM					{ $$ = new_ast_node($1, $2, NULL, yylineno); }
+	| '-' NUM %prec UMINUS		{ $$ = new_ast_node(UMINUS, $2, NULL, yylineno); }
 	| '(' NUM ')'				{ $$ = $2; }
 	;
 
 NUM
-	: ID						{ $$ = new_ast_symbol_reference_node($1); }
+	: ID						{ $$ = new_ast_symbol_reference_node($1, yylineno); }
 	| NON_ID_NUM				{ $$ = $1; }
 	;
 
 NON_ID_NUM
-	: INT_LITERAL				{ $$ = new_ast_int_node($1); }
+	: INT_LITERAL				{ $$ = new_ast_int_node($1, yylineno); }
 	| ARITH						{ $$ = $1; }
 	;
 
 VALUE
-	: ID						{ $$ = new_ast_symbol_reference_node($1); }
-	| STRING_LITERAL			{ $$ = new_ast_string_node($1); }
+	: ID						{ $$ = new_ast_symbol_reference_node($1, yylineno); }
+	| STRING_LITERAL			{ $$ = new_ast_string_node($1, yylineno); }
 	| NON_ID_NUM				{ $$ = $1; }
 	;
 
@@ -197,7 +197,5 @@ int main(void) {
 
 	execute_ast_tree(astTree, globalSt);
 
-	finalize();
-
-	return 0;
+	finalize(0);
 }
