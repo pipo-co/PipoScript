@@ -187,6 +187,8 @@ AstFunctionArgNode * ast_add_function_arg_declaration(AstFunctionArgList *list, 
 
     node->symbolName = name;
     node->type = type;
+    node->value = NULL;
+
     node->next = NULL;
 
     if(list->first == NULL) {
@@ -208,6 +210,7 @@ AstFunctionArgNode * ast_add_function_arg_value(AstFunctionArgList *list, AstNod
 
     AstFunctionArgNode *node = emalloc(sizeof(*node));
 
+    node->symbolName = NULL;
     node->value = value;
     node->next = NULL;
 
@@ -238,7 +241,15 @@ void ast_free_function_arg_list(AstFunctionArgList *list) {
     while(iter != NULL) {
 
         next = iter->next;
+
+        if(iter->symbolName != NULL)
+            free(iter->symbolName);
+
+        if(iter->value != NULL)
+            free_ast_tree(iter->value);
+
         free(iter);
+
         iter = next;
     }
 
