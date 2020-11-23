@@ -49,8 +49,9 @@
 
 %type <astNode> STATEMENT_LIST STATEMENT BLOCK if_statement iteration_statement return_statement declaration_statement
 %type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE 
+%type <astNode> FUNCTION_DEFINITION_LIST FUNCTION_DEFINITION FUNC_DECLARATION_ARG_LIST FUNC_ARG_LIST function_call_statement
 
-%type <operation> ID_TYPES FUNCTION_TYPES
+%type <operation> ID_TYPE FUNCTION_RETURN_TYPE
 
 %token DECLARATION
 
@@ -61,15 +62,20 @@
 %%
 
 P       
-	: STATEMENT_LIST
+	: FUNCTION_DEFINITION_LIST
 		{ 
 			if(yychar == YYEOF) {
 				printf("Input accepted\n");
 			 	astTree = $1;
 			}
 			else
-				yyerror("Unexpected end of program. Invalid statement.");
+				yyerror("Unexpected end of program");
 		}
+	;
+
+FUNCTION_DEFINITION_LIST
+	: FUNCTION_DEFINITION_LIST FUNCTION_DEFINITION	{ $$ = NULL; }
+	|												{ $$ = NULL; }
 	;
 
 STATEMENT_LIST
@@ -83,6 +89,12 @@ STATEMENT
 	| return_statement			{ $$ = $1; }
 	| declaration_statement		{ $$ = $1; }
 	| assignment_statement		{ $$ = $1; }
+	| function_call_statement	{ $$ = NULL; }
+	;
+
+FUNCTION_DEFINITION
+	: FUNCTION_RETURN_TYPE ID '(' FUNC_DECLARATION_ARG_LIST ')' '{' STATEMENT_LIST '}'	{ $$ = NULL; }
+	| FUNCTION_RETURN_TYPE ID '(' ')' '{' STATEMENT_LIST '}'							{ $$ = NULL; }
 	;
 
 BLOCK    	
@@ -116,12 +128,17 @@ return_statement
 	;
 
 declaration_statement
-	: ID_TYPES ID ';'			{ $$ = new_ast_declaration_node($1, $2, NULL, yylineno); }
-	| ID_TYPES ID '=' VALUE ';'	{ $$ = new_ast_declaration_node($1, $2, $4, yylineno); }
+	: ID_TYPE ID ';'			{ $$ = new_ast_declaration_node($1, $2, NULL, yylineno); }
+	| ID_TYPE ID '=' VALUE ';'	{ $$ = new_ast_declaration_node($1, $2, $4, yylineno); }
 	;
 
 assignment_statement
 	: ASSIGNMENT ';'			{ $$ = $1; }
+	;
+
+function_call_statement
+	: ID '(' FUNC_ARG_LIST ')' ';'	{ $$ = NULL; }
+	| ID '(' ')' ';'				{ $$ = NULL; }
 	;
 
 ASSIGNMENT
@@ -132,8 +149,18 @@ ASSIGNMENT
 
 DO_ASSIGNMENT
 	: ASSIGNMENT				{ $$ = $1; }
-	| ID_TYPES ID '=' VALUE		{ $$ = new_ast_declaration_node($1, $2, $4, yylineno); }
+	| ID_TYPE ID '=' VALUE		{ $$ = new_ast_declaration_node($1, $2, $4, yylineno); }
 	|							{ $$ = NULL; }
+	;
+
+FUNC_DECLARATION_ARG_LIST
+	: ID_TYPE ID ',' FUNC_DECLARATION_ARG_LIST	{ $$ = NULL; }
+	| ID_TYPE ID								{ $$ = NULL; }
+	;
+
+FUNC_ARG_LIST
+	: VALUE ',' FUNC_ARG_LIST	{ $$ = NULL; }
+	| VALUE						{ $$ = NULL; }
 	;
         
 ARITH
@@ -170,12 +197,12 @@ VALUE
 	| NON_ID_NUM				{ $$ = $1; }
 	;
 
-ID_TYPES
+ID_TYPE
 	: INT						{ $$ = $1; }
 	| STRING					{ $$ = $1; }
 	;
 
-FUNCTION_TYPES
+FUNCTION_RETURN_TYPE
 	: VOID						{ $$ = $1; }
 	| INT						{ $$ = $1; }
 	| STRING					{ $$ = $1; }
@@ -195,7 +222,7 @@ int main(void) {
 
 	yyparse();
 
-	execute_ast_tree(astTree, globalSt);
+	// execute_ast_tree(astTree, globalSt);
 
 	finalize(0);
 }
