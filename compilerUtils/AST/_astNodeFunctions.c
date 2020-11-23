@@ -1,6 +1,9 @@
-#include "../AST/astNodes.h"
+#include "astNodes.h"
 
-#include "../functionSymbolTable/functionSymbolTable.h"
+#include <stdlib.h>
+
+#include "compilerUtils/functionSymbolTable/functionSymbolTable.h"
+#include "compilerUtils/pipoUtils/pipoUtils.h"
 
 #define ASCII_TABLE_SIZE 128
 #define AST_OP_COUNT (int)(ASCII_TABLE_SIZE + LAST - FIRST)

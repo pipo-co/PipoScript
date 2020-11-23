@@ -1,5 +1,6 @@
 #include "yaccUtils.h"
-#include "lexUtils.h"
+
+#include "compilerUtils/lexUtils/lexUtils.h"
 
 AstNode *astTree;
 SymbolTable globalSt;

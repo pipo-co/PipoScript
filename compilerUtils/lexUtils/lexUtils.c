@@ -1,5 +1,5 @@
 #include "lexUtils.h"
-#include "khash.h"
+#include "libraries/khash.h"
 
 KHASH_MAP_INIT_STR(StrMap, char *)
 

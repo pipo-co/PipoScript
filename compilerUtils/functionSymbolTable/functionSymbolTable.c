@@ -1,5 +1,8 @@
 #include "functionSymbolTable.h"
+
 #include <string.h>
+
+#include "libraries/khash.h"
 
 KHASH_MAP_INIT_STR(functionSymbolTable, AstFunctionDeclarationNode *)
 

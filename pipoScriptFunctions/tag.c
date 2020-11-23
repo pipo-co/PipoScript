@@ -3,16 +3,13 @@
 #include "tag.h"
 #include "mm.h"
 
-
 MemoryManagerHeader mm_tag;
 MemoryManagerHeader mm_tag_node;
-
 
 void tag_service_init() {
     mm_tag = memory_manager_init(freeTag);
     mm_tag_node = memory_manager_init(free);
 }
-
 
 void tag_service_fin() {
     memory_manager_free_all(&mm_tag);

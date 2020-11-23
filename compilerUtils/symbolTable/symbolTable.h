@@ -1,9 +1,6 @@
 #ifndef SYMBOL_TABLE_H_88bb85a02ebb07e487ff1027e1e7390616b9f485
 #define SYMBOL_TABLE_H_88bb85a02ebb07e487ff1027e1e7390616b9f485
 
-
-#include "../pipoUtils/pipoUtils.h"
-#include "../libraries/khash.h"
 #include <stdbool.h>
 
 typedef struct SymbolTableCDT * SymbolTable;

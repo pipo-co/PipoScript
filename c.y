@@ -1,6 +1,6 @@
 %{
 
-	#include "yaccUtils.h"
+	#include "compilerUtils/yaccUtils/yaccUtils.h"
 
 %}
 

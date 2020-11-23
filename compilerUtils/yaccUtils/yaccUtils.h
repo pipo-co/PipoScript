@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "AST/astNodes.h"
+#include "compilerUtils/AST/astNodes.h"
 #include "y.tab.h"
 
-#include "symbolTable/symbolTable.h"
-#include "functionSymbolTable/functionSymbolTable.h"
+#include "compilerUtils/symbolTable/symbolTable.h"
+#include "compilerUtils/functionSymbolTable/functionSymbolTable.h"
 
 // Lex global variables
 extern char yytext[];
