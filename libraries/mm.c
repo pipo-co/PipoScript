@@ -33,6 +33,7 @@ void *memory_manager_alloc(MemoryManagerHeader *mm, size_t size){
 void memory_manager_free_all(MemoryManagerHeader *mm) {
     memory_manager_free_node(mm->first, mm->freer);
 }
+
 void memory_manager_free_node(MemoryManagerNode *n, NodeFreer freer) {
 
     if(n == NULL)

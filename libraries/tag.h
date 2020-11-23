@@ -31,9 +31,9 @@ void tag_service_fin();
 
 tag_t *newTag(char *name);
 
-int renderTag(tag_t *t, int ind);
+void renderTag(tag_t *t, int ind);
 
-int renderNodeList(tag_node_t *n, int ind);
+void renderNodeList(tag_node_t *n, int ind);
 
 void renderAttributes(tag_t *t);
 
