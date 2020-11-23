@@ -1,4 +1,5 @@
 #include "yaccUtils.h"
+#include "lexUtils.h"
 
 
 AstNode *astTree;
@@ -16,12 +17,14 @@ void yyerror(char const *s) {
 void initialize(void) {
     initialize_ast_node_functions();
 	globalSt = symbol_table_create();
+	initializeLex();
 }
 
 void finalize(int status) {
 
-    free_ast_tree(astTree);
     symbol_table_free(globalSt);
+    free_ast_tree(astTree);
+	finalizeLex();
 
 	exit(status);
 }

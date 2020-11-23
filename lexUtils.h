@@ -11,6 +11,9 @@
 
 extern int yylineno;
 
+void initializeLex();
+
+void finalizeLex();
 
 void multiLineComment(int (*input)(void));
 
