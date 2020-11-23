@@ -17,7 +17,7 @@
 	AstNode *astNode;
 }
 
-%error-verbose
+// %error-verbose
 
 %token <operation> FIRST
 
@@ -234,11 +234,11 @@ FUNCTION_RETURN_TYPE
 
 int main(void) {
 
-	// extern FILE *yyin, *yyout; 
+	extern FILE *yyin, *yyout; 
   
-    // yyin = fopen("test.c", "r");
+    yyin = fopen("test.c", "r");
 
-	// yyout = fopen("result.txt", "w");
+	yyout = fopen("result.txt", "w");
 
 	initialize();
 

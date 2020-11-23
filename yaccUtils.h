@@ -17,8 +17,8 @@ extern int yylineno;
 int yylex();
 
 // Global variables
-AstNode *astTree;
-SymbolTable globalSt;
+extern AstNode *astTree;
+extern SymbolTable globalSt;
 
 
 void yyerror(char const *s);

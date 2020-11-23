@@ -70,9 +70,9 @@ int main(int argc, char const *argv[]) {
         i++;
     }
     
-    int ans = renderTag(div, 0);
+    renderTag(div, 0);
 
     tag_service_fin();
     string_service_fin();
-    return ans;
+    return 0;
 }
