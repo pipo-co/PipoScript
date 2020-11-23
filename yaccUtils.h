@@ -17,6 +17,11 @@ extern int yylineno;
 // Lexer
 int yylex();
 
+// Global variables
+extern AstNode *astTree;
+extern SymbolTable globalSt;
+
+
 // Yacc Error Function
 void yyerror(char const *s);
 

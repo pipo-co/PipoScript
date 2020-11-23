@@ -1,5 +1,5 @@
 CC=gcc
-CCFLAGS=-Wall -pedantic -std=c99 -ggdb -fsanitize=address -fno-omit-frame-pointer
+CCFLAGS=-Wall -pedantic -std=c99 -ggdb -fsanitize=address -fno-omit-frame-pointer 
 CCFLAGS_PICHI=-Wall -pedantic -std=c99
 
 LIB_PATH=./libraries
@@ -9,7 +9,7 @@ LIBS_TOBI=pipoUtils/pipoUtils.c symbolTable/symbolTable.c lexUtils.c yaccUtils.c
 
 all:
 	lex c.l
-	yacc -v -t -d c.y
+	yacc -v -t -d c.y -Wno-yacc
 	gcc lex.yy.c y.tab.c $(LIBS_TOBI) -ll $(CCFLAGS) 
 
 test: $(SOURCES) 

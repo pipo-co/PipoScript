@@ -1,4 +1,4 @@
-#include "astNodes.h"
+#include "../AST/astNodes.h"
 
 #include "../functionSymbolTable/functionSymbolTable.h"
 

@@ -1,5 +1,7 @@
 #include "yaccUtils.h"
 
+AstNode *astTree;
+SymbolTable globalSt;
 
 void yyerror(char const *s) {
 

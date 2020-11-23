@@ -1,4 +1,3 @@
-
 #include "astNodes.h"
 
 #include <stdlib.h>

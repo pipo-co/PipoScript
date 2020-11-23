@@ -19,7 +19,7 @@
 	AstNode *astNode;
 }
 
-%error-verbose
+// %error-verbose
 
 %token <operation> FIRST
 
