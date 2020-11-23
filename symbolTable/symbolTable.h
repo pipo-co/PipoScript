@@ -33,4 +33,6 @@ bool symbol_node_exists(SymbolTable st, char *name);
 
 void symbol_table_free(SymbolTable st);
 
+void symbol_table_clean_up(void);
+
 #endif

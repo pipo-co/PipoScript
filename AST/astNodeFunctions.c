@@ -170,6 +170,11 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
     AstAssignmentNode * assignmentNode = (AstAssignmentNode*) node;
 
     SymbolNode *symbol = symbol_table_get(st, assignmentNode->symbolName);
+
+    if(symbol == NULL)
+        print_lineno_and_abort("Variable wasn't previously declared", node->lineno);
+    
+
     AstOpProcessorReturnNode *value = execute_ast_node(assignmentNode->value, st);
 
     if(symbol->type == INT) {

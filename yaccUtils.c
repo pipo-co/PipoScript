@@ -42,7 +42,7 @@ int execute_main(void) {
 void finalize(int status) {
 
     function_symbol_table_free();
-    // symbol_table_free(globalSt);
+	symbol_table_clean_up();
 
 	exit(status);
 }
