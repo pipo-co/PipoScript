@@ -1,5 +1,7 @@
 #include "astNodes.h"
 
+#include "../functionSymbolTable/functionSymbolTable.h"
+
 #define ASCII_TABLE_SIZE 128
 #define AST_OP_COUNT (int)(ASCII_TABLE_SIZE + LAST - FIRST)
 
@@ -31,7 +33,7 @@ static int ast_node_get_int_return_val(AstOpProcessorReturnNode *returnVal, char
 static char * ast_node_get_string_return_val(AstOpProcessorReturnNode *returnVal, char* message, int lineno);
 
 
-static AstOpProcessorReturnNode * execute_ast_node(AstNode *node, SymbolTable st) {
+AstOpProcessorReturnNode * execute_ast_node(AstNode *node, SymbolTable st) {
 
     if(node == NULL)
         return NULL;
@@ -299,8 +301,7 @@ static AstOpProcessorReturnNode * ast_function_declaration_node_destroyer(AstNod
 static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node, SymbolTable st) {
     AstFunctionCallNode * callNode = (AstSymbolReferenceNode*) node;
 
-    AstFunctionDeclarationNode *declarationNode; // Function Symbol Table
-    // AstFunctionDeclarationNode *declarationNode = function_symbol_table_get(callNode->functionName);
+    AstFunctionDeclarationNode *declarationNode = function_symbol_table_get(callNode->functionName);
 
     if(declarationNode->args->argCount != callNode->args->argCount)
         print_lineno_and_abort("Function call with invalid argument count", node->lineno);
@@ -319,7 +320,7 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
         
 
         else if(iterDecl->type == STRING)
-            value.intValue = ast_node_get_string_return_val(execute_ast_node(iterCall->value, st), "Type mismatch on function arguments. Was expecting a string.", node->lineno);
+            value.stringValue = ast_node_get_string_return_val(execute_ast_node(iterCall->value, st), "Type mismatch on function arguments. Was expecting a string.", node->lineno);
 
         else
             print_lineno_and_abort("Invalid function argument type", node->lineno);

@@ -5,7 +5,7 @@ CCFLAGS_PICHI=-Wall -pedantic -std=c99
 LIB_PATH=./libraries
 SOURCES=$(wildcard $(LIB_PATH)/*.c)
 
-LIBS_TOBI=pipoUtils/pipoUtils.c symbolTable/symbolTable.c lexUtils.c yaccUtils.c AST/astNodes.c
+LIBS_TOBI=pipoUtils/pipoUtils.c symbolTable/symbolTable.c lexUtils.c yaccUtils.c AST/astNodes.c functionSymbolTable/functionSymbolTable.c
 
 all:
 	lex c.l

@@ -28,5 +28,4 @@ SymbolNode * symbol_table_get(SymbolTable st, char* name);
 
 void symbol_table_free(SymbolTable st);
 
-
 #endif
