@@ -36,7 +36,10 @@ SymbolNode * symbol_table_add(SymbolTable st, char *name, int type){
     int exist = 0;
     exist = symbol_node_exists(st, name);
     if( exist == -1){
-        khiter_t k = kh_put(symbolTable, st->symbolNodes, name, &ret); 
+        khiter_t k = kh_put(symbolTable, st->symbolNodes, name, &ret);
+        if(ret == -1){
+            return NULL;
+        }
         kh_value(st->symbolNodes, k) = node;            
         return node;      
     }
