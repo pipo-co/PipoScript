@@ -296,6 +296,8 @@ static void ast_function_declaration_node_destroyer(AstNode *node) {
     ast_free_function_arg_list(declarationNode->args);
 
     free_ast_tree(declarationNode->block);
+
+    free(declarationNode);
 }
 
 static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node, SymbolTable st) {
@@ -356,6 +358,8 @@ static void ast_function_call_node_destroyer(AstNode *node) {
     free(callNode->functionName);
 
     ast_free_function_arg_list(callNode->args);
+
+    free(callNode);
 }
 
 static AstOpProcessorReturnNode * ast_statement_list_node_processor(AstNode *node, SymbolTable st) {

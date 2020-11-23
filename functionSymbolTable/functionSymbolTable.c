@@ -19,8 +19,8 @@ bool function_symbol_table_add(AstFunctionDeclarationNode *functionNode) {
     int ret;
 
     if(!function_symbol_table_exists(functionNode->functionName)){
-        
-        khiter_t k = kh_put(functionSymbolTable, fst, (int)functionNode->functionName, &ret); 
+
+        khiter_t k = kh_put(functionSymbolTable, fst, functionNode->functionName, &ret); 
         if(ret == -1){
             return false;
         }
