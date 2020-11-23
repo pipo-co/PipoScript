@@ -1,5 +1,7 @@
 #include "pipoUtils.h"
 
+#include <stdlib.h>
+
 void * emalloc(size_t size) {
 
     void * pointer = malloc(size);

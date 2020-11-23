@@ -1,7 +1,7 @@
 #ifndef AST_NODES_H_fc51f24f6009d9dada1771be6189418224888db1
 #define AST_NODES_H_fc51f24f6009d9dada1771be6189418224888db1
 
-#include "../symbolTable/symbolTable.h"
+#include "compilerUtils/symbolTable/symbolTable.h"
 
 #define MAX_FUNC_ARGS 30
 
@@ -32,7 +32,7 @@ typedef struct AstFunctionArgList {
   
 } AstFunctionArgList;
 
-#include "../y.tab.h"
+#include "y.tab.h"
 
 typedef struct AstIfNode {
   int nodeType;

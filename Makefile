@@ -1,18 +1,31 @@
 CC=gcc
-CCFLAGS=-Wall -pedantic -std=c99 -ggdb -fsanitize=address -fno-omit-frame-pointer 
-CCFLAGS_PICHI=-Wall -pedantic -std=c99
+CFLAGS=-Wall -pedantic -std=c99 -ggdb -fsanitize=address -fno-omit-frame-pointer -I$(PWD)
 
-LIB_PATH=./libraries
-SOURCES=$(wildcard $(LIB_PATH)/*.c)
+COMPILER_UTILS_PATH=compilerUtils/*
+COMPILER_UTILS_SOURCE_FILES = $(foreach dir, $(COMPILER_UTILS_PATH), $(wildcard $(dir)/[^_]*.c))
+COMPILER_UTILS_OBJECTS = $(patsubst %.c, %.o, $(COMPILER_UTILS_SOURCE_FILES))
 
-LIBS_TOBI=pipoUtils/pipoUtils.c symbolTable/symbolTable.c lexUtils.c yaccUtils.c AST/astNodes.c functionSymbolTable/functionSymbolTable.c
+LEX = lex.yy.c
+YACC = y.tab.c
+COMPILER=pipoCompiler
 
-all:
-	lex c.l
-	yacc -v -t -d c.y -Wno-yacc
-	gcc lex.yy.c y.tab.c $(LIBS_TOBI) -I$(LIB_PATH) -ll $(CCFLAGS) 
+all: $(COMPILER)
+
+$(COMPILER): $(LEX) $(YACC) $(COMPILER_UTILS_OBJECTS)
+	$(CC) $(CFLAGS) $^ -o $@  -ll 
+
+$(LEX): c.l
+	lex $<
+
+$(YACC): c.y
+	yacc -v -t -d $< -Wno-yacc
 
 test: $(SOURCES) 
 	$(CC) $(CCFLAGS_PICHI) example.c -o example $^ -I $(LIB_PATH)
 	./example > example.html
 	rm example
+
+clean:
+	rm -f $(LEX) $(YACC) $(COMPILER) $(COMPILER_UTILS_OBJECTS)
+
+.PHONY: all cleam

@@ -4,7 +4,7 @@ HEX				[a-fA-F0-9]
 
 %{
 
-	#include "lexUtils.h"
+	#include "compilerUtils/lexUtils/lexUtils.h"
 
 %}
 

@@ -4,10 +4,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "AST/astNodes.h"
+#include "compilerUtils/AST/astNodes.h"
 #include "y.tab.h"
 
-#include "pipoUtils/pipoUtils.h"
+#include "compilerUtils/pipoUtils/pipoUtils.h"
 
 extern int yylineno;
 

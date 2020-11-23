@@ -3,8 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "../pipoUtils/pipoUtils.h"
-
+#include "compilerUtils/pipoUtils/pipoUtils.h"
 
 AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right, int lineno) {
 
@@ -253,7 +252,7 @@ void ast_free_function_arg_list(AstFunctionArgList *list) {
     free(list);
 }
 
-#include "astNodeFunctions.c"
+#include "_astNodeFunctions.c"
 
 int execute_ast_tree(AstNode *tree, SymbolTable st) {
     AstOpProcessorReturnNode *resultNode = execute_ast_node(tree, st);

@@ -1,7 +1,7 @@
 #ifndef FUNCTION_SYMBOL_TABLE_H_88bb85a02ebb07e487ff1027e1e7390616b9f485
 #define FUNCTION_SYMBOL_TABLE_H_88bb85a02ebb07e487ff1027e1e7390616b9f485
 
-#include "../AST/astNodes.h"
+#include "compilerUtils/AST/astNodes.h"
 
 #include <stdbool.h>
 

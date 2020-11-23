@@ -1,5 +1,9 @@
 #include "symbolTable.h"
+
 #include <string.h>
+
+#include "compilerUtils/pipoUtils/pipoUtils.h"
+#include "libraries/khash.h"
 
 KHASH_MAP_INIT_STR(symbolTable, SymbolNode *)
 
