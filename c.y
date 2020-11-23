@@ -49,7 +49,7 @@
 
 %type <astNode> STATEMENT_LIST STATEMENT BLOCK if_statement iteration_statement return_statement declaration_statement
 %type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE 
-%type <astNode> FUNCTION_DEFINITION FUNC_DECLARATION_ARG_LIST FUNC_ARG_LIST function_call_statement
+%type <astNode> FUNC_DECLARATION_ARG_LIST FUNC_ARG_LIST function_call_statement
 
 %type <operation> ID_TYPE FUNCTION_RETURN_TYPE
 
@@ -93,10 +93,16 @@ STATEMENT
 
 FUNCTION_DEFINITION
 	: FUNCTION_RETURN_TYPE ID '(' FUNC_DECLARATION_ARG_LIST ')' '{' STATEMENT_LIST '}'	
-								{ $$ = new_ast_function_declaration_node($1, $2, $4, $7, yylineno); }
+								{ 
+									AstNode *functionNode = new_ast_function_declaration_node($1, $2, $4, $7, yylineno);
+									register_function(functionNode);
+								}
 
 	| FUNCTION_RETURN_TYPE ID '(' ')' '{' STATEMENT_LIST '}'							
-								{ $$ = new_ast_function_declaration_node($1, $2, NULL, $6, yylineno); }
+								{ 
+									AstNode *functionNode = new_ast_function_declaration_node($1, $2, NULL, $6, yylineno);
+									register_function(functionNode);
+								}
 	;
 
 BLOCK    	
@@ -244,7 +250,7 @@ int main(void) {
 
 	yyparse();
 
-	// execute_ast_tree(astTree, globalSt);
+	int status = execute_main();
 
-	finalize(0);
+	finalize(status);
 }

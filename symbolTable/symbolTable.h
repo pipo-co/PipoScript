@@ -32,5 +32,4 @@ int symbol_node_exists(SymbolTable st, char *name);
 
 void symbol_table_free(SymbolTable st);
 
-
 #endif

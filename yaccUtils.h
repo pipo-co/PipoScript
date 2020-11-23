@@ -8,6 +8,7 @@
 #include "y.tab.h"
 
 #include "symbolTable/symbolTable.h"
+#include "functionSymbolTable/functionSymbolTable.h"
 
 // Lex global variables
 extern char yytext[];
@@ -21,10 +22,15 @@ extern AstNode *astTree;
 extern SymbolTable globalSt;
 
 
+// Yacc Error Function
 void yyerror(char const *s);
 
 void initialize(void);
 
+int execute_main(void);
+
 void finalize(int status);
+
+void register_function(AstNode *node);
 
 #endif

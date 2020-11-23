@@ -1,10 +1,6 @@
 #ifndef AST_NODES_H_fc51f24f6009d9dada1771be6189418224888db1
 #define AST_NODES_H_fc51f24f6009d9dada1771be6189418224888db1
 
-#include <stdlib.h>
-#include <stdio.h>
-
-#include "../pipoUtils/pipoUtils.h"
 #include "../symbolTable/symbolTable.h"
 
 #define MAX_FUNC_ARGS 30
@@ -134,7 +130,7 @@ typedef struct AstStringNode {
 
 void initialize_ast_node_functions();
 
-void execute_ast_tree(AstNode *tree, SymbolTable st);
+int execute_ast_tree(AstNode *tree, SymbolTable st);
 
 void free_ast_tree(AstNode *root);
 

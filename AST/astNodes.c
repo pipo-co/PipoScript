@@ -1,5 +1,11 @@
 #include "astNodes.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "../pipoUtils/pipoUtils.h"
+
+
 AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right, int lineno) {
 
     AstNode * astNode = emalloc(sizeof(*astNode));
@@ -238,8 +244,13 @@ void ast_free_function_arg_list(AstFunctionArgList *list) {
 
 #include "astNodeFunctions.c"
 
-void execute_ast_tree(AstNode *tree, SymbolTable st) {
-    execute_ast_node(tree, st);
+int execute_ast_tree(AstNode *tree, SymbolTable st) {
+    AstOpProcessorReturnNode *resultNode = execute_ast_node(tree, st);
+
+    if(resultNode->returnType == INT)
+        return resultNode->value.intValue;
+
+    return 0;
 }
 
 void free_ast_tree(AstNode *node) {
