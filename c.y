@@ -134,8 +134,8 @@ iteration_statement
 	;
 
 return_statement
-	: RETURN ';'				{ $$ = NULL; }
-	| RETURN VALUE ';'			{ $$ = NULL; }
+	: RETURN ';'				{ $$ = new_ast_return_node(NULL, yylineno); }
+	| RETURN VALUE ';'			{ $$ = new_ast_return_node($2, yylineno); }
 	;
 
 declaration_statement

@@ -9,6 +9,7 @@
 
 typedef struct AstOpProcessorReturnNode {
     int returnType;
+    bool returnGenerated;
 
     SymbolValue value;
 } AstOpProcessorReturnNode;
@@ -29,6 +30,7 @@ static AstOpProcessorReturnNode * execute_ast_node(AstNode *node, SymbolTable st
 // Return Value Auxiliary Functions
 static AstOpProcessorReturnNode * ast_node_create_int_return_val(int val) ;
 static AstOpProcessorReturnNode * ast_node_create_string_return_val(char *val);
+static AstOpProcessorReturnNode * ast_node_create_void_return_val(void);
 static int ast_node_get_int_return_val(AstOpProcessorReturnNode *returnVal, char* message, int lineno);
 static char * ast_node_get_string_return_val(AstOpProcessorReturnNode *returnVal, char* message, int lineno);
 
@@ -49,12 +51,10 @@ static AstOpProcessorReturnNode * ast_if_node_processor(AstNode *node, SymbolTab
     fprintf(stderr, "IF\n");
 
     if(ast_node_get_int_return_val(execute_ast_node(ifNode->condition, st), "Missing if condition return value (int)", node->lineno))
-        execute_ast_node(ifNode->ifBranch, st);
+        return execute_ast_node(ifNode->ifBranch, st);
     
     else
-        execute_ast_node(ifNode->elseBranch, st);
-
-    return NULL;
+        return execute_ast_node(ifNode->elseBranch, st);
 }
 
 static void ast_if_node_destroyer(AstNode *node) {
@@ -72,8 +72,14 @@ static AstOpProcessorReturnNode * ast_while_node_processor(AstNode *node , Symbo
 
     fprintf(stderr, "WHILE\n");
 
-    while(ast_node_get_int_return_val(execute_ast_node(whileNode->condition, st), "Missing while condition return value (int)", node->lineno))
-        execute_ast_node(whileNode->whileBranch, st);
+    AstOpProcessorReturnNode *returnNode;
+
+    while(ast_node_get_int_return_val(execute_ast_node(whileNode->condition, st), "Missing while condition return value (int)", node->lineno)) {
+        returnNode = execute_ast_node(whileNode->whileBranch, st);
+
+        if(returnNode != NULL && returnNode->returnGenerated)
+            return returnNode;
+    }
 
     return NULL;
 }
@@ -92,8 +98,13 @@ static AstOpProcessorReturnNode * ast_do_while_node_processor(AstNode *node, Sym
 
     fprintf(stderr, "DO\n");
 
+    AstOpProcessorReturnNode *returnNode;
+
     do {
-        execute_ast_node(doNode->whileBranch, st);
+        returnNode = execute_ast_node(doNode->whileBranch, st);
+
+        if(returnNode != NULL && returnNode->returnGenerated)
+            return returnNode;
 
     } while(ast_node_get_int_return_val(execute_ast_node(doNode->condition, st), "Missing do-while condition return value (int)", node->lineno));
 
@@ -105,11 +116,17 @@ static AstOpProcessorReturnNode * ast_for_node_processor(AstNode *node, SymbolTa
 
     fprintf(stderr, "FOR\n");
 
+    AstOpProcessorReturnNode *returnNode;
+
     execute_ast_node(forNode->firstAssignment, st);
 
     while(ast_node_get_int_return_val(execute_ast_node(forNode->condition, st), "Missing for condition return value (int)", node->lineno)) {
 
-        execute_ast_node(forNode->forBranch, st);
+        returnNode = execute_ast_node(forNode->forBranch, st);
+
+        if(returnNode != NULL && returnNode->returnGenerated)
+            return returnNode;
+        
         execute_ast_node(forNode->lastAssignment, st);
     }
 
@@ -132,9 +149,9 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
 
     SymbolNode *symbol = symbol_table_add(st, declarationNode->symbolName, declarationNode->type);
 
-    if(symbol == NULL){
+    if(symbol == NULL)
         print_lineno_and_abort("Symbol already declared", node->lineno);
-    }
+    
 
     if(declarationNode->value != NULL) {
         AstOpProcessorReturnNode *valueNode = execute_ast_node(declarationNode->value, st);
@@ -177,8 +194,10 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
     if(symbol == NULL)
         print_lineno_and_abort("Variable wasn't previously declared", node->lineno);
     
-
     AstOpProcessorReturnNode *value = execute_ast_node(assignmentNode->value, st);
+
+    if(value->returnType != symbol->type)
+        print_lineno_and_abort("Declared and assigned types don't match", node->lineno);
 
     if(symbol->type == INT) {
         
@@ -214,6 +233,9 @@ static AstOpProcessorReturnNode * ast_inc_dec_assignment_node_processor(AstNode 
     AstAssignmentNode * assignmentNode = (AstAssignmentNode*) node;
 
     SymbolNode *symbol = symbol_table_get(st, assignmentNode->symbolName);
+
+    if(symbol == NULL)
+        print_lineno_and_abort("Variable wasn't previously declared", node->lineno);
     
     if(symbol->type != INT)
         print_lineno_and_abort("++ and -- operations are only aplicable to ints", node->lineno);
@@ -267,6 +289,9 @@ static AstOpProcessorReturnNode * ast_symbol_reference_node_processor(AstNode *n
 
     SymbolNode *symbol = symbol_table_get(st, symbolRefNode->symbolName);
 
+    if(symbol == NULL)
+        print_lineno_and_abort("Variable wasn't previously declared", node->lineno);
+
     if(symbol->type == INT) {
         fprintf(stderr, "Symbol Dereference %s (%d)\n", symbol->name, symbol->value.intValue);
 
@@ -291,6 +316,32 @@ static void ast_symbol_reference_node_destroyer(AstNode *node) {
     free(symbolRefNode);
 }
 
+static AstOpProcessorReturnNode * ast_return_node_processor(AstNode *node, SymbolTable st) {
+    AstReturnNode * returnNode = (AstReturnNode*) node;
+
+    AstOpProcessorReturnNode *returnValueNode;
+
+    if(returnNode->value == NULL) {
+        returnValueNode = ast_node_create_void_return_val();
+        returnValueNode->returnGenerated = true;
+
+        return returnValueNode;
+    }
+
+    returnValueNode = execute_ast_node(returnNode->value, st);
+    returnValueNode->returnGenerated = true;
+
+    return returnValueNode;
+}
+
+static void ast_return_node_destroyer(AstNode *node) {
+    AstReturnNode * returnNode = (AstReturnNode*) node;
+
+    free_ast_tree(returnNode->value);
+
+    free(returnNode);
+}
+
 static void ast_function_declaration_node_destroyer(AstNode *node) {
     AstFunctionDeclarationNode * declarationNode = (AstFunctionDeclarationNode*) node;
 
@@ -306,8 +357,16 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
 
     AstFunctionDeclarationNode *declarationNode = function_symbol_table_get(callNode->functionName);
 
-    if(declarationNode->args != NULL && declarationNode->args->argCount != callNode->args->argCount)
+    if(declarationNode == NULL)
+        print_lineno_and_abort("Function wasn't previously declared", node->lineno);
+
+    // Both declaration and call have the same number of arguments (NULL == no arguments)
+    if((declarationNode->args != NULL && callNode == NULL) ||
+       (declarationNode->args == NULL && callNode != NULL) ||
+       (declarationNode->args->argCount != callNode->args->argCount)) {
+
         print_lineno_and_abort("Function call with invalid argument count", node->lineno);
+    }
 
     SymbolTable functionST = symbol_table_create();
 
@@ -331,6 +390,10 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
                 print_lineno_and_abort("Invalid function argument type", node->lineno);
 
             SymbolNode *symbolNode = symbol_table_add(functionST, iterDecl->symbolName, iterDecl->type);
+
+            if(declarationNode == NULL)
+                print_lineno_and_abort("There are duplicated argument names in functions", node->lineno);
+
             symbolNode->value = value;
 
             iterCall = iterCall->next;
@@ -347,9 +410,14 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
 
     symbol_table_free(functionST);
 
-    if((returnNode == NULL && declarationNode->returnType != VOID) || (returnNode != NULL && returnNode->returnType != declarationNode->returnType))
+    if(returnNode == NULL && declarationNode->returnType == VOID)
+        return ast_node_create_void_return_val();
+    
+
+    if(declarationNode->returnType == VOID || returnNode->returnType != declarationNode->returnType)
         print_lineno_and_abort("Function return type and actual return value don't match", node->lineno);
 
+    returnNode->returnGenerated = false;
     return returnNode;
 }
 
@@ -364,12 +432,13 @@ static void ast_function_call_node_destroyer(AstNode *node) {
 static AstOpProcessorReturnNode * ast_statement_list_node_processor(AstNode *node, SymbolTable st) {
 
     // Execute statement recursion to find first statement
-    execute_ast_node(node->left, st);
+    AstOpProcessorReturnNode *returnNode = execute_ast_node(node->left, st);
+
+    if(returnNode != NULL)
+        return returnNode;
 
     // Execute the corresponding statement for this iteration
-    execute_ast_node(node->right, st);
-
-    return NULL;
+    return execute_ast_node(node->right, st);
 }
 
 // Binary and Unary Operators
@@ -568,6 +637,9 @@ void initialize_ast_node_functions() {
     astNodeFunctions[AST_OP_POSITION(ID)].processor = ast_symbol_reference_node_processor;
     astNodeFunctions[AST_OP_POSITION(ID)].destroyer = ast_symbol_reference_node_destroyer;
 
+    astNodeFunctions[AST_OP_POSITION(RETURN)].processor = ast_return_node_processor;
+    astNodeFunctions[AST_OP_POSITION(RETURN)].destroyer = ast_return_node_destroyer;
+
     // Doesn't have processor
     astNodeFunctions[AST_OP_POSITION(FUNCTION_DECLARATION_CONST)].destroyer = ast_function_declaration_node_destroyer;
 
@@ -649,6 +721,7 @@ static AstOpProcessorReturnNode * ast_node_create_int_return_val(int val) {
 
     ret->returnType = INT;
     ret->value.intValue = val;
+    ret->returnGenerated = false;
 
     return ret;
 }
@@ -658,6 +731,16 @@ static AstOpProcessorReturnNode * ast_node_create_string_return_val(char *val) {
 
     ret->returnType = STRING;
     ret->value.stringValue = val;
+    ret->returnGenerated = false;
+
+    return ret;
+}
+
+static AstOpProcessorReturnNode * ast_node_create_void_return_val(void) {
+    AstOpProcessorReturnNode *ret = emalloc(sizeof(*ret));
+
+    ret->returnType = VOID;
+    ret->returnGenerated = false;
 
     return ret;
 }

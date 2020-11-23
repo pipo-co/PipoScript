@@ -18,10 +18,10 @@ bool function_symbol_table_add(AstFunctionDeclarationNode *functionNode) {
     
     int ret;
 
-    if(!function_symbol_table_exists(functionNode->functionName)){
+    if(!function_symbol_table_exists(functionNode->functionName)) {
 
         khiter_t k = kh_put(functionSymbolTable, fst, functionNode->functionName, &ret); 
-        if(ret == -1){
+        if(ret == -1) {
             return false;
         }
 
@@ -34,21 +34,22 @@ bool function_symbol_table_add(AstFunctionDeclarationNode *functionNode) {
 
 AstFunctionDeclarationNode * function_symbol_table_get(char* functionName) {
 
-    if(functionName == NULL){
+    if(functionName == NULL) {
         return NULL;
     }
 
     khiter_t k = kh_get(functionSymbolTable, fst, functionName);
 
-    if(k != kh_end(fst)){
+    if(k != kh_end(fst)) {
         return kh_value(fst, k);
     }
+    
     return NULL;
 }
 
 bool function_symbol_table_exists(char* functionName) {
 
-     if(functionName == NULL){
+     if(functionName == NULL) {
         return false;
     }
 

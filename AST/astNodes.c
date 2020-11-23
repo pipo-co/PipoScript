@@ -142,6 +142,18 @@ AstNode * new_ast_string_node(char *value, int lineno) {
     return (AstNode *) astNode;
 }
 
+AstNode * new_ast_return_node(AstNode *value, int lineno) {
+
+    AstReturnNode * astNode = emalloc(sizeof(*astNode));
+
+    astNode->nodeType = RETURN;
+    astNode->lineno = lineno;
+
+    astNode->value = value;
+
+    return (AstNode *) astNode;
+}
+
 AstNode * new_ast_function_declaration_node(int returnType, char *name, AstFunctionArgList *args, AstNode *block, int lineno) {
 
     AstFunctionDeclarationNode * astNode = emalloc(sizeof(*astNode));

@@ -115,6 +115,13 @@ typedef struct AstFunctionCallNode {
 
 } AstFunctionCallNode;
 
+typedef struct AstReturnNode {
+  int nodeType;
+  int lineno;
+
+  AstNode *value;
+} AstReturnNode;
+
 typedef struct AstIntNode {
   int nodeType;
   int lineno;
@@ -154,6 +161,8 @@ AstNode * new_ast_inc_dec_assignment_node(int type, char *symbolName, int lineno
 AstNode * new_ast_int_node(int value, int lineno);
 
 AstNode * new_ast_string_node(char *value, int lineno);
+
+AstNode * new_ast_return_node(AstNode *value, int lineno);
 
 AstNode * new_ast_function_declaration_node(int returnType, char *name, AstFunctionArgList *args, AstNode *block, int lineno);
 
