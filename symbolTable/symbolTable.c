@@ -17,12 +17,6 @@ SymbolTable symbol_table_create(){
     return st;
 }
 
-// SymbolTable symbol_table_create() {
-
-//     SymbolTable st = calloc(1, sizeof(*st));
-
-//     return st;
-// }
 
 SymbolNode * symbol_table_add(SymbolTable st, char *name, int type){
 
@@ -32,10 +26,8 @@ SymbolNode * symbol_table_add(SymbolTable st, char *name, int type){
 
     SymbolNode *node = new_symbol_node(name, type);
     int ret = 0;
-
-    int exist = 0;
-    exist = symbol_node_exists(st, name);
-    if( exist == -1){
+     
+    if(!symbol_node_exists(st, name)){
         khiter_t k = kh_put(symbolTable, st->symbolNodes, name, &ret);
         if(ret == -1){
             return NULL;
@@ -47,54 +39,29 @@ SymbolNode * symbol_table_add(SymbolTable st, char *name, int type){
     return NULL;   
 }
 
-int symbol_node_exists(SymbolTable st, char *name){
+bool symbol_node_exists(SymbolTable st, char *name){
     
     if(name == NULL){
-        return -1;
+        return false;
     }
 
-    khiter_t k;
-    int flag = 1;
+    khiter_t k = kh_get(symbolTable, st->symbolNodes, name);
 
-    for (k = kh_begin(st->symbolNodes); flag && k != kh_end(st->symbolNodes); ++k){
-        if (kh_exist(st->symbolNodes, k) && !strcmp(kh_key(st->symbolNodes, k), name)){
-            flag = 0;
-        }  
-    }
-        
-    if(flag) {
-        return -1; //si el flag esta en 1 es que no existe 
-    }  
-        
-    return k - 1;   //si existe retorno la posicion en el hash
-    
+    return k != kh_end(st->symbolNodes);
 }
-// SymbolNode * symbol_table_add(SymbolTable st, char *name, int type) {
-
-//     SymbolNode *node = new_symbol_node(name, type);
-
-//     st->sym[(int)node->name[0] - 'a'] = node;
-
-//     return node;
-// }
 
 SymbolNode * symbol_table_get(SymbolTable st, char *name){
 
     if( name == NULL){
         return NULL;
     }
+    khiter_t k = kh_get(symbolTable, st->symbolNodes, name);
 
-    int k = symbol_node_exists(st, name);
-    if(k != -1){
+    if(k != kh_end(st->symbolNodes)){
         return kh_value(st->symbolNodes, k);
     }
     return NULL;
 }
-
-// SymbolNode * symbol_table_get(SymbolTable st, char* name) {
-
-//     return st->sym[(int)name[0] - 'a'];
-// }
 
 void symbol_table_free(SymbolTable st){
     for (khiter_t k = kh_begin(st->symbolNodes); k != kh_end(st->symbolNodes); ++k){
@@ -106,16 +73,6 @@ void symbol_table_free(SymbolTable st){
 
     free(st);
 }
-
-// void symbol_table_free(SymbolTable st) {
-
-//     for(int i = 0; i < SYMBOL_TABLE_SIZE; i++) {
-//         if(st->sym[i] != NULL)
-//             free(st->sym[i]);
-//     }
-
-//     free(st);
-// }
 
 static SymbolNode * new_symbol_node(char *name, int type) {
 

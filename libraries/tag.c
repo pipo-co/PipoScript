@@ -47,17 +47,15 @@ int putAttribute(tag_t *tag, char *attributeName, char *attributeValue) {
     khiter_t k;
     int ret, keyNotPresent = 1;
 
-    for (k = kh_begin(tag->attributes); keyNotPresent && k != kh_end(tag->attributes); k++)
-        if (kh_exist(tag->attributes, k) && !strcmp((char *) kh_key(tag->attributes, k), (char *) attributeName))
-            keyNotPresent = 0;
+    k = kh_get(att, tag->attributes, attributeName);
 
-    if(keyNotPresent) {
+    if(k == kh_end(tag->attributes)) {
         khiter_t k = kh_put(att, tag->attributes, attributeName, &ret);  // Obtengo el puntero par la llave "attributeName"
         kh_value(tag->attributes, k) = attributeValue;  // Asigno el valor "attributeValue" a la llave anterior             
         return ret;      
     }
     else {
-        kh_value(tag->attributes, k - 1) = attributeValue;
+        kh_value(tag->attributes, k) = attributeValue;
         return 0;
     }
     

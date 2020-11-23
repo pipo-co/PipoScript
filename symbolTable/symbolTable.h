@@ -4,6 +4,7 @@
 
 #include "../pipoUtils/pipoUtils.h"
 #include "../libraries/khash.h"
+#include <stdbool.h>
 
 typedef struct SymbolTableCDT * SymbolTable;
 
@@ -28,7 +29,7 @@ SymbolNode * symbol_table_add(SymbolTable st, char *name, int type);
 
 SymbolNode * symbol_table_get(SymbolTable st, char* name);
 
-int symbol_node_exists(SymbolTable st, char *name);
+bool symbol_node_exists(SymbolTable st, char *name);
 
 void symbol_table_free(SymbolTable st);
 
