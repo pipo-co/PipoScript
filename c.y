@@ -53,7 +53,7 @@
 %nonassoc IFX
 %nonassoc ELSE
 %nonassoc STATEMENT_LIST_CONST FUNCTION_DECLARATION_CONST FUNCTION_CALL_CONST FUNCTION_DEFINITION_LIST_CONST
-%nonassoc SET_PROPERTY_CONST SET_NAMED_PROPERTY_CONST GET_PROPERTY_CONST GET_NAMED_PROPERTY_CONST
+%nonassoc SET_PROPERTY_CONST SET_NAMED_PROPERTY_CONST GET_PROPERTY_CONST GET_NAMED_PROPERTY_CONST INT_CAST_CONST
 
 %type <astNode> STATEMENT_LIST STATEMENT BLOCK if_statement iteration_statement return_statement declaration_statement
 %type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE FUNCTION_CALL function_call_statement
@@ -244,14 +244,15 @@ NUM
 NON_ID_NUM
 	: INT_LITERAL				{ $$ = new_ast_int_node($1, yylineno); }
 	| ARITH						{ $$ = $1; }
-	| LEN '(' STRING_VALUE ')'	{ $$ = NULL; }
+	| INT '(' STRING_VALUE ')' 	{ $$ = new_ast_node(INT_CAST_CONST, $3, NULL, yylineno); }
+	| LEN '(' STRING_VALUE ')'	{ $$ = new_ast_node(LEN, $3, NULL, yylineno); }
 	| CMP '(' STRING_VALUE ',' STRING_VALUE ')'
-								{ $$ = NULL; }
+								{ $$ = new_ast_node(CMP, $3, $5, yylineno); }
 	;
 
 STRING_ARITH
 	: CONCAT '(' STRING_VALUE ',' STRING_VALUE ')'
-								{ $$ = NULL; }
+								{ $$ = new_ast_node(CONCAT, $3, $5, yylineno); }
 	;
 
 STRING_VALUE
@@ -263,7 +264,7 @@ STRING_VALUE
 NON_ID_STRING_VALUE
 	: STRING_LITERAL			{ $$ = new_ast_string_node($1, yylineno); }
 	| STRING_ARITH				{ $$ = $1; }
-	| STR '(' NUM ')'			{ $$ = NULL; }
+	| STR '(' NUM ')'			{ $$ = new_ast_node(STR, $3, NULL, yylineno); }
 	| GET_PROPERTY FROM ID		{ $$ = new_ast_get_property_node($3, $1, yylineno); }
 	| GET_NAMED_PROPERTY STRING_LITERAL FROM ID
 								{ $$ = new_ast_get_named_property_node($4, $1, $2, yylineno); }
@@ -311,9 +312,7 @@ int main(void) {
 
 	yyparse();
 
-	// int status = execute_main();
+	int status = execute_main();
 
-	// finalize(status);
-
-	// finalize(0);
+	finalize(status);
 }
