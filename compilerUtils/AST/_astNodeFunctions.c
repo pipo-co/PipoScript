@@ -410,7 +410,7 @@ static AstOpProcessorReturnNode * ast_append_child_node_processor(AstNode *node,
     Tag * tagValue = ast_node_get_tag_return_val(execute_ast_node(appendChildNode->value, st), "Type mismatch. Append child expects a tag.", node->lineno);
 
     append_tag(symbol->value.tagValue, tagValue);
-    fprintf(stderr, "append_tag from %s = %s;\n", symbol->name, tagValue->name);
+    fprintf(stderr, "append child from %s = %s;\n", symbol->name, tagValue->name);
 
     return NULL;
 }
