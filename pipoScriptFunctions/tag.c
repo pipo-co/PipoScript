@@ -16,10 +16,10 @@ void tag_service_fin() {
     memory_manager_free_all(&mm_tag_node);
 }
 
-tag_t *newTag(char *name) {
+tag_t *newTag() {
     
     tag_t *t = memory_manager_alloc(&mm_tag, sizeof(*t));
-    t->name = name;
+    t->name = NULL;
     t->attributes = kh_init(att);
     t->body = NULL;
     t->children.first = NULL;

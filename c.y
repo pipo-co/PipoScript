@@ -19,7 +19,7 @@
 	AstNode *astNode;
 }
 
-%error-verbose
+%define parse.error verbose
 
 %token <operation> FIRST
 
@@ -29,10 +29,12 @@
 %token <stringValue> STRING_LITERAL
 
 %token <operation> LEFT RIGHT
-%token <operation> INT VOID STRING
+%token <operation> INT VOID STRING TAG
 %token <operation> IF ELSE WHILE DO FOR RETURN
+%token <operation> SET GET NAME BODY ATTRIBUTE FROM APPEND_CHILD
 
 %right '='
+%left CONCAT
 %left OR AND
 %left '>' '<' LE GE EQ NE
 %left '+' '-'
@@ -44,6 +46,7 @@
 %nonassoc UMINUS
 
 %type <operation> AND OR '=' '>' '<' LE GE EQ NE '+' '-' '*' '/' '!' INC DEC ')' '(' UMINUS
+%type <operation> SET_PROPERTY SET_NAMED_PROPERTY GET_PROPERTY GET_NAMED_PROPERTY
 
 %nonassoc IFX
 %nonassoc ELSE
@@ -159,7 +162,21 @@ ASSIGNMENT
 	: ID '=' VALUE				{ $$ = new_ast_assignment_node($1, $3, yylineno); }
 	| ID INC					{ $$ = new_ast_inc_dec_assignment_node($2, $1, yylineno); }
 	| ID DEC					{ $$ = new_ast_inc_dec_assignment_node($2, $1, yylineno); }
+	| SET_PROPERTY FROM ID '=' VALUE
+								{ $$ = NULL; }
+	| SET_NAMED_PROPERTY STRING_LITERAL FROM ID '=' VALUE
+								{ $$ = NULL; }
+	| APPEND_CHILD FROM ID '=' VALUE
+								{ $$ = NULL; }
 	;
+
+SET_PROPERTY
+	: SET BODY					{ $$ = $2; }
+	| SET NAME					{ $$ = $2; }
+	;
+
+SET_NAMED_PROPERTY	
+	: SET ATTRIBUTE				{ $$ = $2; }
 
 DO_ASSIGNMENT
 	: ASSIGNMENT				{ $$ = $1; }
@@ -228,17 +245,32 @@ VALUE
 	| FUNCTION_CALL				{ $$ = $1; }
 	| STRING_LITERAL			{ $$ = new_ast_string_node($1, yylineno); }
 	| NON_ID_NUM				{ $$ = $1; }
+	| GET_PROPERTY FROM ID		{ $$ = NULL; }
+
+	| GET_NAMED_PROPERTY STRING_LITERAL FROM ID
+								{ $$ = NULL; }
 	;
+
+GET_PROPERTY
+	: GET BODY					{ $$ = $2; }
+	| GET NAME					{ $$ = $2; }
+	;
+
+GET_NAMED_PROPERTY	
+	: GET ATTRIBUTE				{ $$ = $2; }
+
 
 ID_TYPE
 	: INT						{ $$ = $1; }
 	| STRING					{ $$ = $1; }
+	| TAG						{ $$ = $1; }
 	;
 
 FUNCTION_RETURN_TYPE
 	: VOID						{ $$ = $1; }
 	| INT						{ $$ = $1; }
 	| STRING					{ $$ = $1; }
+	| TAG						{ $$ = $1; }
 	;
 
 %%
@@ -255,7 +287,8 @@ int main(void) {
 
 	yyparse();
 
-	int status = execute_main();
+	// int status = execute_main();
+	// finalize(status);
 
-	finalize(status);
+	finalize(0);
 }

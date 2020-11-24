@@ -25,11 +25,10 @@ typedef struct tag {
     struct tag_list_h children;
 } tag_t;
 
+// Contexto
 void tag_service_init();
 
 void tag_service_fin();
-
-tag_t *newTag(char *name);
 
 void renderTag(tag_t *t, int ind);
 
@@ -37,12 +36,15 @@ void renderNodeList(tag_node_t *n, int ind);
 
 void renderAttributes(tag_t *t);
 
+void freeTag(void * ptr);
+
+// Runtime
+tag_t *newTag();
+
 void appendTag(tag_t *parent, tag_t *child);
 
 int putAttribute(tag_t *tag, char *attributeName, char *attributeValue);
 
 char *getAttribute(tag_t *tag, const char *attributeName);
-
-void freeTag(void * ptr);
 
 #endif

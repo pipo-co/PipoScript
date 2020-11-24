@@ -22,21 +22,30 @@ HEX				[a-fA-F0-9]
 "if"							{ yylval.operation = IF; return IF; }
 "int"							{ yylval.operation = INT; return INT; }
 "string"						{ yylval.operation = STRING; return STRING; }
+"tag"							{ yylval.operation = TAG; return TAG; }
 "return"						{ yylval.operation = RETURN; return RETURN; }
 "void"							{ yylval.operation = VOID; return VOID; }
 "while"							{ yylval.operation = WHILE; return WHILE; }
+
+"set"							{ yylval.operation = SET; return SET; }
+"get"							{ yylval.operation = GET; return GET; }
+"name"							{ yylval.operation = NAME; return NAME; }
+"body"							{ yylval.operation = BODY; return BODY; }
+"attribute"						{ yylval.operation = ATTRIBUTE; return ATTRIBUTE; }
+"from"							{ yylval.operation = FROM; return FROM; }
+"append_child"					{ yylval.operation = APPEND_CHILD; return APPEND_CHILD; }
+
+"concat"						{ yylval.operation = CONCAT; return CONCAT; }
 
 {LETTER}({LETTER}|{DIGIT})*		{ yylval.symbol = lex_copy_string(yytext, yyleng); return ID; }
 
 0|[1-9]{DIGIT}*					{ yylval.intValue = atoi(yytext); return INT_LITERAL; }
 \"(\\.|[^\\"\n])*\"				{ yylval.stringValue = lex_copy_string(yytext + 1, yyleng - 2); return STRING_LITERAL; }
 
-
 ">>"							{ yylval.operation = RIGHT; return RIGHT; }
 "<<"							{ yylval.operation = LEFT; return LEFT; }
 "++"							{ yylval.operation = INC; return INC; }
 "--"							{ yylval.operation = DEC; return DEC; }
-
 
 "&&"							{ yylval.operation = AND; return AND; }
 "||"							{ yylval.operation = OR; return OR; }

@@ -1,5 +1,5 @@
-CC=gcc
-CFLAGS=-Wall -pedantic -std=c99 -ggdb -fsanitize=address -fno-omit-frame-pointer -I$(PWD)
+CC ?= gcc
+CFLAGS ?= -Wall -pedantic -std=c99 -ggdb -fsanitize=address -fno-omit-frame-pointer -I$(PWD)
 
 COMPILER_UTILS_PATH=compilerUtils/*
 COMPILER_UTILS_SOURCE_FILES = $(foreach dir, $(COMPILER_UTILS_PATH), $(wildcard $(dir)/[^_]*.c))
