@@ -395,6 +395,100 @@ static void ast_set_named_property_node_destroyer(AstNode *node) {
     free(setNamedPropertyNode);
 }
 
+static AstOpProcessorReturnNode * ast_append_child_node_processor(AstNode *node, SymbolTable st) {
+    
+    AstAppendChildNode *appendChildNode = (AstAppendChildNode*) node;
+
+    SymbolNode *symbol = symbol_table_get(st, appendChildNode->symbolName);
+
+    if(symbol == NULL)
+        print_lineno_and_abort("Variable wasn't previously declared", node->lineno);
+    
+    if(symbol->type != TAG)
+        print_lineno_and_abort("Append child operations are only aplicable to tags", node->lineno);
+    
+    Tag * tagValue = ast_node_get_tag_return_val(execute_ast_node(appendChildNode->value, st), "Type mismatch. Append child expects a tag.", node->lineno);
+
+    append_tag(symbol->value.tagValue, tagValue);
+    fprintf(stderr, "append_tag from %s = %s;\n", symbol->name, tagValue->name);
+
+    return NULL;
+}
+
+static void ast_append_child_node_destroyer(AstNode *node) {
+    AstAppendChildNode *appendChildNode = (AstAppendChildNode*) node;
+
+    free_ast_tree(appendChildNode->value);
+
+    free(appendChildNode);
+}
+
+static AstOpProcessorReturnNode * ast_get_property_node_processor(AstNode *node, SymbolTable st) {
+    
+    AstGetPropertyNode *getPropertyNode = (AstGetPropertyNode*) node;
+
+    SymbolNode *symbol = symbol_table_get(st, getPropertyNode->symbolName);
+
+    if(symbol == NULL)
+        print_lineno_and_abort("Variable wasn't previously declared", node->lineno);
+    
+    if(symbol->type != TAG)
+        print_lineno_and_abort("Get property operations are only aplicable to tags", node->lineno);
+
+    if(getPropertyNode->propertyType == BODY) {
+        return ast_node_create_string_return_val(symbol->value.tagValue->body);
+    }
+
+    else if(getPropertyNode->propertyType == NAME) {
+        return ast_node_create_string_return_val(symbol->value.tagValue->name);
+    }
+
+    else
+        print_lineno_and_abort("Invalid property on get operation. Expecting body or name.", node->lineno);
+
+    return NULL;
+}
+
+static void ast_get_property_node_destroyer(AstNode *node) {
+    AstStringNode * stringNode = (AstStringNode*) node;
+
+    free(stringNode);
+}
+
+static AstOpProcessorReturnNode * ast_get_named_property_node_processor(AstNode *node, SymbolTable st) {
+
+    AstGetNamedPropertyNode *getNamedPropertyNode = (AstGetNamedPropertyNode*) node;
+
+    SymbolNode *symbol = symbol_table_get(st, getNamedPropertyNode->symbolName);
+
+    if(symbol == NULL)
+        print_lineno_and_abort("Variable wasn't previously declared", node->lineno);
+    
+    if(symbol->type != TAG)
+        print_lineno_and_abort("Get property operations are only aplicable to tags", node->lineno);
+
+    if(getNamedPropertyNode->propertyType == ATTRIBUTE) {
+        
+        fprintf(stderr, "get attribute %s from %s;\n", getNamedPropertyNode->propertyName, symbol->name);
+        
+        return ast_node_create_string_return_val(get_attribute(symbol->value.tagValue, getNamedPropertyNode->propertyName));
+
+    }
+
+    else
+        print_lineno_and_abort("Invalid property on set operation. Expecting attribute.", node->lineno);
+
+    return NULL;
+
+}
+
+static void ast_get_named_property_node_destroyer(AstNode *node) {
+    AstStringNode * stringNode = (AstStringNode*) node;
+
+    free(stringNode);
+
+}
+
 static AstOpProcessorReturnNode * ast_int_node_processor(AstNode *node, SymbolTable st) {
     AstIntNode * intNode = (AstIntNode*) node;
 
@@ -819,6 +913,15 @@ void initialize_ast_node_functions() {
 
     astNodeFunctions[AST_OP_POSITION(SET_NAMED_PROPERTY_CONST)].processor = ast_set_named_property_node_processor;
     astNodeFunctions[AST_OP_POSITION(SET_NAMED_PROPERTY_CONST)].destroyer = ast_set_named_property_node_destroyer;
+
+    astNodeFunctions[AST_OP_POSITION(APPEND_CHILD)].processor = ast_append_child_node_processor;
+    astNodeFunctions[AST_OP_POSITION(APPEND_CHILD)].destroyer = ast_append_child_node_destroyer;
+
+    astNodeFunctions[AST_OP_POSITION(GET_PROPERTY_CONST)].processor = ast_get_property_node_processor;
+    astNodeFunctions[AST_OP_POSITION(GET_PROPERTY_CONST)].destroyer = ast_get_property_node_destroyer;
+
+    astNodeFunctions[AST_OP_POSITION(GET_NAMED_PROPERTY_CONST)].processor = ast_get_named_property_node_processor;
+    astNodeFunctions[AST_OP_POSITION(GET_NAMED_PROPERTY_CONST)].destroyer = ast_get_named_property_node_destroyer;
 
     astNodeFunctions[AST_OP_POSITION(INT)].processor = ast_int_node_processor;
     astNodeFunctions[AST_OP_POSITION(INT)].destroyer = ast_int_node_destroyer;

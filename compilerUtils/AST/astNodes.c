@@ -146,6 +146,47 @@ AstNode * new_ast_set_named_property_node(char *symbolName, int propertyType, ch
     return (AstNode *) astNode;
 }
 
+AstNode * new_ast_append_child_node(char *symbolName, AstNode *value, int lineno) {
+    
+    AstAppendChildNode * astNode = emalloc(sizeof(*astNode));
+
+    astNode->nodeType = APPEND_CHILD;
+    astNode->lineno = lineno;
+
+    astNode->symbolName = symbolName;       // ID
+    astNode->value = value;                 // <tag>
+
+    return (AstNode *) astNode;
+}
+
+AstNode * new_ast_get_property_node(char *symbolName, int propertyType, int lineno) {
+    
+    AstSetPropertyNode * astNode = emalloc(sizeof(*astNode));
+
+    astNode->nodeType = GET_PROPERTY_CONST;
+    astNode->lineno = lineno;
+
+    astNode->propertyType = propertyType;   // BODY o NAME
+    astNode->symbolName = symbolName;       // ID
+
+    return (AstNode *) astNode;
+}
+
+AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, char *propertyName, int lineno) {
+    
+    AstSetNamedPropertyNode * astNode = emalloc(sizeof(*astNode));
+
+    astNode->nodeType = GET_NAMED_PROPERTY_CONST;
+    astNode->lineno = lineno;
+
+    astNode->propertyType = propertyType;   // ATTRIBUTE
+    astNode->propertyName = propertyName;   // <string>
+    astNode->symbolName = symbolName;       // ID
+
+    return (AstNode *) astNode;
+}
+
+
 AstNode * new_ast_int_node(int value, int lineno) {
 
     AstIntNode * astNode = emalloc(sizeof(*astNode));

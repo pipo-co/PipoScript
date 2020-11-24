@@ -159,6 +159,34 @@ typedef struct AstSetNamedPropertyNode {
 
 } AstSetNamedPropertyNode;
 
+typedef struct AstAppendChildNode {
+  int nodeType;
+  int lineno;
+
+  char *symbolName;
+  AstNode *value;
+
+} AstAppendChildNode;
+
+typedef struct AstGetPropertyNode {
+  int nodeType;
+  int lineno;
+
+  int propertyType;
+  char *symbolName;
+
+} AstGetPropertyNode;
+
+typedef struct AstGetNamedPropertyNode {
+  int nodeType;
+  int lineno;
+
+  int propertyType;
+  char *symbolName;
+  char *propertyName;
+
+} AstGetNamedPropertyNode;
+
 void initialize_ast_node_functions();
 
 int execute_ast_tree(AstNode *tree, SymbolTable st);
@@ -184,6 +212,12 @@ AstNode * new_ast_inc_dec_assignment_node(int type, char *symbolName, int lineno
 AstNode * new_ast_set_property_node(char *symbolName, int propertyType, AstNode *value, int lineno);
 
 AstNode * new_ast_set_named_property_node(char *symbolName, int propertyType, char *propertyName, AstNode *value, int lineno);
+
+AstNode * new_ast_append_child_node(char *symbolName, AstNode *value, int lineno);
+
+AstNode * new_ast_get_property_node(char *symbolName, int propertyType, int lineno);
+
+AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, char *propertyName, int lineno);
 
 AstNode * new_ast_int_node(int value, int lineno);
 
