@@ -31,4 +31,4 @@ test: $(SOURCES)
 clean:
 	rm -f $(LEX) $(YACC) $(COMPILER) $(COMPILER_UTILS_OBJECTS)
 
-.PHONY: all cleam
+.PHONY: all clean

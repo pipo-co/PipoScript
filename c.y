@@ -33,17 +33,19 @@
 
 %right '='
 %left CONCAT
+%left CMP
 %left OR AND
 %left '>' '<' LE GE EQ NE
 %left '+' '-'
 %left '*' '/'
-%right '!'
+%right '!' STR LEN
 %left INC DEC
 %left ')'
 %right '('
 %nonassoc UMINUS
 
 %type <operation> AND OR '=' '>' '<' LE GE EQ NE '+' '-' '*' '/' '!' INC DEC ')' '(' UMINUS
+%type <operation> CONCAT CMP LEN STR
 %type <operation> SET_PROPERTY SET_NAMED_PROPERTY GET_PROPERTY GET_NAMED_PROPERTY
 
 %nonassoc IFX
@@ -53,6 +55,7 @@
 
 %type <astNode> STATEMENT_LIST STATEMENT BLOCK if_statement iteration_statement return_statement declaration_statement
 %type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE FUNCTION_CALL function_call_statement
+%type <astNode> STRING_ARITH STRING_VALUE NON_ID_STRING_VALUE
 
 %type <functionArgList> FUNC_ARG_LIST FUNC_DECLARATION_ARG_LIST
 
@@ -239,17 +242,36 @@ NUM
 NON_ID_NUM
 	: INT_LITERAL				{ $$ = new_ast_int_node($1, yylineno); }
 	| ARITH						{ $$ = $1; }
+	| LEN '(' STRING_VALUE ')'	{ $$ = NULL; }
+	| CMP '(' STRING_VALUE ',' STRING_VALUE ')'
+								{ $$ = NULL; }
+	;
+
+STRING_ARITH
+	: CONCAT '(' STRING_VALUE ',' STRING_VALUE ')'
+								{ $$ = NULL; }
+	;
+
+STRING_VALUE
+	: ID						{ $$ = new_ast_symbol_reference_node($1, yylineno); }
+	| FUNCTION_CALL				{ $$ = $1; }
+	| NON_ID_STRING_VALUE		{ $$ = $1; }
+	;
+
+NON_ID_STRING_VALUE
+	: STRING_LITERAL			{ $$ = new_ast_string_node($1, yylineno); }
+	| STRING_ARITH				{ $$ = $1; }
+	| STR '(' NUM ')'			{ $$ = NULL; }
+	| GET_PROPERTY FROM ID		{ $$ = new_ast_get_property_node($3, $1, yylineno); }
+	| GET_NAMED_PROPERTY STRING_LITERAL FROM ID
+								{ $$ = new_ast_get_named_property_node($4, $1, $2, yylineno); }
 	;
 
 VALUE
 	: ID						{ $$ = new_ast_symbol_reference_node($1, yylineno); }
 	| FUNCTION_CALL				{ $$ = $1; }
-	| STRING_LITERAL			{ $$ = new_ast_string_node($1, yylineno); }
+	| NON_ID_STRING_VALUE		{ $$ = $1; }
 	| NON_ID_NUM				{ $$ = $1; }
-	| GET_PROPERTY FROM ID		{ $$ = new_ast_get_property_node($3, $1, yylineno); }
-
-	| GET_NAMED_PROPERTY STRING_LITERAL FROM ID
-								{ $$ = new_ast_get_named_property_node($4, $1, $2, yylineno); }
 	;
 
 GET_PROPERTY
@@ -259,7 +281,6 @@ GET_PROPERTY
 
 GET_NAMED_PROPERTY	
 	: GET ATTRIBUTE				{ $$ = $2; }
-
 
 ID_TYPE
 	: INT						{ $$ = $1; }
@@ -293,6 +314,4 @@ int main(void) {
 	render_final_tag(tag, yyout);
 
 	finalize(0);
-
-	// finalize(0);
 }
