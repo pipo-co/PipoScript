@@ -80,8 +80,13 @@ static AstOpProcessorReturnNode * ast_while_node_processor(AstNode *node , Symbo
     while(ast_node_get_int_return_val(execute_ast_node(whileNode->condition, st), "Missing while condition return value (int)", node->lineno)) {
         returnNode = execute_ast_node(whileNode->whileBranch, st);
 
-        if(returnNode != NULL && returnNode->returnGenerated)
-            return returnNode;
+        if(returnNode != NULL) {
+
+            if(returnNode->returnGenerated)
+                return returnNode;
+
+            free(returnNode);
+        }
     }
 
     return NULL;
@@ -106,8 +111,12 @@ static AstOpProcessorReturnNode * ast_do_while_node_processor(AstNode *node, Sym
     do {
         returnNode = execute_ast_node(doNode->whileBranch, st);
 
-        if(returnNode != NULL && returnNode->returnGenerated)
-            return returnNode;
+        if(returnNode != NULL) {
+            if(returnNode->returnGenerated)
+                return returnNode;
+
+            free(returnNode);
+        }
 
     } while(ast_node_get_int_return_val(execute_ast_node(doNode->condition, st), "Missing do-while condition return value (int)", node->lineno));
 
@@ -127,8 +136,12 @@ static AstOpProcessorReturnNode * ast_for_node_processor(AstNode *node, SymbolTa
 
         returnNode = execute_ast_node(forNode->forBranch, st);
 
-        if(returnNode != NULL && returnNode->returnGenerated)
-            return returnNode;
+        if(returnNode != NULL) {
+            if(returnNode->returnGenerated)
+                return returnNode;
+
+            free(returnNode);
+        }
         
         execute_ast_node(forNode->lastAssignment, st);
     }
@@ -159,8 +172,12 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
     if(declarationNode->value != NULL) {
         AstOpProcessorReturnNode *valueNode = execute_ast_node(declarationNode->value, st);
 
-        if(valueNode->returnType != symbol->type)
+        if(valueNode->returnType != symbol->type){
+            if(valueNode != NULL)
+                free(valueNode);
+
             print_lineno_and_abort("Declared and assigned types don't match", node->lineno);
+        }
 
         if(symbol->type == INT) {
             symbol->value.intValue = ast_node_get_int_return_val(valueNode, NULL, node->lineno);
@@ -172,8 +189,12 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
             fprintf(stderr, "string %s = %s;\n", symbol->name, symbol->value.stringValue);
         }
 
-        else
+        else {
+            if(valueNode != NULL)
+                free(valueNode);
+
             print_lineno_and_abort("Invalid declaration type", node->lineno);
+        }
     }
     else
         fprintf(stderr, "%s %s;\n", (symbol->type == INT)? "int" : "string", symbol->name);
@@ -199,8 +220,12 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
     
     AstOpProcessorReturnNode *value = execute_ast_node(assignmentNode->value, st);
 
-    if(value->returnType != symbol->type)
+    if(value->returnType != symbol->type) {
+        if(value != NULL)
+            free(value);
+
         print_lineno_and_abort("Declared and assigned types don't match", node->lineno);
+    }
 
     if(symbol->type == INT) {
         
@@ -218,8 +243,12 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
         symbol->value.stringValue = stringVal;
     }
 
-    else
+    else {
+        if(value != NULL)
+            free(value);
+
         print_lineno_and_abort("Invalid data type assignment", node->lineno);
+    }
 
     return NULL;
 }
@@ -413,12 +442,21 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
 
     symbol_table_free(functionST);
 
-    if(returnNode == NULL && declarationNode->returnType == VOID)
-        return ast_node_create_void_return_val();
-    
+    if((returnNode == NULL || !returnNode->returnGenerated) && declarationNode->returnType == VOID) {
 
-    if(declarationNode->returnType == VOID || returnNode->returnType != declarationNode->returnType)
+        if(returnNode != NULL)
+            free(returnNode);
+
+        return ast_node_create_void_return_val();
+    }
+    
+    if(declarationNode->returnType == VOID || returnNode->returnType != declarationNode->returnType) {
+
+        if(returnNode != NULL)
+            free(returnNode);
+
         print_lineno_and_abort("Function return type and actual return value don't match", node->lineno);
+    }
 
     returnNode->returnGenerated = false;
     return returnNode;
@@ -437,8 +475,12 @@ static AstOpProcessorReturnNode * ast_statement_list_node_processor(AstNode *nod
     // Execute statement recursion to find first statement
     AstOpProcessorReturnNode *returnNode = execute_ast_node(node->left, st);
 
-    if(returnNode != NULL)
-        return returnNode;
+    if(returnNode != NULL) {
+        if(returnNode->returnGenerated)
+            return returnNode;
+        
+        free(returnNode);
+    }
 
     // Execute the corresponding statement for this iteration
     return execute_ast_node(node->right, st);

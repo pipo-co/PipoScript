@@ -269,10 +269,15 @@ void ast_free_function_arg_list(AstFunctionArgList *list) {
 int execute_ast_tree(AstNode *tree, SymbolTable st) {
     AstOpProcessorReturnNode *resultNode = execute_ast_node(tree, st);
 
-    if(resultNode != NULL && resultNode->returnType == INT)
-        return resultNode->value.intValue;
+    int returnVal = 0;
 
-    return 0;
+    if(resultNode != NULL && resultNode->returnType == INT)
+        returnVal = resultNode->value.intValue;
+    
+    if(resultNode != NULL)
+        free(resultNode);
+
+    return returnVal;
 }
 
 void free_ast_tree(AstNode *node) {
