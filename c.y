@@ -37,14 +37,14 @@
 %left OR AND
 %left '>' '<' LE GE EQ NE
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
 %right '!' STR LEN
 %left INC DEC
 %left ')'
 %right '('
 %nonassoc UMINUS
 
-%type <operation> AND OR '=' '>' '<' LE GE EQ NE '+' '-' '*' '/' '!' INC DEC ')' '(' UMINUS
+%type <operation> AND OR '=' '>' '<' LE GE EQ NE '+' '-' '*' '/' '%' '!' INC DEC ')' '(' UMINUS
 %type <operation> CONCAT CMP LEN STR
 %type <operation> SET_PROPERTY SET_NAMED_PROPERTY GET_PROPERTY GET_NAMED_PROPERTY
 
@@ -220,6 +220,7 @@ ARITH
 	| NUM '-' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
 	| NUM '*' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
 	| NUM '/' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| NUM '%' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
 	| NUM '<' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
 	| NUM '>' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
 	| NUM LE NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }

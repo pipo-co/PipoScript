@@ -856,6 +856,17 @@ static AstOpProcessorReturnNode * ast_div_node_processor(AstNode *node, SymbolTa
     return ast_node_create_int_return_val(left / right);
 }
 
+static AstOpProcessorReturnNode * ast_mod_node_processor(AstNode *node, SymbolTable st) {
+
+    int left = ast_node_get_int_return_val(execute_ast_node(node->left, st), "Both operators of %% must be ints", node->lineno);
+
+    int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of %% must be ints", node->lineno);
+
+    fprintf(stderr, "(%d %% %d)", left, right);
+
+    return ast_node_create_int_return_val(left % right);
+}
+
 static AstOpProcessorReturnNode * ast_neg_node_processor(AstNode *node, SymbolTable st) {
 
     int val = ast_node_get_int_return_val(execute_ast_node(node->left, st), "Operator of ! must be an int", node->lineno);
@@ -1029,6 +1040,9 @@ void initialize_ast_node_functions() {
 
     astNodeFunctions[AST_OP_POSITION('/')].processor = ast_div_node_processor;
     astNodeFunctions[AST_OP_POSITION('/')].destroyer = ast_node_destroyer;
+
+    astNodeFunctions[AST_OP_POSITION('%')].processor = ast_mod_node_processor;
+    astNodeFunctions[AST_OP_POSITION('%')].destroyer = ast_node_destroyer;
 
     astNodeFunctions[AST_OP_POSITION('!')].processor = ast_neg_node_processor;
     astNodeFunctions[AST_OP_POSITION('!')].destroyer = ast_node_destroyer;
