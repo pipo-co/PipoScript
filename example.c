@@ -28,7 +28,7 @@ int main(int argc, char const *argv[]) {
     string_service_init();
 
     // Tag div2 = new_tag "div";
-    tag_t *div = newTag("div");
+    Tag *div = newTag("div");
 
     putAttribute(div, "id", "div-id");
     // String s = "h";
@@ -44,7 +44,7 @@ int main(int argc, char const *argv[]) {
         char * name = joinStrings(s, itoa2(i));
         
         // Tag aux_title = new_tag name;
-        tag_t *aux_title = newTag(name);
+        Tag *aux_title = newTag(name);
         
         // if( i % 2 == 0)
         if( i % 2 == 0){

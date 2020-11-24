@@ -16,9 +16,9 @@ void tag_service_fin() {
     memory_manager_free_all(&mm_tag_node);
 }
 
-tag_t *newTag() {
+Tag *newTag() {
     
-    tag_t *t = memory_manager_alloc(&mm_tag, sizeof(*t));
+    Tag *t = memory_manager_alloc(&mm_tag, sizeof(*t));
     t->name = NULL;
     t->attributes = kh_init(att);
     t->body = NULL;
@@ -27,9 +27,9 @@ tag_t *newTag() {
     return t;
 }
 
-void appendTag(tag_t *parent, tag_t *child) {
+void appendTag(Tag *parent, Tag *child) {
 
-    tag_node_t * newNode = memory_manager_alloc(&mm_tag_node, sizeof(tag_node_t));
+    TagNode * newNode = memory_manager_alloc(&mm_tag_node, sizeof(TagNode));
     newNode->tag = child;
     newNode->next = NULL;
 
@@ -40,7 +40,7 @@ void appendTag(tag_t *parent, tag_t *child) {
 
 }
 
-int putAttribute(tag_t *tag, char *attributeName, char *attributeValue) {
+int putAttribute(Tag *tag, char *attributeName, char *attributeValue) {
     khiter_t k;
     int ret, keyNotPresent = 1;
 
@@ -59,7 +59,7 @@ int putAttribute(tag_t *tag, char *attributeName, char *attributeValue) {
     return -1;        
 }
 
-char *getAttribute(tag_t *tag, const char *attributeName) {
+char *getAttribute(Tag *tag, const char *attributeName) {
     if( attributeName == NULL)
         return NULL;
 
@@ -71,7 +71,7 @@ char *getAttribute(tag_t *tag, const char *attributeName) {
     return (char *) kh_value(tag->attributes, k);
 }
 
-void renderTag(tag_t *t, int ind) {
+void renderTag(Tag *t, int ind) {
 
     // <#name# #attribute_1_name#=#attribute_1_value# #attribute_n_name#=#attribute_n_value#>
     for (size_t i = 0; i < ind; i++) putchar('\t');
@@ -93,7 +93,7 @@ void renderTag(tag_t *t, int ind) {
     printf("</%s>\n", t->name);
 }
 
-void renderNodeList(tag_node_t *n, int ind) {
+void renderNodeList(TagNode *n, int ind) {
 
     if(n == NULL)
         return;
@@ -102,7 +102,7 @@ void renderNodeList(tag_node_t *n, int ind) {
     renderNodeList(n->next, ind);
 }
 
-void renderAttributes(tag_t *t){
+void renderAttributes(Tag *t){
     
     khiter_t k, end = kh_end(t->attributes);
     const char * attribute;
@@ -117,7 +117,7 @@ void renderAttributes(tag_t *t){
 
 void freeTag(void * ptr){
 
-    tag_t * t = (tag_t *) ptr;
+    Tag * t = (Tag *) ptr;
     
     if(t == NULL)
         return;

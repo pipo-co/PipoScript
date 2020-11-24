@@ -2,6 +2,7 @@
 #define SYMBOL_TABLE_H_88bb85a02ebb07e487ff1027e1e7390616b9f485
 
 #include <stdbool.h>
+#include "pipoScriptFunctions/tag.h"
 
 typedef struct SymbolTableCDT * SymbolTable;
 
@@ -10,6 +11,9 @@ typedef union SymbolValue {
   int intValue;
 
   char *stringValue;
+
+  Tag *tagValue;
+
 } SymbolValue;
 
 typedef struct SymbolNode {

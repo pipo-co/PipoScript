@@ -5,46 +5,49 @@
 
 KHASH_MAP_INIT_STR(att, char *)
 
-struct tag;
-typedef struct tag_node {
+struct Tag;
+typedef struct TagNode {
 
-    struct tag *tag;
-    struct tag_node *next;
-} tag_node_t;
-struct tag_list_h {
+    struct Tag *tag;
+    struct TagNode *next;
+
+} TagNode;
+typedef struct TagList {
     
-    struct tag_node *first;
-    struct tag_node *last;
-};
+    struct TagNode *first;
+    struct TagNode *last;
 
-typedef struct tag {
+} TagList;
+
+typedef struct Tag {
     
     char *name;
-    khash_t(att) *attributes;
     char *body;
-    struct tag_list_h children;
-} tag_t;
+    khash_t(att) *attributes;
+    struct TagList children;
+
+} Tag;
 
 // Contexto
 void tag_service_init();
 
 void tag_service_fin();
 
-void renderTag(tag_t *t, int ind);
+void renderTag(Tag *t, int ind);
 
-void renderNodeList(tag_node_t *n, int ind);
+void renderNodeList(TagNode *n, int ind);
 
-void renderAttributes(tag_t *t);
+void renderAttributes(Tag *t);
 
 void freeTag(void * ptr);
 
 // Runtime
-tag_t *newTag();
+Tag *newTag();
 
-void appendTag(tag_t *parent, tag_t *child);
+void appendTag(Tag *parent, Tag *child);
 
-int putAttribute(tag_t *tag, char *attributeName, char *attributeValue);
+int putAttribute(Tag *tag, char *attributeName, char *attributeValue);
 
-char *getAttribute(tag_t *tag, const char *attributeName);
+char *getAttribute(Tag *tag, const char *attributeName);
 
 #endif
