@@ -487,6 +487,9 @@ static AstOpProcessorReturnNode * ast_return_node_processor(AstNode *node, Symbo
     else if(returnValueNode->returnType == STRING)
         fprintf(stderr, "return %s;\n", returnValueNode->value.stringValue);
 
+    else if(returnValueNode->returnType == TAG)
+        fprintf(stderr, "return {name: '%s', body: '%.10s', attrCount: %d};\n", returnValueNode->value.tagValue->name, returnValueNode->value.tagValue->body, returnValueNode->value.tagValue->attributes->size);
+
     else
         fprintf(stderr, "return ???; [ERROR: return value isn't defined]\n");
 
