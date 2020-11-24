@@ -26,7 +26,6 @@
 %token <intValue> INT_LITERAL
 %token <stringValue> STRING_LITERAL
 
-%token <operation> LEFT RIGHT
 %token <operation> INT VOID STRING TAG
 %token <operation> IF ELSE WHILE DO FOR RETURN
 %token <operation> SET GET NAME BODY ATTRIBUTE FROM APPEND_CHILD
@@ -37,21 +36,21 @@
 %left OR AND
 %left '>' '<' LE GE EQ NE
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
 %right '!' STR LEN
 %left INC DEC
 %left ')'
 %right '('
 %nonassoc UMINUS
 
-%type <operation> AND OR '=' '>' '<' LE GE EQ NE '+' '-' '*' '/' '!' INC DEC ')' '(' UMINUS
+%type <operation> AND OR '=' '>' '<' LE GE EQ NE '+' '-' '*' '/' '%' '!' INC DEC ')' '(' UMINUS
 %type <operation> CONCAT CMP LEN STR
 %type <operation> SET_PROPERTY SET_NAMED_PROPERTY GET_PROPERTY GET_NAMED_PROPERTY
 
 %nonassoc IFX
 %nonassoc ELSE
 %nonassoc STATEMENT_LIST_CONST FUNCTION_DECLARATION_CONST FUNCTION_CALL_CONST FUNCTION_DEFINITION_LIST_CONST
-%nonassoc SET_PROPERTY_CONST SET_NAMED_PROPERTY_CONST GET_PROPERTY_CONST GET_NAMED_PROPERTY_CONST
+%nonassoc SET_PROPERTY_CONST SET_NAMED_PROPERTY_CONST GET_PROPERTY_CONST GET_NAMED_PROPERTY_CONST INT_CAST_CONST
 
 %type <astNode> STATEMENT_LIST STATEMENT BLOCK if_statement iteration_statement return_statement declaration_statement
 %type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE FUNCTION_CALL function_call_statement
@@ -220,6 +219,7 @@ ARITH
 	| NUM '-' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
 	| NUM '*' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
 	| NUM '/' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
+	| NUM '%' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
 	| NUM '<' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
 	| NUM '>' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
 	| NUM LE NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
@@ -242,14 +242,15 @@ NUM
 NON_ID_NUM
 	: INT_LITERAL				{ $$ = new_ast_int_node($1, yylineno); }
 	| ARITH						{ $$ = $1; }
-	| LEN '(' STRING_VALUE ')'	{ $$ = NULL; }
+	| INT '(' STRING_VALUE ')' 	{ $$ = new_ast_node(INT_CAST_CONST, $3, NULL, yylineno); }
+	| LEN '(' STRING_VALUE ')'	{ $$ = new_ast_node(LEN, $3, NULL, yylineno); }
 	| CMP '(' STRING_VALUE ',' STRING_VALUE ')'
-								{ $$ = NULL; }
+								{ $$ = new_ast_node(CMP, $3, $5, yylineno); }
 	;
 
 STRING_ARITH
 	: CONCAT '(' STRING_VALUE ',' STRING_VALUE ')'
-								{ $$ = NULL; }
+								{ $$ = new_ast_node(CONCAT, $3, $5, yylineno); }
 	;
 
 STRING_VALUE
@@ -261,7 +262,7 @@ STRING_VALUE
 NON_ID_STRING_VALUE
 	: STRING_LITERAL			{ $$ = new_ast_string_node($1, yylineno); }
 	| STRING_ARITH				{ $$ = $1; }
-	| STR '(' NUM ')'			{ $$ = NULL; }
+	| STR '(' NUM ')'			{ $$ = new_ast_node(STR, $3, NULL, yylineno); }
 	| GET_PROPERTY FROM ID		{ $$ = new_ast_get_property_node($3, $1, yylineno); }
 	| GET_NAMED_PROPERTY STRING_LITERAL FROM ID
 								{ $$ = new_ast_get_named_property_node($4, $1, $2, yylineno); }

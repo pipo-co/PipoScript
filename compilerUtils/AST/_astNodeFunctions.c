@@ -4,6 +4,7 @@
 
 #include "compilerUtils/functionSymbolTable/functionSymbolTable.h"
 #include "compilerUtils/pipoUtils/pipoUtils.h"
+#include "pipoScriptFunctions/stringService.h"
 
 #define ASCII_TABLE_SIZE 128
 #define AST_OP_COUNT (int)(ASCII_TABLE_SIZE + LAST - FIRST)
@@ -855,6 +856,17 @@ static AstOpProcessorReturnNode * ast_div_node_processor(AstNode *node, SymbolTa
     return ast_node_create_int_return_val(left / right);
 }
 
+static AstOpProcessorReturnNode * ast_mod_node_processor(AstNode *node, SymbolTable st) {
+
+    int left = ast_node_get_int_return_val(execute_ast_node(node->left, st), "Both operators of %% must be ints", node->lineno);
+
+    int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of %% must be ints", node->lineno);
+
+    fprintf(stderr, "(%d %% %d)", left, right);
+
+    return ast_node_create_int_return_val(left % right);
+}
+
 static AstOpProcessorReturnNode * ast_neg_node_processor(AstNode *node, SymbolTable st) {
 
     int val = ast_node_get_int_return_val(execute_ast_node(node->left, st), "Operator of ! must be an int", node->lineno);
@@ -871,6 +883,55 @@ static AstOpProcessorReturnNode * ast_uminus_node_processor(AstNode *node, Symbo
     fprintf(stderr, "-(%d)", val);
 
     return ast_node_create_int_return_val(-val); 
+}
+
+static AstOpProcessorReturnNode * ast_cmp_node_processor(AstNode *node, SymbolTable st) {
+
+    char *val1 = ast_node_get_string_return_val(execute_ast_node(node->left, st), "You can only compare two strings", node->lineno);
+
+    char *val2 = ast_node_get_string_return_val(execute_ast_node(node->right, st), "You can only compare two strings", node->lineno);
+
+    fprintf(stderr, "cmp(%s, %s)\n", val1, val2);
+
+    return ast_node_create_int_return_val(strcmp(val1, val2));
+}
+
+static AstOpProcessorReturnNode * ast_concat_node_processor(AstNode *node, SymbolTable st) {
+
+    char *val1 = ast_node_get_string_return_val(execute_ast_node(node->left, st), "You can only concat two strings", node->lineno);
+
+    char *val2 = ast_node_get_string_return_val(execute_ast_node(node->right, st), "You can only concat two strings", node->lineno);
+
+    fprintf(stderr, "concat(%s, %s)\n", val1, val2);
+
+    return ast_node_create_string_return_val(joinStrings(val1, val2)); 
+}
+
+static AstOpProcessorReturnNode * ast_len_node_processor(AstNode *node, SymbolTable st) {
+
+    char *val = ast_node_get_string_return_val(execute_ast_node(node->left, st), "You can only calculate the length of a string", node->lineno);
+
+    fprintf(stderr, "len(%s)\n", val);
+
+    return ast_node_create_int_return_val(strlen(val)); 
+}
+
+static AstOpProcessorReturnNode * ast_str_node_processor(AstNode *node, SymbolTable st) {
+
+    int val = ast_node_get_int_return_val(execute_ast_node(node->left, st), "You tried to cast an int to string, yet an int wasn't provided", node->lineno);
+
+    fprintf(stderr, "str(%d)\n", val);
+
+    return ast_node_create_string_return_val(itoa2(val)); 
+}
+
+static AstOpProcessorReturnNode * ast_cast_int_node_processor(AstNode *node, SymbolTable st) {
+
+    char *val = ast_node_get_string_return_val(execute_ast_node(node->left, st), "You tried to cast a string to int, yet a string wasn't provided", node->lineno);
+
+    fprintf(stderr, "int(%s)", val);
+
+    return ast_node_create_int_return_val(atoi(val)); 
 }
 
 static void ast_node_destroyer(AstNode *node) {
@@ -980,11 +1041,29 @@ void initialize_ast_node_functions() {
     astNodeFunctions[AST_OP_POSITION('/')].processor = ast_div_node_processor;
     astNodeFunctions[AST_OP_POSITION('/')].destroyer = ast_node_destroyer;
 
+    astNodeFunctions[AST_OP_POSITION('%')].processor = ast_mod_node_processor;
+    astNodeFunctions[AST_OP_POSITION('%')].destroyer = ast_node_destroyer;
+
     astNodeFunctions[AST_OP_POSITION('!')].processor = ast_neg_node_processor;
     astNodeFunctions[AST_OP_POSITION('!')].destroyer = ast_node_destroyer;
 
     astNodeFunctions[AST_OP_POSITION(UMINUS)].processor = ast_uminus_node_processor;
     astNodeFunctions[AST_OP_POSITION(UMINUS)].destroyer = ast_node_destroyer;
+
+    astNodeFunctions[AST_OP_POSITION(CMP)].processor = ast_cmp_node_processor;
+    astNodeFunctions[AST_OP_POSITION(CMP)].destroyer = ast_node_destroyer;
+
+    astNodeFunctions[AST_OP_POSITION(CONCAT)].processor = ast_concat_node_processor;
+    astNodeFunctions[AST_OP_POSITION(CONCAT)].destroyer = ast_node_destroyer;
+
+    astNodeFunctions[AST_OP_POSITION(LEN)].processor = ast_len_node_processor;
+    astNodeFunctions[AST_OP_POSITION(LEN)].destroyer = ast_node_destroyer;
+
+    astNodeFunctions[AST_OP_POSITION(STR)].processor = ast_str_node_processor;
+    astNodeFunctions[AST_OP_POSITION(STR)].destroyer = ast_node_destroyer;
+
+    astNodeFunctions[AST_OP_POSITION(INT_CAST_CONST)].processor = ast_cast_int_node_processor;
+    astNodeFunctions[AST_OP_POSITION(INT_CAST_CONST)].destroyer = ast_node_destroyer;
 }
 
 static int ast_node_get_int_return_val(AstOpProcessorReturnNode *returnVal, char* message, int lineno) {

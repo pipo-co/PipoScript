@@ -45,8 +45,7 @@ HEX				[a-fA-F0-9]
 0|[1-9]{DIGIT}*					{ yylval.intValue = atoi(yytext); return INT_LITERAL; }
 \"(\\.|[^\\"\n])*\"				{ yylval.stringValue = lex_copy_string(yytext + 1, yyleng - 2); return STRING_LITERAL; }
 
-">>"							{ yylval.operation = RIGHT; return RIGHT; }
-"<<"							{ yylval.operation = LEFT; return LEFT; }
+
 "++"							{ yylval.operation = INC; return INC; }
 "--"							{ yylval.operation = DEC; return DEC; }
 
