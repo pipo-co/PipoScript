@@ -26,7 +26,6 @@
 %token <intValue> INT_LITERAL
 %token <stringValue> STRING_LITERAL
 
-%token <operation> LEFT RIGHT
 %token <operation> INT VOID STRING TAG
 %token <operation> IF ELSE WHILE DO FOR RETURN
 %token <operation> SET GET NAME BODY ATTRIBUTE FROM APPEND_CHILD
