@@ -42,14 +42,14 @@ void append_tag(Tag *parent, Tag *child) {
 
 bool put_attribute(Tag *tag, char *attributeName, char *attributeValue) {
     khiter_t k;
-    int ret, keyNotPresent = 1;
+    int ret;
 
     k = kh_get(att, tag->attributes, attributeName);
 
     if(k == kh_end(tag->attributes)) {
         khiter_t k = kh_put(att, tag->attributes, attributeName, &ret);  // Obtengo el puntero par la llave "attributeName"
         kh_value(tag->attributes, k) = attributeValue;  // Asigno el valor "attributeValue" a la llave anterior             
-        return ret < 0;      
+        return ret >= 0;      
     }
     else {
         kh_value(tag->attributes, k) = attributeValue;
@@ -106,11 +106,19 @@ void render_attributes(Tag *t, FILE * out){
     
     khiter_t k, end = kh_end(t->attributes);
     const char * attribute;
+    char *attrValue;
 
     for (k = kh_begin(t->attributes); k != end; ++k){
         if(kh_exist(t->attributes, k)){
             attribute = kh_key(t->attributes, k);
-            fprintf(out, " %s=\"%s\"", attribute, get_attribute(t, attribute));
+            attrValue = get_attribute(t, attribute); 
+            
+            if(attrValue != NULL){
+                fprintf(out, " %s=\"%s\"", attribute,attrValue);
+            }
+            else {
+                fprintf(out, " %s", attribute);
+            }
         }
     }
 }

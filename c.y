@@ -28,7 +28,7 @@
 
 %token <operation> INT VOID STRING TAG
 %token <operation> IF ELSE WHILE DO FOR RETURN
-%token <operation> SET GET NAME BODY ATTRIBUTE FROM APPEND_CHILD
+%token <operation> SET GET NEW NAME BODY ATTRIBUTE FROM APPEND_CHILD
 
 %right '='
 %left CONCAT
@@ -166,6 +166,9 @@ ASSIGNMENT
 	| SET_PROPERTY FROM ID '=' VALUE
 								{ $$ = new_ast_set_property_node($3, $1, $5, yylineno); }
 
+	| SET_NAMED_PROPERTY STRING_LITERAL FROM ID
+								{ $$ = new_ast_set_named_property_node($4, $1, $2, NULL, yylineno); }
+
 	| SET_NAMED_PROPERTY STRING_LITERAL FROM ID '=' VALUE
 								{ $$ = new_ast_set_named_property_node($4, $1, $2, $6, yylineno); }
 
@@ -273,6 +276,7 @@ VALUE
 	| FUNCTION_CALL				{ $$ = $1; }
 	| NON_ID_STRING_VALUE		{ $$ = $1; }
 	| NON_ID_NUM				{ $$ = $1; }
+	| NEW TAG					{ $$  = new_ast_tag_node(yylineno); }
 	;
 
 GET_PROPERTY

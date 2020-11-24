@@ -29,6 +29,7 @@ HEX				[a-fA-F0-9]
 
 "set"							{ yylval.operation = SET; return SET; }
 "get"							{ yylval.operation = GET; return GET; }
+"new"							{ yylval.operation = NEW; return NEW; }
 "name"							{ yylval.operation = NAME; return NAME; }
 "body"							{ yylval.operation = BODY; return BODY; }
 "attribute"						{ yylval.operation = ATTRIBUTE; return ATTRIBUTE; }

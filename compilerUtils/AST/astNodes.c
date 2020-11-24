@@ -211,6 +211,17 @@ AstNode * new_ast_string_node(char *value, int lineno) {
     return (AstNode *) astNode;
 }
 
+AstNode * new_ast_tag_node(int lineno){
+
+    AstTagNode * astNode = emalloc(sizeof(*astNode));
+
+    astNode->nodeType = TAG;
+    astNode->lineno = lineno;
+
+    return (AstNode *) astNode;
+
+}
+
 AstNode * new_ast_return_node(AstNode *value, int lineno) {
 
     AstReturnNode * astNode = emalloc(sizeof(*astNode));
