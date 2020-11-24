@@ -117,6 +117,35 @@ AstNode * new_ast_inc_dec_assignment_node(int type, char *symbolName, int lineno
     return (AstNode *) astNode;
 }
 
+AstNode * new_ast_set_property_node(char *symbolName, int propertyType, AstNode *value, int lineno) {
+    
+    AstSetPropertyNode * astNode = emalloc(sizeof(*astNode));
+
+    astNode->nodeType = SET_PROPERTY_CONST;
+    astNode->lineno = lineno;
+
+    astNode->propertyType = propertyType;   // BODY o NAME
+    astNode->symbolName = symbolName;       // ID
+    astNode->value = value;                 // <string>
+
+    return (AstNode *) astNode;
+}
+
+AstNode * new_ast_set_named_property_node(char *symbolName, int propertyType, char *propertyName, AstNode *value, int lineno) {
+    
+    AstSetNamedPropertyNode * astNode = emalloc(sizeof(*astNode));
+
+    astNode->nodeType = SET_NAMED_PROPERTY_CONST;
+    astNode->lineno = lineno;
+
+    astNode->propertyType = propertyType;   // ATTRIBUTE
+    astNode->propertyName = propertyName;   // <string>
+    astNode->symbolName = symbolName;       // ID
+    astNode->value = value;                 // <string>
+
+    return (AstNode *) astNode;
+}
+
 AstNode * new_ast_int_node(int value, int lineno) {
 
     AstIntNode * astNode = emalloc(sizeof(*astNode));

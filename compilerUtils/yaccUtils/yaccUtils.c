@@ -1,6 +1,8 @@
 #include "yaccUtils.h"
 
 #include "compilerUtils/lexUtils/lexUtils.h"
+#include "pipoScriptFunctions/tag.h"
+#include "pipoScriptFunctions/stringService.h"
 
 AstNode *astTree;
 SymbolTable globalSt;
@@ -17,6 +19,8 @@ void initialize(void) {
 	function_symbol_table_initialize();
     initialize_ast_node_functions();
 	initializeLex();
+	tag_service_init();
+    string_service_init();
 }
 
 int execute_main(void) {
@@ -47,6 +51,8 @@ void finalize(int status) {
     function_symbol_table_free();
 	symbol_table_clean_up();
 	finalizeLex();
+	tag_service_fin();
+    string_service_fin();
 
 	exit(status);
 }

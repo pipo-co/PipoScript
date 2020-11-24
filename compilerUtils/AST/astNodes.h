@@ -138,6 +138,27 @@ typedef struct AstStringNode {
 
 } AstStringNode;
 
+typedef struct AstSetPropertyNode {
+  int nodeType;
+  int lineno;
+
+  int propertyType;
+  char *symbolName;
+  AstNode *value;
+
+} AstSetPropertyNode;
+
+typedef struct AstSetNamedPropertyNode {
+  int nodeType;
+  int lineno;
+
+  int propertyType;
+  char *symbolName;
+  char *propertyName;
+  AstNode *value;
+
+} AstSetNamedPropertyNode;
+
 void initialize_ast_node_functions();
 
 int execute_ast_tree(AstNode *tree, SymbolTable st);
@@ -159,6 +180,10 @@ AstNode * new_ast_declaration_node(int type, char *symbolName, AstNode *value, i
 AstNode * new_ast_assignment_node(char *symbolName, AstNode *value, int lineno);
 
 AstNode * new_ast_inc_dec_assignment_node(int type, char *symbolName, int lineno);
+
+AstNode * new_ast_set_property_node(char *symbolName, int propertyType, AstNode *value, int lineno);
+
+AstNode * new_ast_set_named_property_node(char *symbolName, int propertyType, char *propertyName, AstNode *value, int lineno);
 
 AstNode * new_ast_int_node(int value, int lineno);
 

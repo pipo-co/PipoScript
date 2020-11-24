@@ -1,7 +1,8 @@
 #ifndef __TAG_SERVICE_H__
 #define __TAG_SERVICE_H__
 
-#include "khash.h"
+#include "libraries/khash.h"
+#include <stdbool.h>
 
 KHASH_MAP_INIT_STR(att, char *)
 
@@ -33,21 +34,21 @@ void tag_service_init();
 
 void tag_service_fin();
 
-void renderTag(Tag *t, int ind);
+void render_tag(Tag *t, int ind);
 
-void renderNodeList(TagNode *n, int ind);
+void render_node_list(TagNode *n, int ind);
 
-void renderAttributes(Tag *t);
+void render_attributes(Tag *t);
 
-void freeTag(void * ptr);
+void free_tag(void * ptr);
 
 // Runtime
-Tag *newTag();
+Tag *new_tag();
 
-void appendTag(Tag *parent, Tag *child);
+void append_tag(Tag *parent, Tag *child);
 
-int putAttribute(Tag *tag, char *attributeName, char *attributeValue);
+bool put_attribute(Tag *tag, char *attributeName, char *attributeValue);
 
-char *getAttribute(Tag *tag, const char *attributeName);
+char *get_attribute(Tag *tag, const char *attributeName);
 
 #endif

@@ -51,6 +51,7 @@
 %nonassoc IFX
 %nonassoc ELSE
 %nonassoc STATEMENT_LIST_CONST FUNCTION_DECLARATION_CONST FUNCTION_CALL_CONST FUNCTION_DEFINITION_LIST_CONST
+%nonassoc SET_PROPERTY_CONST SET_NAMED_PROPERTY_CONST GET_PROPERTY_CONST GET_NAMED_PROPERTY_CONST
 
 %type <astNode> STATEMENT_LIST STATEMENT BLOCK if_statement iteration_statement return_statement declaration_statement
 %type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE FUNCTION_CALL function_call_statement
@@ -163,9 +164,11 @@ ASSIGNMENT
 	| ID INC					{ $$ = new_ast_inc_dec_assignment_node($2, $1, yylineno); }
 	| ID DEC					{ $$ = new_ast_inc_dec_assignment_node($2, $1, yylineno); }
 	| SET_PROPERTY FROM ID '=' VALUE
-								{ $$ = NULL; }
+								{ $$ = new_ast_set_property_node($3, $1, $5, yylineno); }
+
 	| SET_NAMED_PROPERTY STRING_LITERAL FROM ID '=' VALUE
-								{ $$ = NULL; }
+								{ $$ = new_ast_set_named_property_node($4, $1, $2, $6, yylineno); }
+
 	| APPEND_CHILD FROM ID '=' VALUE
 								{ $$ = NULL; }
 	;
@@ -287,8 +290,8 @@ int main(void) {
 
 	yyparse();
 
-	// int status = execute_main();
-	// finalize(status);
+	int status = execute_main();
+	finalize(status);
 
-	finalize(0);
+	// finalize(0);
 }

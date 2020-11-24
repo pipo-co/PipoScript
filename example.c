@@ -28,9 +28,9 @@ int main(int argc, char const *argv[]) {
     string_service_init();
 
     // Tag div2 = new_tag "div";
-    Tag *div = newTag("div");
+    Tag *div = new_tag("div");
 
-    putAttribute(div, "id", "div-id");
+    put_attribute(div, "id", "div-id");
     // String s = "h";
     char * s = "h";
 
@@ -44,7 +44,7 @@ int main(int argc, char const *argv[]) {
         char * name = joinStrings(s, itoa2(i));
         
         // Tag aux_title = new_tag name;
-        Tag *aux_title = newTag(name);
+        Tag *aux_title = new_tag(name);
         
         // if( i % 2 == 0)
         if( i % 2 == 0){
@@ -60,17 +60,17 @@ int main(int argc, char const *argv[]) {
             aux_title->body = joinStrings("Titulo impar", itoa2(i));
         }
 
-        putAttribute(aux_title, "id", joinStrings("id-", itoa2(i)));
+        put_attribute(aux_title, "id", joinStrings("id-", itoa2(i)));
 
-        putAttribute(aux_title, "color", i % 2 == 0? "red":"blue");
+        put_attribute(aux_title, "color", i % 2 == 0? "red":"blue");
         // // append_child_to div = aux_title;
-        appendTag(div, aux_title);
+        append_tag(div, aux_title);
 
         // i++;
         i++;
     }
     
-    renderTag(div, 0);
+    render_tag(div, 0);
 
     tag_service_fin();
     string_service_fin();
