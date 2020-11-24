@@ -44,7 +44,7 @@
 *.output
 testing.c
 test.c
-result.txt
+index.html
 
 # Kernel Module Compile Results
 *.mod*

@@ -3,6 +3,8 @@
 
 #include "libraries/khash.h"
 #include <stdbool.h>
+#include <stdio.h>
+#define INIT_IND 0
 
 KHASH_MAP_INIT_STR(att, char *)
 
@@ -34,11 +36,11 @@ void tag_service_init();
 
 void tag_service_fin();
 
-void render_tag(Tag *t, int ind);
+void render_tag(Tag *t, int ind, FILE * out);
 
-void render_node_list(TagNode *n, int ind);
+void render_node_list(TagNode *n, int ind, FILE * out);
 
-void render_attributes(Tag *t);
+void render_attributes(Tag *t, FILE * out);
 
 void free_tag(void * ptr);
 

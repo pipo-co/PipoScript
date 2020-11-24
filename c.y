@@ -1,7 +1,5 @@
 %{
-
 	#include "compilerUtils/yaccUtils/yaccUtils.h"
-
 %}
 
 %union {
@@ -306,13 +304,15 @@ int main(void) {
   
     yyin = fopen("test.c", "r");
 
-	// yyout = fopen("result.txt", "w");
+	yyout = fopen("index.html", "w");
 
 	initialize();
 
 	yyparse();
 
-	int status = execute_main();
+	Tag * tag = execute_main();
+	
+	int status = render_final_tag(tag, yyout);
 
 	finalize(status);
 }

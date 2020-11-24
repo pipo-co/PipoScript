@@ -9,6 +9,7 @@
 
 #include "compilerUtils/symbolTable/symbolTable.h"
 #include "compilerUtils/functionSymbolTable/functionSymbolTable.h"
+#include "pipoScriptFunctions/tag.h"
 
 // Lex global variables
 extern char yytext[];
@@ -27,7 +28,9 @@ void yyerror(char const *s);
 
 void initialize(void);
 
-int execute_main(void);
+Tag * execute_main(void);
+
+int render_final_tag(Tag * tag, FILE * out);
 
 void finalize(int status);
 

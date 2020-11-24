@@ -189,7 +189,7 @@ typedef struct AstGetNamedPropertyNode {
 
 void initialize_ast_node_functions();
 
-int execute_ast_tree(AstNode *tree, SymbolTable st);
+Tag * execute_ast_tree(AstNode *tree, SymbolTable st);
 
 void free_ast_tree(AstNode *root);
 
