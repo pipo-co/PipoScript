@@ -47,14 +47,15 @@ Tag * execute_main(void) {
 	return t;
 }
 
-void render_final_tag(Tag * tag, FILE * out){
+int render_final_tag(Tag * tag, FILE * out){
 	if(tag == NULL){
 		fprintf(stderr, "No tag was return, thus, rendered the tag will not be.\n");
-		return;
+		return 1;
 	}
 
 	render_tag(tag, INIT_IND, out);
 
+	return 0;
 }
 
 void finalize(int status) {

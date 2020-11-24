@@ -311,7 +311,7 @@ int main(void) {
 
 	Tag * tag = execute_main();
 	
-	render_final_tag(tag, yyout);
+	int status = render_final_tag(tag, yyout);
 
-	finalize(0);
+	finalize(status);
 }

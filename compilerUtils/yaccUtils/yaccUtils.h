@@ -30,7 +30,7 @@ void initialize(void);
 
 Tag * execute_main(void);
 
-void render_final_tag(Tag * tag, FILE * out);
+int render_final_tag(Tag * tag, FILE * out);
 
 void finalize(int status);
 
