@@ -470,11 +470,25 @@ static AstOpProcessorReturnNode * ast_return_node_processor(AstNode *node, Symbo
         returnValueNode = ast_node_create_void_return_val();
         returnValueNode->returnGenerated = true;
 
+        fprintf(stderr, "return;\n");
         return returnValueNode;
     }
 
     returnValueNode = execute_ast_node(returnNode->value, st);
     returnValueNode->returnGenerated = true;
+
+    // Print Log
+    if(returnValueNode->returnType == VOID)
+        fprintf(stderr, "return;\n");
+
+    else if(returnValueNode->returnType == INT)
+        fprintf(stderr, "return %d;\n", returnValueNode->value.intValue);
+
+    else if(returnValueNode->returnType == STRING)
+        fprintf(stderr, "return %s;\n", returnValueNode->value.stringValue);
+
+    else
+        fprintf(stderr, "return ???; [ERROR: return value isn't defined]\n");
 
     return returnValueNode;
 }
@@ -558,7 +572,11 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
 
     }
 
+    fprintf(stderr, "\nStart Function %s {\n", callNode->functionName);
+
     AstOpProcessorReturnNode *returnNode = execute_ast_node(declarationNode->block, functionST);
+
+    fprintf(stderr, "} End Function %s\n", callNode->functionName);
 
     symbol_table_free(functionST);
 
