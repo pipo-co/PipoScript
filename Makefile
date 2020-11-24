@@ -15,7 +15,7 @@ COMPILER=pipoCompiler
 all: $(COMPILER)
 
 $(COMPILER): $(LEX) $(YACC) $(COMPILER_UTILS_OBJECTS) $(PIPO_FUNCTIONS_OBJECTS)
-	$(CC) $(CFLAGS) $^ -o $@  -ll 
+	$(CC) $(CFLAGS) $^ -o $@
 
 $(LEX): c.l
 	lex $<
