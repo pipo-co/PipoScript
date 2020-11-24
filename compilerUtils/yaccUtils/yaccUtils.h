@@ -8,6 +8,7 @@
 #include "y.tab.h"
 
 #include "compilerUtils/symbolTable/symbolTable.h"
+#include "compilerUtils/argsHandler/args.h"
 #include "compilerUtils/functionSymbolTable/functionSymbolTable.h"
 #include "pipoScriptFunctions/tag.h"
 

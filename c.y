@@ -297,13 +297,16 @@ FUNCTION_RETURN_TYPE
 
 %%
 
-int main(void) {
+int main(int argc, char *argv[]) {
 
-	extern FILE *yyin, *yyout; 
+	FILE *output;
+	extern FILE *yyin; 
+
+	Args *args = parse_args(argc, argv);
   
-    yyin = fopen("test.c", "r");
+    yyin = fopen(args->inputFileName, "r");
 
-	yyout = fopen("index.html", "w");
+	output = fopen(args->outputFileName, "w");
 
 	initialize();
 
@@ -311,7 +314,7 @@ int main(void) {
 
 	Tag * tag = execute_main();
 	
-	int status = render_final_tag(tag, yyout);
+	int status = render_final_tag(tag, output);
 
 	finalize(status);
 }
