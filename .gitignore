@@ -64,3 +64,6 @@ lex.yy.c
 .vscode/
 
 pipoCompiler
+test.pipo
+test2.pipo
+test3.pipo
