@@ -35,7 +35,10 @@ HEX				[a-fA-F0-9]
 "from"							{ yylval.operation = FROM; return FROM; }
 "append_child"					{ yylval.operation = APPEND_CHILD; return APPEND_CHILD; }
 
+"str"							{ yylval.operation = STR; return STR; }
 "concat"						{ yylval.operation = CONCAT; return CONCAT; }
+"len"							{ yylval.operation = LEN; return LEN; }
+"cmp"							{ yylval.operation = CMP; return CMP; }
 
 {LETTER}({LETTER}|{DIGIT})*		{ yylval.symbol = lex_copy_string(yytext, yyleng); return ID; }
 
