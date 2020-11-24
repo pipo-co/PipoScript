@@ -393,12 +393,17 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
         print_lineno_and_abort("Function wasn't previously declared", node->lineno);
 
     // Both declaration and call have the same number of arguments (NULL == no arguments)
-    if((declarationNode->args != NULL && callNode == NULL) ||
-       (declarationNode->args == NULL && callNode != NULL) ||
-       (declarationNode->args->argCount != callNode->args->argCount)) {
-
-        print_lineno_and_abort("Function call with invalid argument count", node->lineno);
+    if(declarationNode->args == NULL) {
+        if(callNode->args != NULL)
+            print_lineno_and_abort("Function call with invalid argument count", node->lineno);
     }
+
+    else if(callNode->args == NULL)
+        print_lineno_and_abort("Function call with invalid argument count", node->lineno);
+
+    else if(declarationNode->args->argCount != callNode->args->argCount)
+        print_lineno_and_abort("Function call with invalid argument count", node->lineno);
+
 
     SymbolTable functionST = symbol_table_create();
 
@@ -450,7 +455,7 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
         return ast_node_create_void_return_val();
     }
     
-    if(declarationNode->returnType == VOID || returnNode->returnType != declarationNode->returnType) {
+    if(returnNode == NULL || !returnNode->returnGenerated || returnNode->returnType != declarationNode->returnType) {
 
         if(returnNode != NULL)
             free(returnNode);

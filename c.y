@@ -19,7 +19,7 @@
 	AstNode *astNode;
 }
 
-// %error-verbose
+%error-verbose
 
 %token <operation> FIRST
 
@@ -50,7 +50,7 @@
 %nonassoc STATEMENT_LIST_CONST FUNCTION_DECLARATION_CONST FUNCTION_CALL_CONST FUNCTION_DEFINITION_LIST_CONST
 
 %type <astNode> STATEMENT_LIST STATEMENT BLOCK if_statement iteration_statement return_statement declaration_statement
-%type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE function_call_statement
+%type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE FUNCTION_CALL function_call_statement
 
 %type <functionArgList> FUNC_ARG_LIST FUNC_DECLARATION_ARG_LIST
 
@@ -148,11 +148,11 @@ assignment_statement
 	;
 
 function_call_statement
-	: ID '(' FUNC_ARG_LIST ')' ';'	
-								{ $$ = new_ast_function_call_node($1, $3, yylineno); }
+	: FUNCTION_CALL ';'			{ $$ = $1; }
 
-	| ID '(' ')' ';'
-								{ $$ = new_ast_function_call_node($1, NULL, yylineno); }
+FUNCTION_CALL
+	: ID '(' FUNC_ARG_LIST ')'	{ $$ = new_ast_function_call_node($1, $3, yylineno); }
+	| ID '(' ')'				{ $$ = new_ast_function_call_node($1, NULL, yylineno); }
 	;
 
 ASSIGNMENT
@@ -214,6 +214,7 @@ ARITH
 
 NUM
 	: ID						{ $$ = new_ast_symbol_reference_node($1, yylineno); }
+	| FUNCTION_CALL				{ $$ = $1; }
 	| NON_ID_NUM				{ $$ = $1; }
 	;
 
@@ -224,6 +225,7 @@ NON_ID_NUM
 
 VALUE
 	: ID						{ $$ = new_ast_symbol_reference_node($1, yylineno); }
+	| FUNCTION_CALL				{ $$ = $1; }
 	| STRING_LITERAL			{ $$ = new_ast_string_node($1, yylineno); }
 	| NON_ID_NUM				{ $$ = $1; }
 	;
