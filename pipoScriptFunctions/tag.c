@@ -71,38 +71,38 @@ char *get_attribute(Tag *tag, const char *attributeName) {
     return (char *) kh_value(tag->attributes, k);
 }
 
-void render_tag(Tag *t, int ind) {
+void render_tag(Tag *t, int ind, FILE * out) {
 
     // <#name# #attribute_1_name#=#attribute_1_value# #attribute_n_name#=#attribute_n_value#>
-    for (size_t i = 0; i < ind; i++) putchar('\t');
-    printf("<%s", t->name);
-    render_attributes(t);
-    printf(">\n");
+    for (size_t i = 0; i < ind; i++) fputc('\t', out);
+    fprintf(out, "<%s", t->name);
+    render_attributes(t, out);
+    fprintf(out, ">\n");
 
     // #body#
     if(t->body != NULL){
-        for (size_t i = 0; i < ind; i++) putchar('\t');
-        printf("\t%s\n", t->body);
+        for (size_t i = 0; i < ind; i++) fputc('\t', out);
+        fprintf(out, "\t%s\n", t->body);
     }
 
     // #child_1# #child_2# ... #child_n#
-    render_node_list(t->children.first, ind);
+    render_node_list(t->children.first, ind, out);
 
     // </#name#>
-    for (size_t i = 0; i < ind; i++) putchar('\t');    
-    printf("</%s>\n", t->name);
+    for (size_t i = 0; i < ind; i++) fputc('\t', out);    
+    fprintf(out, "</%s>\n", t->name);
 }
 
-void render_node_list(TagNode *n, int ind) {
+void render_node_list(TagNode *n, int ind, FILE * out) {
 
     if(n == NULL)
         return;
 
-    render_tag(n->tag, ind + 1);
-    render_node_list(n->next, ind);
+    render_tag(n->tag, ind + 1, out);
+    render_node_list(n->next, ind, out);
 }
 
-void render_attributes(Tag *t){
+void render_attributes(Tag *t, FILE * out){
     
     khiter_t k, end = kh_end(t->attributes);
     const char * attribute;
@@ -110,7 +110,7 @@ void render_attributes(Tag *t){
     for (k = kh_begin(t->attributes); k != end; ++k){
         if(kh_exist(t->attributes, k)){
             attribute = kh_key(t->attributes, k);
-            printf(" %s=\"%s\"", attribute, get_attribute(t, attribute));
+            fprintf(out, " %s=\"%s\"", attribute, get_attribute(t, attribute));
         }
     }
 }

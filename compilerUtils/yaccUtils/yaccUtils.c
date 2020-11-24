@@ -23,27 +23,38 @@ void initialize(void) {
     string_service_init();
 }
 
-int execute_main(void) {
+Tag * execute_main(void) {
 
 	AstFunctionDeclarationNode *mainNode = function_symbol_table_get("main");
 
+
 	if(mainNode == NULL) {
-		fprintf(stderr, "Main function was not declared. Aborting");
-		return 2;
+		fprintf(stderr, "Main function was not declared. Aborting\n");
+		return NULL;
 	}
 
-	if(mainNode->returnType != INT) {
-		fprintf(stderr, "Line %d: Main function was declared with invalid return type. It must be int. Aborting.", mainNode->lineno);
-		return 2;
+	if(mainNode->returnType != TAG) {
+		fprintf(stderr, "Line %d: Main function was declared with invalid return type. It must be Tag. Aborting.\n", mainNode->lineno);
+		return NULL;
 	}
 
 	SymbolTable st = symbol_table_create();
 
-	int returnValue = execute_ast_tree(mainNode->block, st);
+	Tag * t = execute_ast_tree(mainNode->block, st);
 
 	symbol_table_free(st);
 
-	return returnValue;
+	return t;
+}
+
+void render_final_tag(Tag * tag, FILE * out){
+	if(tag == NULL){
+		fprintf(stderr, "No tag was return, thus, rendered the tag will not be.\n");
+		return;
+	}
+
+	render_tag(tag, INIT_IND, out);
+
 }
 
 void finalize(int status) {

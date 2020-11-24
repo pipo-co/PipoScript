@@ -336,13 +336,13 @@ void ast_free_function_arg_list(AstFunctionArgList *list) {
 
 #include "_astNodeFunctions.c"
 
-int execute_ast_tree(AstNode *tree, SymbolTable st) {
+Tag * execute_ast_tree(AstNode *tree, SymbolTable st) {
     AstOpProcessorReturnNode *resultNode = execute_ast_node(tree, st);
 
-    int returnVal = 0;
+    Tag *returnVal;
 
-    if(resultNode != NULL && resultNode->returnType == INT)
-        returnVal = resultNode->value.intValue;
+    if(resultNode != NULL && resultNode->returnType == TAG)
+        returnVal = resultNode->value.tagValue;
     
     if(resultNode != NULL)
         free(resultNode);
