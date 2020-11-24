@@ -173,7 +173,7 @@ ASSIGNMENT
 								{ $$ = new_ast_set_named_property_node($4, $1, $2, $6, yylineno); }
 
 	| APPEND_CHILD FROM ID '=' VALUE
-								{ $$ = NULL; }
+								{ $$ = new_ast_append_child_node($3, $5, yylineno); }
 	;
 
 SET_PROPERTY
@@ -264,9 +264,9 @@ NON_ID_STRING_VALUE
 	: STRING_LITERAL			{ $$ = new_ast_string_node($1, yylineno); }
 	| STRING_ARITH				{ $$ = $1; }
 	| STR '(' NUM ')'			{ $$ = NULL; }
-	| GET_PROPERTY FROM ID		{ $$ = NULL; }
+	| GET_PROPERTY FROM ID		{ $$ = new_ast_get_property_node($3, $1, yylineno); }
 	| GET_NAMED_PROPERTY STRING_LITERAL FROM ID
-								{ $$ = NULL; }
+								{ $$ = new_ast_get_named_property_node($4, $1, $2, yylineno); }
 	;
 
 VALUE

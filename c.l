@@ -33,7 +33,7 @@ HEX				[a-fA-F0-9]
 "body"							{ yylval.operation = BODY; return BODY; }
 "attribute"						{ yylval.operation = ATTRIBUTE; return ATTRIBUTE; }
 "from"							{ yylval.operation = FROM; return FROM; }
-"append_child"					{ yylval.operation = APPEND_CHILD; return APPEND_CHILD; }
+"append child"					{ yylval.operation = APPEND_CHILD; return APPEND_CHILD; }
 
 "str"							{ yylval.operation = STR; return STR; }
 "concat"						{ yylval.operation = CONCAT; return CONCAT; }
