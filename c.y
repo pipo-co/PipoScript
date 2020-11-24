@@ -307,15 +307,30 @@ int main(int argc, char *argv[]) {
   
     yyin = fopen(args->inputFileName, "r");
 
+	if(yyin == NULL) {
+		perror("Error opening input file");
+		exit(1);
+	}
+	
 	output = fopen(args->outputFileName, "w");
+
+	if(output == NULL) {
+		perror("Error opening output file");
+		fclose(yyin);
+		exit(1);
+	}
 
 	initialize();
 
 	yyparse();
+	
+	fclose(yyin);
 
 	Tag * tag = execute_main();
 	
 	int status = render_final_tag(tag, output);
+
+	fclose(output);
 
 	finalize(status);
 }
