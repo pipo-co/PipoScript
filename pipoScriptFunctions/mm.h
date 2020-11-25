@@ -1,7 +1,7 @@
 #ifndef __MM_H__
 #define __MM_H__
 
-#include <stdlib.h>
+#include <stddef.h>
 
 typedef void (*NodeFreer)(void *);
 typedef struct MemoryManagerNode{

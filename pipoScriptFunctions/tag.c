@@ -35,6 +35,7 @@ void append_tag(Tag *parent, Tag *child) {
 
     if (parent->children.first == NULL)
        parent->children.last = parent->children.first = newNode;
+       
     else
        parent->children.last = parent->children.last->next = newNode; 
 

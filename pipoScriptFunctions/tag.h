@@ -4,6 +4,7 @@
 #include "libraries/khash.h"
 #include <stdbool.h>
 #include <stdio.h>
+
 #define INIT_IND 0
 
 KHASH_MAP_INIT_STR(att, char *)
