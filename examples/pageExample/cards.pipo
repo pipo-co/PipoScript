@@ -1,0 +1,65 @@
+tag cards(){
+
+    string cardTitle = "Such a great experience";
+    string cardDescription = "With pipoScript you can create 'tag' variables and then you can put them attributes and change their name and body. You will also be able to build a tree with all these tags.";
+    string altText = "PipoScript logo";
+    int size = 250;
+    int half = size/2 + 1;
+
+    tag div = new tag;
+    set name from div = "div";
+    set attribute "style" from div = "display:flex;";
+
+    append child from div = margin(imgCard("https://cdn.discordapp.com/attachments/740587722703634504/781015574380675132/pslogo.png", altText, size, cardTitle, cardDescription),int("30"), int("40"), 30, 40);
+
+    if (len(cardDescription) > 0){
+        cardDescription = "PipoScript is a really easy to learn language. However, it will allow you to make components and use them in your code so you don't have to repeat code.";
+    }
+
+    if (cmp(cardTitle, "Write less code")){
+        cardTitle = "Write less code";
+    }
+
+    altText = "tag";
+    
+    append child from div = margin(imgCard("https://cdn.icon-icons.com/icons2/494/PNG/512/code_icon-icons.com_48323.png", altText, 300, cardTitle, cardDescription), int("30"), int("40"), 30, 40);
+
+
+    if (len(cardDescription) > 0){
+        cardDescription = "The developers are the nicest guys ever, i promise.";
+    }
+
+    if (cmp(cardTitle, "A great team behind")){
+        cardTitle = "A great team behind";
+    }
+
+    altText = "developers";
+
+    append child from div = margin(imgCard("https://www.w3schools.com/howto/img_avatar.png", altText, size - 85, cardTitle, cardDescription), int("30"), int("40"), 30, 40);
+
+    if (len(cardDescription) > 0){
+        cardDescription = "This is an academic proyect build for TLA";
+    }
+
+    if (cmp(cardTitle, "A nice place to learn")){
+        cardTitle = "A nice place to learn";
+    }
+
+    altText = "developers";
+
+    append child from div = margin(imgCard("http://www.universidadeshoy.com.ar/imgNoticias2013/derf__63733_1922016_logo%20itba%20alta.jpg", altText, 2*(size + 40)/3, cardTitle, cardDescription), int("30"), int("40"), 30, 40);
+    
+    if (len(cardDescription) > 0){
+        cardDescription = "With PipoScript, writing code is almost the same as speaking english. For example, to set the body of a tag you just have to write set body from tag = and write the body you want. For that, PipoScript provides string functionalities such as compare and concat to make the tedious job of writing much simpler";
+    }
+
+    if (cmp(cardTitle, "A great team behind")){
+        cardTitle = "Code the way you speak";
+    }
+
+    altText = "developers";
+
+    append child from div = margin(imgCard("https://i2.wp.com/marketingsubjetivo.com/wp-content/uploads/2020/01/helloworld-e1578763834250.jpeg?resize=768%2C380&ssl=1", altText, size * 2 - 20 % 6 + 100 , cardTitle, cardDescription), int("30"), int("40"), 30, 40);
+
+    return div;
+}
