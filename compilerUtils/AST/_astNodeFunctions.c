@@ -350,7 +350,6 @@ static AstOpProcessorReturnNode * ast_set_property_node_processor(AstNode *node,
     if(!symbol->initialized)
         print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously initialized", setPropertyNode->symbolName);
 
-
     char * stringValue = ast_node_get_string_return_val(execute_ast_node(setPropertyNode->value, st), "Type mismatch. Set property expects a string.", node->filename, node->lineno);
 
     if(setPropertyNode->propertyType == BODY) {
@@ -447,6 +446,7 @@ static AstOpProcessorReturnNode * ast_append_child_node_processor(AstNode *node,
     Tag * tagValue = ast_node_get_tag_return_val(execute_ast_node(appendChildNode->value, st), "Type mismatch. Append child expects a tag.", node->filename, node->lineno);
 
     append_tag(symbol->value.tagValue, tagValue);
+    
     debug_print("append child from %s = %s;\n", symbol->name, tagValue->name);
 
     return NULL;
@@ -786,10 +786,12 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
     
     if(returnNode == NULL || !returnNode->returnGenerated || returnNode->returnType != declarationNode->returnType) {
 
+        int returnType = returnNode->returnType;
+
         if(returnNode != NULL)
             free(returnNode);
 
-        print_lineno_and_abort_shorthand(node, "Function %s return type and actual return value don't match (%d vs %d)", callNode->functionName, declarationNode->returnType, returnNode->returnType);
+        print_lineno_and_abort_shorthand(node, "Function %s return type and actual return value don't match (%d vs %d)", callNode->functionName, declarationNode->returnType, returnType);
     }
 
     returnNode->returnGenerated = false;
