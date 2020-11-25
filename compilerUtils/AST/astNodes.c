@@ -140,7 +140,7 @@ AstNode * new_ast_set_property_node(char *symbolName, int propertyType, AstNode 
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_set_named_property_node(char *symbolName, int propertyType, char *propertyName, AstNode *value, char* filename, int lineno) {
+AstNode * new_ast_set_named_property_node(char *symbolName, int propertyType, AstNode *propertyName, AstNode *value, char* filename, int lineno) {
     
     AstSetNamedPropertyNode * astNode = emalloc(sizeof(*astNode));
 
@@ -184,7 +184,7 @@ AstNode * new_ast_get_property_node(char *symbolName, int propertyType, char* fi
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, char *propertyName, char* filename, int lineno) {
+AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, AstNode *propertyName, char* filename, int lineno) {
     
     AstSetNamedPropertyNode * astNode = emalloc(sizeof(*astNode));
 
@@ -199,7 +199,7 @@ AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, ch
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_has_named_property_node(char *symbolName, int propertyType, char *propertyName, char* filename, int lineno) {
+AstNode * new_ast_has_named_property_node(char *symbolName, int propertyType, AstNode *propertyName, char* filename, int lineno) {
 
     AstHasNamedPropertyNode * astNode = emalloc(sizeof(*astNode));
 

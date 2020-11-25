@@ -397,22 +397,24 @@ static AstOpProcessorReturnNode * ast_set_named_property_node_processor(AstNode 
 
     if(setNamedPropertyNode->propertyType == ATTRIBUTE) {
 
+        char * attributeKey = ast_node_get_string_return_val(execute_ast_node(setNamedPropertyNode->propertyName, st), "Type mismatch. Property name expects a string.", node->filename, node->lineno);
+
         if(setNamedPropertyNode->value == NULL) {
-            if(!put_attribute(symbol->value.tagValue, setNamedPropertyNode->propertyName, NULL)) {
-                print_and_abort_shorthand("Error adding attribute %s with no value. Problem on internal hashing", setNamedPropertyNode->propertyName);
+            if(!put_attribute(symbol->value.tagValue, attributeKey, NULL)) {
+                print_and_abort_shorthand("Error adding attribute %s with no value. Problem on internal hashing", attributeKey);
             }
             
-            debug_print("set attribute %s from %s;\n", setNamedPropertyNode->propertyName, symbol->name);
+            debug_print("set attribute %s from %s;\n", attributeKey, symbol->name);
         }
         
         else {
-            char * stringValue = ast_node_get_string_return_val(execute_ast_node(setNamedPropertyNode->value, st), "Type mismatch. Set property expects a string.", node->filename, node->lineno);
+            char * attributeValue = ast_node_get_string_return_val(execute_ast_node(setNamedPropertyNode->value, st), "Type mismatch. Set property expects a string.", node->filename, node->lineno);
         
-            if(!put_attribute(symbol->value.tagValue, setNamedPropertyNode->propertyName, stringValue)){
-                print_and_abort_shorthand("Error adding attribute %s with value %s. Problem on internal hashing.", setNamedPropertyNode->propertyName, stringValue);
+            if(!put_attribute(symbol->value.tagValue, attributeKey, attributeValue)){
+                print_and_abort_shorthand("Error adding attribute %s with value %s. Problem on internal hashing.", attributeKey, attributeValue);
             }
             
-            debug_print("set attribute %s from %s = %s;\n", setNamedPropertyNode->propertyName, symbol->name, stringValue);
+            debug_print("set attribute %s from %s = %s;\n", attributeKey, symbol->name, attributeValue);
         }
     }
 
@@ -515,17 +517,19 @@ static AstOpProcessorReturnNode * ast_get_named_property_node_processor(AstNode 
 
     if(getNamedPropertyNode->propertyType == ATTRIBUTE) {
 
-        if(!has_attribute(symbol->value.tagValue, getNamedPropertyNode->propertyName)) {
-            print_lineno_and_abort_shorthand(node, "Tag %s doesn't have attribute %s", symbol->name, getNamedPropertyNode->propertyName);
+        char * attributeKey = ast_node_get_string_return_val(execute_ast_node(getNamedPropertyNode->propertyName, st), "Type mismatch. Property name expects a string.", node->filename, node->lineno);
+
+        if(!has_attribute(symbol->value.tagValue, attributeKey)) {
+            print_lineno_and_abort_shorthand(node, "Tag %s doesn't have attribute %s", symbol->name, attributeKey);
         }
 
-        char *attributeValue = get_attribute(symbol->value.tagValue, getNamedPropertyNode->propertyName);
+        char *attributeValue = get_attribute(symbol->value.tagValue, attributeKey);
 
         if(attributeValue == NULL) {
-            attributeValue = getNamedPropertyNode->propertyName;
+            attributeValue = attributeKey;
         }
 
-        debug_print("get attribute %s from %s; (%s)\n", getNamedPropertyNode->propertyName, symbol->name, attributeValue);
+        debug_print("get attribute %s from %s; (%s)\n", attributeKey, symbol->name, attributeValue);
         
         return ast_node_create_string_return_val(attributeValue);
     }
@@ -560,9 +564,11 @@ static AstOpProcessorReturnNode * ast_has_named_property_node_processor(AstNode 
 
     if(hasNamedPropertyNode->propertyType == ATTRIBUTE) {
 
-        int hasAttribute = has_attribute(symbol->value.tagValue, hasNamedPropertyNode->propertyName);
+        char * attributeKey = ast_node_get_string_return_val(execute_ast_node(hasNamedPropertyNode->propertyName, st), "Type mismatch. Property name expects a string.", node->filename, node->lineno);
+
+        int hasAttribute = has_attribute(symbol->value.tagValue, attributeKey);
         
-        debug_print("has attribute %s from %s; (%d)\n", hasNamedPropertyNode->propertyName, symbol->name, hasAttribute);
+        debug_print("has attribute %s from %s; (%d)\n", attributeKey, symbol->name, hasAttribute);
 
         return ast_node_create_int_return_val(hasAttribute);
     }

@@ -162,10 +162,10 @@ ASSIGNMENT
 	| SET_PROPERTY FROM ID '=' VALUE
 								{ $$ = new_ast_set_property_node($3, $1, $5, args.inputFiles.currentFilename, yylineno); }
 
-	| SET_NAMED_PROPERTY STRING_LITERAL FROM ID
+	| SET_NAMED_PROPERTY STRING_VALUE FROM ID
 								{ $$ = new_ast_set_named_property_node($4, $1, $2, NULL, args.inputFiles.currentFilename, yylineno); }
 
-	| SET_NAMED_PROPERTY STRING_LITERAL FROM ID '=' VALUE
+	| SET_NAMED_PROPERTY STRING_VALUE FROM ID '=' VALUE
 								{ $$ = new_ast_set_named_property_node($4, $1, $2, $6, args.inputFiles.currentFilename, yylineno); }
 
 	| APPEND_CHILD FROM ID '=' VALUE
@@ -247,7 +247,7 @@ NON_ID_NUM
 	| CMP '(' STRING_VALUE ',' STRING_VALUE ')'
 								{ $$ = new_ast_node(CMP, $3, $5, args.inputFiles.currentFilename, yylineno); }
 
-	| HAS_NAMED_PROPERTY STRING_LITERAL FROM ID
+	| HAS_NAMED_PROPERTY STRING_VALUE FROM ID
 								{ $$ = new_ast_has_named_property_node($4, $1, $2, args.inputFiles.currentFilename, yylineno); }
 	;
 
@@ -267,7 +267,7 @@ NON_ID_STRING_VALUE
 	| STRING_ARITH				{ $$ = $1; }
 	| STR '(' NUM ')'			{ $$ = new_ast_node(STR, $3, NULL, args.inputFiles.currentFilename, yylineno); }
 	| GET_PROPERTY FROM ID		{ $$ = new_ast_get_property_node($3, $1, args.inputFiles.currentFilename, yylineno); }
-	| GET_NAMED_PROPERTY STRING_LITERAL FROM ID
+	| GET_NAMED_PROPERTY STRING_VALUE FROM ID
 								{ $$ = new_ast_get_named_property_node($4, $1, $2, args.inputFiles.currentFilename, yylineno); }
 	;
 

@@ -173,7 +173,7 @@ typedef struct AstSetNamedPropertyNode {
 
   int propertyType;
   char *symbolName;
-  char *propertyName;
+  AstNode *propertyName;
   AstNode *value;
 
 } AstSetNamedPropertyNode;
@@ -205,7 +205,7 @@ typedef struct AstGetNamedPropertyNode {
 
   int propertyType;
   char *symbolName;
-  char *propertyName;
+  AstNode *propertyName;
 
 } AstGetNamedPropertyNode;
 
@@ -216,7 +216,7 @@ typedef struct AstHasNamedPropertyNode {
 
   int propertyType;
   char *symbolName;
-  char *propertyName;
+  AstNode *propertyName;
 
 } AstHasNamedPropertyNode;
 
@@ -244,15 +244,15 @@ AstNode * new_ast_inc_dec_assignment_node(int type, char *symbolName, char* file
 
 AstNode * new_ast_set_property_node(char *symbolName, int propertyType, AstNode *value, char* filename, int lineno);
 
-AstNode * new_ast_set_named_property_node(char *symbolName, int propertyType, char *propertyName, AstNode *value, char* filename, int lineno);
+AstNode * new_ast_set_named_property_node(char *symbolName, int propertyType, AstNode *propertyName, AstNode *value, char* filename, int lineno);
 
 AstNode * new_ast_append_child_node(char *symbolName, AstNode *value, char* filename, int lineno);
 
 AstNode * new_ast_get_property_node(char *symbolName, int propertyType, char* filename, int lineno);
 
-AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, char *propertyName, char* filename, int lineno);
+AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, AstNode *propertyName, char* filename, int lineno);
 
-AstNode * new_ast_has_named_property_node(char *symbolName, int propertyType, char *propertyName, char* filename, int lineno);
+AstNode * new_ast_has_named_property_node(char *symbolName, int propertyType, AstNode *propertyName, char* filename, int lineno);
 
 AstNode * new_ast_int_node(int value, char* filename, int lineno);
 
