@@ -26,12 +26,18 @@ $(LEX): c.l
 $(YACC): c.y
 	yacc -v -t -d $< -Wno-yacc
 
-examples: $(COMPILER) $(EXAMPLES_OUTPUTS)
+examples: FORCE $(EXAMPLES_OUTPUTS)
 
-%.html: %
+errors: FORCE $(COMPILER)
+	cd errors; COMPILER=../$(COMPILER) ./run.sh
+	
+
+%.html: % $(COMPILER)
 	$(COMPILER) -o $@ $(wildcard $</*.pipo)
 
 clean:
 	rm -f $(LEX) y.output y.tab.h $(YACC) $(COMPILER) $(COMPILER_UTILS_OBJECTS) $(PIPO_FUNCTIONS_OBJECTS) $(EXAMPLES_OUTPUTS)
 
-.PHONY: all clean examples
+FORCE:
+
+.PHONY: all clean examples FORCE
