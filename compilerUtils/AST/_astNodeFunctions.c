@@ -755,8 +755,8 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
 
             SymbolNode *symbolNode = symbol_table_add(functionST, iterDecl->symbolName, iterDecl->type);
 
-            if(declarationNode == NULL)
-                print_lineno_and_abort_shorthand(node, "Function %s has argument %s duplicated", callNode->functionName, iterDecl->symbolName);
+            if(symbolNode == NULL)
+                print_lineno_and_abort_shorthand(declarationNode, "Function %s has argument %s duplicated", callNode->functionName, iterDecl->symbolName);
 
             symbolNode->value = value;
             symbolNode->initialized = true;
@@ -794,7 +794,7 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
         if(returnNode != NULL)
             free(returnNode);
 
-        print_lineno_and_abort_shorthand(node, "Function %s return type and actual return value don't match (%s vs %s)", callNode->functionName, ast_node_get_type_name(declarationNode->returnType), ast_node_get_type_name(returnType));
+        print_lineno_and_abort_shorthand(declarationNode, "Function %s return type and actual return value don't match (%s vs %s)", callNode->functionName, ast_node_get_type_name(declarationNode->returnType), ast_node_get_type_name(returnType));
     }
 
     returnNode->returnGenerated = false;
