@@ -52,6 +52,9 @@ static int ast_node_get_int_return_val(AstOpProcessorReturnNode *returnVal, char
 static char * ast_node_get_string_return_val(AstOpProcessorReturnNode *returnVal, char* message, char *filename, int lineno);
 static Tag * ast_node_get_tag_return_val(AstOpProcessorReturnNode *returnVal, char* message, char *filename, int lineno);
 
+// Aux Functions
+static char * ast_node_get_type_name(int type);
+
 inline AstOpProcessorReturnNode * execute_ast_node(AstNode *node, SymbolTable st) {
 
     if(node == NULL)
@@ -212,7 +215,7 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
             if(valueNode != NULL)
                 free(valueNode);
 
-            print_lineno_and_abort_shorthand(node, "Internal error: Not supported type %d.", symbol->type);
+            print_lineno_and_abort_shorthand(node, "Internal error: Not supported type");
         }
 
         symbol->initialized = true;
@@ -289,7 +292,7 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
         if(value != NULL)
             free(value);
 
-        print_lineno_and_abort_shorthand(node, "Internal error: Not supported type %d", symbol->type);
+        print_lineno_and_abort_shorthand(node, "Internal error: Not supported type");
     }
 
     symbol->initialized = true;
@@ -330,7 +333,7 @@ static AstOpProcessorReturnNode * ast_inc_dec_assignment_node_processor(AstNode 
     }
 
     else
-        print_lineno_and_abort_shorthand(node, "Invalid inc/dec assignment operand %d", assignmentNode->nodeType);
+        print_lineno_and_abort_shorthand(node, "Invalid inc/dec assignment operand", assignmentNode->nodeType);
 
     return NULL;
 }
@@ -363,7 +366,7 @@ static AstOpProcessorReturnNode * ast_set_property_node_processor(AstNode *node,
     }
 
     else
-        print_lineno_and_abort_shorthand(node, "Invalid property %d on set operation. Expecting body or name", setPropertyNode->propertyType);
+        print_lineno_and_abort_shorthand(node, "Invalid property on set operation. Expecting body or name", setPropertyNode->propertyType);
 
     return NULL;
 }
@@ -414,7 +417,7 @@ static AstOpProcessorReturnNode * ast_set_named_property_node_processor(AstNode 
     }
 
     else
-        print_lineno_and_abort_shorthand(node, "Invalid property %d on set operation. Expecting attribute", setNamedPropertyNode->propertyType);
+        print_lineno_and_abort_shorthand(node, "Invalid property on set operation. Expecting attribute");
 
     return NULL;
 
@@ -446,7 +449,7 @@ static AstOpProcessorReturnNode * ast_append_child_node_processor(AstNode *node,
     Tag * tagValue = ast_node_get_tag_return_val(execute_ast_node(appendChildNode->value, st), "Type mismatch. Append child expects a tag.", node->filename, node->lineno);
 
     append_tag(symbol->value.tagValue, tagValue);
-    
+
     debug_print("append child from %s = %s;\n", symbol->name, tagValue->name);
 
     return NULL;
@@ -484,7 +487,7 @@ static AstOpProcessorReturnNode * ast_get_property_node_processor(AstNode *node,
     }
 
     else
-        print_lineno_and_abort_shorthand(node, "Invalid property %d on get operation. Expecting body or name.", getPropertyNode->propertyType);
+        print_lineno_and_abort_shorthand(node, "Invalid property on get operation. Expecting body or name.");
 
     return NULL;
 }
@@ -528,7 +531,7 @@ static AstOpProcessorReturnNode * ast_get_named_property_node_processor(AstNode 
     }
 
     else
-        print_lineno_and_abort_shorthand(node, "Invalid property %d on get operation. Expecting attribute.", getNamedPropertyNode->propertyType);
+        print_lineno_and_abort_shorthand(node, "Invalid property on get operation. Expecting attribute.");
 
     return NULL;
 
@@ -565,7 +568,7 @@ static AstOpProcessorReturnNode * ast_has_named_property_node_processor(AstNode 
     }
 
     else
-        print_lineno_and_abort_shorthand(node, "Invalid property %d on has operation. Expecting attribute.", hasNamedPropertyNode->propertyType);
+        print_lineno_and_abort_shorthand(node, "Invalid property on has operation. Expecting attribute.");
 
     return NULL;
 
@@ -642,7 +645,7 @@ static AstOpProcessorReturnNode * ast_symbol_reference_node_processor(AstNode *n
     }
 
     else
-        print_lineno_and_abort_shorthand(node, "Variable %s with non existing type %d", symbolRefNode->symbolName, symbol->type);
+        print_lineno_and_abort_shorthand(node, "Variable %s with non existing type", symbolRefNode->symbolName);
 
     return NULL;
 }
@@ -748,7 +751,7 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
                 value.tagValue = ast_node_get_tag_return_val(execute_ast_node(iterCall->value, st), "Type mismatch on function arguments. Was expecting a tag.", node->filename, node->lineno);
 
             else
-                print_lineno_and_abort_shorthand(node, "Invalid function %s argument type %d", callNode->functionName, iterDecl->type);
+                print_lineno_and_abort_shorthand(node, "Invalid function %s argument type", callNode->functionName);
 
             SymbolNode *symbolNode = symbol_table_add(functionST, iterDecl->symbolName, iterDecl->type);
 
@@ -791,7 +794,7 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
         if(returnNode != NULL)
             free(returnNode);
 
-        print_lineno_and_abort_shorthand(node, "Function %s return type and actual return value don't match (%d vs %d)", callNode->functionName, declarationNode->returnType, returnType);
+        print_lineno_and_abort_shorthand(node, "Function %s return type and actual return value don't match (%s vs %s)", callNode->functionName, ast_node_get_type_name(declarationNode->returnType), ast_node_get_type_name(returnType));
     }
 
     returnNode->returnGenerated = false;
@@ -1245,4 +1248,14 @@ static AstOpProcessorReturnNode * ast_node_create_void_return_val(void) {
     ret->returnGenerated = false;
 
     return ret;
+}
+
+static char * ast_node_get_type_name(int type) {
+    switch(type) {
+        case INT: return "int";
+        case STRING: return "string";
+        case TAG: return "tag";
+        case VOID: return "void";
+        default: return "unkown type";
+    }
 }
