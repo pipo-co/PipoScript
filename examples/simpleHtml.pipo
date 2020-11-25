@@ -1,0 +1,21 @@
+tag main() {
+
+    tag html = new tag;
+    set name from html = "html";
+
+    tag head = new tag;
+    set name from head = "head";
+    append child from html = head;
+    
+    tag title = new tag;
+    set name from title = "title";
+    set body from title = "Index";
+    append child from head = title;
+
+    tag bodyT = new tag;
+    set name from bodyT = "body";
+    set body from bodyT = "Hola mundo!";
+    append child from html = bodyT;
+
+    return html;
+}

@@ -148,6 +148,13 @@ typedef struct AstStringNode {
 
 } AstStringNode;
 
+typedef struct AstTagNode {
+  int nodeType;
+  char *filename;
+  int lineno;
+
+} AstTagNode;
+
 typedef struct AstSetPropertyNode {
   int nodeType;
   char* filename;
@@ -238,7 +245,9 @@ AstNode * new_ast_int_node(int value, char* filename, int lineno);
 
 AstNode * new_ast_string_node(char *value, char* filename, int lineno);
 
-AstNode * new_ast_return_node(AstNode *value, char* filename, int lineno);
+AstNode * new_ast_tag_node(char *filename, int lineno);
+
+AstNode * new_ast_return_node(AstNode *value, char *filename, int lineno);
 
 AstNode * new_ast_function_declaration_node(int returnType, char *name, AstFunctionArgList *args, AstNode *block, char* filename, int lineno);
 

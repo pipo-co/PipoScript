@@ -1,0 +1,70 @@
+tag main(){
+
+    tag html = new tag;
+    set name from html = "html";
+
+    tag style = new tag;
+    set name from style = "style";
+    set body from style = "table {font-family: arial, sans-serif;border-collapse: collapse;width: 100%;}";
+    set body from style = concat(get body from style, "td, th {border: 3px solid #dddddd;text-align: left;padding: 8px;}");
+    set body from style = concat(get body from style, " tr:nth-child(even) {background-color:#dddddd;}");
+
+    append child from html = style;
+
+    int max = 100;
+
+    tag h1 = new tag;
+    set name from h1 = "h1";
+    set body from h1 = concat(concat("First ", str(max)), " primes.");
+    append child from html = h1;
+    
+    tag table = new tag;
+    set name from table = "table";
+    append child from html = table;
+
+    tag tr;
+    tag tdNum;
+    tag tdMessage;
+    int i;
+    int n = 2;
+    int flag;
+    string message;
+
+    while(n < max) {
+        
+        tr = new tag;
+        tdNum = new tag;
+        tdMessage = new tag;
+
+        set name from tr = "tr";
+        set name from tdNum = "td";
+        set name from tdMessage = "td";
+
+        set body from tdNum = str(n);
+        
+        flag = 0;
+        for (i = 2; !flag && i <= n / 2; i++){
+            if (n % i == 0) {
+                flag = 1;
+            }
+        }
+
+        if(flag){
+            message = "No es primo";
+        }
+        else {
+            message = "Es primo!";
+        }
+
+        set body from tdMessage = message;
+
+        append child from tr = tdNum;
+        append child from tr = tdMessage;
+
+        append child from table = tr;
+
+        n++;
+    }
+
+    return html;
+}

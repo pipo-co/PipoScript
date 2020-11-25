@@ -209,7 +209,7 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
     else {
 
         if(symbol->type == TAG) {
-            symbol->value.tagValue = new_tag();
+            symbol->value.tagValue = NULL;
         }
 
         char * type;
@@ -274,8 +274,8 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
 
         Tag* tagVal = ast_node_get_tag_return_val(value, "Tried to assign an invalid type to a tag variable", node->filename, node->lineno);
         
-        fprintf(stderr, "tag %s = {name: '%s', body: '%.10s', attrCount: %d};\n", symbol->name, symbol->value.tagValue->name, symbol->value.tagValue->body,symbol->value.tagValue->attributes->size);
         symbol->value.tagValue = tagVal;
+        fprintf(stderr, "tag %s = {name: '%s', body: '%.10s', attrCount: %d};\n", symbol->name, symbol->value.tagValue->name, symbol->value.tagValue->body, symbol->value.tagValue->attributes->size);
     }
 
     else {
@@ -335,6 +335,10 @@ static AstOpProcessorReturnNode * ast_set_property_node_processor(AstNode *node,
     if(symbol->type != TAG)
         print_lineno_and_abort("Set property operations are only aplicable to tags", node->filename, node->lineno, ERROR_CODE);
     
+    if(symbol->value.tagValue == NULL)
+        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
+    
+
     char * stringValue = ast_node_get_string_return_val(execute_ast_node(setPropertyNode->value, st), "Type mismatch. Set property expects a string.", node->filename, node->lineno);
 
     if(setPropertyNode->propertyType == BODY) {
@@ -373,14 +377,30 @@ static AstOpProcessorReturnNode * ast_set_named_property_node_processor(AstNode 
     if(symbol->type != TAG)
         print_lineno_and_abort("Set property operations are only aplicable to tags", node->filename, node->lineno, ERROR_CODE);
     
-    char * stringValue = ast_node_get_string_return_val(execute_ast_node(setNamedPropertyNode->value, st), "Type mismatch. Set property expects a string.", node->filename, node->lineno);
+    if(symbol->value.tagValue == NULL)
+        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
+    
 
     if(setNamedPropertyNode->propertyType == ATTRIBUTE) {
-        
-        if(put_attribute(symbol->value.tagValue, setNamedPropertyNode->propertyName, stringValue))
-            print_and_abort("Error adding attribute. Problem on internal hashing.", ERROR_CODE);
 
-        fprintf(stderr, "set attribute %s from %s = %s;\n", setNamedPropertyNode->propertyName, symbol->name, stringValue);
+        if(setNamedPropertyNode->value == NULL) {
+            if(!put_attribute(symbol->value.tagValue, setNamedPropertyNode->propertyName, NULL)) {
+                print_and_abort("Error adding attribute. Problem on internal hashing.", ERROR_CODE);
+            }
+            
+            fprintf(stderr, "set attribute %s from %s;\n", setNamedPropertyNode->propertyName, symbol->name);
+        }
+        
+        else {
+            char * stringValue = ast_node_get_string_return_val(execute_ast_node(setNamedPropertyNode->value, st), "Type mismatch. Set property expects a string.", node->filename, node->lineno);
+        
+            if(!put_attribute(symbol->value.tagValue, setNamedPropertyNode->propertyName, stringValue)){
+                print_and_abort("Error adding attribute. Problem on internal hashing.", ERROR_CODE);
+            }
+            
+            fprintf(stderr, "set attribute %s from %s = %s;\n", setNamedPropertyNode->propertyName, symbol->name, stringValue);
+        }
+        
     }
 
     else
@@ -518,6 +538,17 @@ static void ast_string_node_destroyer(AstNode *node) {
     AstStringNode * stringNode = (AstStringNode*) node;
 
     free(stringNode);
+}
+
+static AstOpProcessorReturnNode * ast_tag_node_processor(AstNode *node, SymbolTable st) {
+
+    return ast_node_create_tag_return_val(new_tag());
+}
+
+static void ast_tag_node_destroyer(AstNode *node) {
+    AstTagNode * tagNode = (AstTagNode*) node;
+
+    free(tagNode);
 }
 
 static AstOpProcessorReturnNode * ast_symbol_reference_node_processor(AstNode *node, SymbolTable st) {
@@ -991,6 +1022,9 @@ void initialize_ast_node_functions() {
 
     astNodeFunctions[AST_OP_POSITION(STRING)].processor = ast_string_node_processor;
     astNodeFunctions[AST_OP_POSITION(STRING)].destroyer = ast_string_node_destroyer;
+
+    astNodeFunctions[AST_OP_POSITION(TAG)].processor = ast_tag_node_processor;
+    astNodeFunctions[AST_OP_POSITION(TAG)].destroyer = ast_tag_node_destroyer;
 
     astNodeFunctions[AST_OP_POSITION(ID)].processor = ast_symbol_reference_node_processor;
     astNodeFunctions[AST_OP_POSITION(ID)].destroyer = ast_symbol_reference_node_destroyer;

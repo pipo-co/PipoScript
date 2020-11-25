@@ -29,6 +29,6 @@ test: $(SOURCES)
 	rm example
 
 clean:
-	rm -f $(LEX) $(YACC) $(COMPILER) $(COMPILER_UTILS_OBJECTS)
+	rm -f $(LEX) $(YACC) $(COMPILER) $(COMPILER_UTILS_OBJECTS) $(PIPO_FUNCTIONS_OBJECTS)
 
 .PHONY: all clean
