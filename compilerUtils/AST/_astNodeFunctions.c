@@ -15,7 +15,13 @@
 #define AST_OP_POSITION(op) (int)((op < ASCII_TABLE_SIZE)? op : ASCII_TABLE_SIZE + op - FIRST - 1)
 
 #define debug_print(...) \
-            do { if (args.debug) fprintf(stderr, __VA_ARGS__); } while (0)
+            do { if (args.debug) fprintf(stderr, __VA_ARGS__); } while(0)
+
+#define print_lineno_and_abort_shorthand(node, ...) \
+            do { print_lineno_and_abort(node->filename, node->lineno, ERROR_CODE, __VA_ARGS__); } while(0)
+
+#define print_and_abort_shorthand(...) \
+            do { print_and_abort(ERROR_CODE, __VA_ARGS__); } while(0)
 
 typedef struct AstOpProcessorReturnNode {
     int returnType;
@@ -174,7 +180,7 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
     SymbolNode *symbol = symbol_table_add(st, declarationNode->symbolName, declarationNode->type);
 
     if(symbol == NULL)
-        print_lineno_and_abort("Symbol already declared", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Symbol %s already declared", declarationNode->symbolName);
     
 
     if(declarationNode->value != NULL) {
@@ -184,7 +190,7 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
             if(valueNode != NULL)
                 free(valueNode);
 
-            print_lineno_and_abort("Declared and assigned types don't match", node->filename, node->lineno, ERROR_CODE);
+            print_lineno_and_abort_shorthand(node, "Declared and assigned types don't match");
         }
 
         if(symbol->type == INT) {
@@ -206,7 +212,7 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
             if(valueNode != NULL)
                 free(valueNode);
 
-            print_lineno_and_abort("Internal error: Not supported type.", node->filename, node->lineno, ERROR_CODE);
+            print_lineno_and_abort_shorthand(node, "Internal error: Not supported type %d.", symbol->type);
         }
 
         symbol->initialized = true;
@@ -244,7 +250,7 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
     SymbolNode *symbol = symbol_table_get(st, assignmentNode->symbolName);
 
     if(symbol == NULL)
-        print_lineno_and_abort("Variable wasn't previously declared", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously declared", assignmentNode->symbolName);
     
     AstOpProcessorReturnNode *value = execute_ast_node(assignmentNode->value, st);
 
@@ -252,7 +258,7 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
         if(value != NULL)
             free(value);
 
-        print_lineno_and_abort("Declared and assigned types don't match", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Declared and assigned types don't match");
     }
 
     if(symbol->type == INT) {
@@ -283,7 +289,7 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
         if(value != NULL)
             free(value);
 
-        print_lineno_and_abort("Internal error: Not supported type.", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Internal error: Not supported type %d", symbol->type);
     }
 
     symbol->initialized = true;
@@ -305,13 +311,13 @@ static AstOpProcessorReturnNode * ast_inc_dec_assignment_node_processor(AstNode 
     SymbolNode *symbol = symbol_table_get(st, assignmentNode->symbolName);
 
     if(symbol == NULL)
-        print_lineno_and_abort("Variable wasn't previously declared", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously declared", assignmentNode->symbolName);
 
     if(symbol->type != INT)
-        print_lineno_and_abort("++ and -- operations are only aplicable to ints", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "++ and -- operations are only aplicable to ints. %s is not an int.", assignmentNode->symbolName);
     
     if(!symbol->initialized)
-        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously initialized", assignmentNode->symbolName);
 
     if(assignmentNode->nodeType == INC) {
         symbol->value.intValue++;
@@ -324,7 +330,7 @@ static AstOpProcessorReturnNode * ast_inc_dec_assignment_node_processor(AstNode 
     }
 
     else
-        print_lineno_and_abort("Invalid inc/dec assignment operand", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Invalid inc/dec assignment operand %d", assignmentNode->nodeType);
 
     return NULL;
 }
@@ -336,13 +342,13 @@ static AstOpProcessorReturnNode * ast_set_property_node_processor(AstNode *node,
     SymbolNode *symbol = symbol_table_get(st, setPropertyNode->symbolName);
 
     if(symbol == NULL)
-        print_lineno_and_abort("Variable wasn't previously declared", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously declared", setPropertyNode->symbolName);
 
     if(symbol->type != TAG)
-        print_lineno_and_abort("Set property operations are only aplicable to tags", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Set property operations are only aplicable to tags. %s is not a tag", setPropertyNode->symbolName);
     
     if(!symbol->initialized)
-        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously initialized", setPropertyNode->symbolName);
 
 
     char * stringValue = ast_node_get_string_return_val(execute_ast_node(setPropertyNode->value, st), "Type mismatch. Set property expects a string.", node->filename, node->lineno);
@@ -358,7 +364,7 @@ static AstOpProcessorReturnNode * ast_set_property_node_processor(AstNode *node,
     }
 
     else
-        print_lineno_and_abort("Invalid property on set operation. Expecting body or name.", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Invalid property %d on set operation. Expecting body or name", setPropertyNode->propertyType);
 
     return NULL;
 }
@@ -378,20 +384,20 @@ static AstOpProcessorReturnNode * ast_set_named_property_node_processor(AstNode 
     SymbolNode *symbol = symbol_table_get(st, setNamedPropertyNode->symbolName);
 
     if(symbol == NULL)
-        print_lineno_and_abort("Variable wasn't previously declared", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously declared", setNamedPropertyNode->symbolName);
     
     if(symbol->type != TAG)
-        print_lineno_and_abort("Set property operations are only aplicable to tags", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Set property operations are only aplicable to tags. %s is not a tag", setNamedPropertyNode->symbolName);
     
     if(!symbol->initialized)
-        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously initialized", setNamedPropertyNode->symbolName);
     
 
     if(setNamedPropertyNode->propertyType == ATTRIBUTE) {
 
         if(setNamedPropertyNode->value == NULL) {
             if(!put_attribute(symbol->value.tagValue, setNamedPropertyNode->propertyName, NULL)) {
-                print_and_abort("Error adding attribute. Problem on internal hashing.", ERROR_CODE);
+                print_and_abort_shorthand("Error adding attribute %s with no value. Problem on internal hashing", setNamedPropertyNode->propertyName);
             }
             
             debug_print("set attribute %s from %s;\n", setNamedPropertyNode->propertyName, symbol->name);
@@ -401,16 +407,15 @@ static AstOpProcessorReturnNode * ast_set_named_property_node_processor(AstNode 
             char * stringValue = ast_node_get_string_return_val(execute_ast_node(setNamedPropertyNode->value, st), "Type mismatch. Set property expects a string.", node->filename, node->lineno);
         
             if(!put_attribute(symbol->value.tagValue, setNamedPropertyNode->propertyName, stringValue)){
-                print_and_abort("Error adding attribute. Problem on internal hashing.", ERROR_CODE);
+                print_and_abort_shorthand("Error adding attribute %s with value %s. Problem on internal hashing.", setNamedPropertyNode->propertyName, stringValue);
             }
             
             debug_print("set attribute %s from %s = %s;\n", setNamedPropertyNode->propertyName, symbol->name, stringValue);
         }
-        
     }
 
     else
-        print_lineno_and_abort("Invalid property on set operation. Expecting attribute.", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Invalid property %d on set operation. Expecting attribute", setNamedPropertyNode->propertyType);
 
     return NULL;
 
@@ -431,13 +436,13 @@ static AstOpProcessorReturnNode * ast_append_child_node_processor(AstNode *node,
     SymbolNode *symbol = symbol_table_get(st, appendChildNode->symbolName);
 
     if(symbol == NULL)
-        print_lineno_and_abort("Variable wasn't previously declared", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously declared", appendChildNode->symbolName);
     
     if(symbol->type != TAG)
-        print_lineno_and_abort("Append child operations are only aplicable to tags", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Append child operations are only aplicable to tags. %s is not a tag", appendChildNode->symbolName);
     
     if(!symbol->initialized)
-        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously initialized", appendChildNode->symbolName);
     
     Tag * tagValue = ast_node_get_tag_return_val(execute_ast_node(appendChildNode->value, st), "Type mismatch. Append child expects a tag.", node->filename, node->lineno);
 
@@ -462,13 +467,13 @@ static AstOpProcessorReturnNode * ast_get_property_node_processor(AstNode *node,
     SymbolNode *symbol = symbol_table_get(st, getPropertyNode->symbolName);
 
     if(symbol == NULL)
-        print_lineno_and_abort("Variable wasn't previously declared", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously declared", getPropertyNode->symbolName);
     
     if(symbol->type != TAG)
-        print_lineno_and_abort("Get property operations are only aplicable to tags", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Get property operations are only aplicable to tags. %s is not a tag", getPropertyNode->symbolName);
 
     if(!symbol->initialized)
-        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously initialized", getPropertyNode->symbolName);
 
     if(getPropertyNode->propertyType == BODY) {
         return ast_node_create_string_return_val(symbol->value.tagValue->body);
@@ -479,7 +484,7 @@ static AstOpProcessorReturnNode * ast_get_property_node_processor(AstNode *node,
     }
 
     else
-        print_lineno_and_abort("Invalid property on get operation. Expecting body or name.", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Invalid property %d on get operation. Expecting body or name.", getPropertyNode->propertyType);
 
     return NULL;
 }
@@ -497,13 +502,13 @@ static AstOpProcessorReturnNode * ast_get_named_property_node_processor(AstNode 
     SymbolNode *symbol = symbol_table_get(st, getNamedPropertyNode->symbolName);
 
     if(symbol == NULL)
-        print_lineno_and_abort("Variable wasn't previously declared", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously declared", getNamedPropertyNode->symbolName);
     
     if(symbol->type != TAG)
-        print_lineno_and_abort("Get property operations are only aplicable to tags", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Get property operations are only aplicable to tags. %s is not a tag", getNamedPropertyNode->symbolName);
 
     if(!symbol->initialized)
-        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously initialized", getNamedPropertyNode->symbolName);
 
     if(getNamedPropertyNode->propertyType == ATTRIBUTE) {
         
@@ -514,7 +519,7 @@ static AstOpProcessorReturnNode * ast_get_named_property_node_processor(AstNode 
     }
 
     else
-        print_lineno_and_abort("Invalid property on set operation. Expecting attribute.", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Invalid property %d on set operation. Expecting attribute.", getNamedPropertyNode->propertyType);
 
     return NULL;
 
@@ -568,10 +573,10 @@ static AstOpProcessorReturnNode * ast_symbol_reference_node_processor(AstNode *n
     SymbolNode *symbol = symbol_table_get(st, symbolRefNode->symbolName);
 
     if(symbol == NULL)
-        print_lineno_and_abort("Variable wasn't previously declared", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously declared", symbolRefNode->symbolName);
 
     if(!symbol->initialized)
-        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously initialized", symbolRefNode->symbolName);
 
     if(symbol->type == INT) {
         debug_print("Symbol Dereference %s (%d)\n", symbol->name, symbol->value.intValue);
@@ -592,7 +597,7 @@ static AstOpProcessorReturnNode * ast_symbol_reference_node_processor(AstNode *n
     }
 
     else
-        print_lineno_and_abort("Variable with non existing type", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Variable %s with non existing type %d", symbolRefNode->symbolName, symbol->type);
 
     return NULL;
 }
@@ -662,19 +667,19 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
     AstFunctionDeclarationNode *declarationNode = function_symbol_table_get(callNode->functionName);
 
     if(declarationNode == NULL)
-        print_lineno_and_abort("Function wasn't previously declared", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Function %s wasn't previously declared", callNode->functionName);
 
     // Both declaration and call have the same number of arguments (NULL == no arguments)
     if(declarationNode->args == NULL) {
         if(callNode->args != NULL)
-            print_lineno_and_abort("Function call with invalid argument count", node->filename, node->lineno, ERROR_CODE);
+            print_lineno_and_abort_shorthand(node, "Function call %s with invalid argument count (%d vs 0)", callNode->functionName, callNode->args->argCount);
     }
 
     else if(callNode->args == NULL)
-        print_lineno_and_abort("Function call with invalid argument count", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Function call %s with invalid argument count (0 vs %d)", callNode->functionName, declarationNode->args->argCount);
 
     else if(declarationNode->args->argCount != callNode->args->argCount)
-        print_lineno_and_abort("Function call with invalid argument count", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Function call %s with invalid argument count (%d vs %d)", callNode->functionName, callNode->args->argCount, declarationNode->args->argCount);
 
 
     SymbolTable functionST = symbol_table_create();
@@ -698,12 +703,12 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
                 value.tagValue = ast_node_get_tag_return_val(execute_ast_node(iterCall->value, st), "Type mismatch on function arguments. Was expecting a tag.", node->filename, node->lineno);
 
             else
-                print_lineno_and_abort("Invalid function argument type", node->filename, node->lineno, ERROR_CODE);
+                print_lineno_and_abort_shorthand(node, "Invalid function %s argument type %d", callNode->functionName, iterDecl->type);
 
             SymbolNode *symbolNode = symbol_table_add(functionST, iterDecl->symbolName, iterDecl->type);
 
             if(declarationNode == NULL)
-                print_lineno_and_abort("There are duplicated argument names in functions", node->filename, node->lineno, ERROR_CODE);
+                print_lineno_and_abort_shorthand(node, "Function %s has argument %s duplicated", callNode->functionName, iterDecl->symbolName);
 
             symbolNode->value = value;
 
@@ -713,7 +718,7 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
 
         // Assert
         if(iterCall != NULL || iterDecl != NULL)
-            print_lineno_and_abort("IterCall or IterDecl weren't null after parsing arguments (assert null)", node->filename, node->lineno, ERROR_CODE);
+            print_lineno_and_abort_shorthand(node, "IterCall or IterDecl weren't null after parsing arguments (assert null)");
 
     }
 
@@ -738,7 +743,7 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
         if(returnNode != NULL)
             free(returnNode);
 
-        print_lineno_and_abort("Function return type and actual return value don't match", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort_shorthand(node, "Function %s return type and actual return value don't match (%d vs %d)", callNode->functionName, declarationNode->returnType, returnNode->returnType);
     }
 
     returnNode->returnGenerated = false;
@@ -1119,7 +1124,7 @@ void initialize_ast_node_functions() {
 static int ast_node_get_int_return_val(AstOpProcessorReturnNode *returnVal, char* message, char *filename, int lineno) {
 
     if(returnVal == NULL || returnVal->returnType != INT)
-        print_lineno_and_abort((message != NULL)? message : "Error returning int. An int return value was needed and wasn't provided", filename, lineno, ERROR_CODE);
+        print_lineno_and_abort(filename, lineno, ERROR_CODE, (message != NULL)? message : "Error returning int. An int return value was needed and wasn't provided");
 
     int intVal = returnVal->value.intValue;
 
@@ -1131,7 +1136,7 @@ static int ast_node_get_int_return_val(AstOpProcessorReturnNode *returnVal, char
 static char * ast_node_get_string_return_val(AstOpProcessorReturnNode *returnVal, char* message, char *filename, int lineno) {
 
     if(returnVal == NULL || returnVal->returnType != STRING)
-        print_lineno_and_abort((message != NULL)? message : "Error returning string. A string return value was needed and wasn't provided", filename, lineno, ERROR_CODE);
+        print_lineno_and_abort(filename, lineno, ERROR_CODE, (message != NULL)? message : "Error returning string. A string return value was needed and wasn't provided");
 
     char* stringVal = returnVal->value.stringValue;
 
@@ -1143,7 +1148,7 @@ static char * ast_node_get_string_return_val(AstOpProcessorReturnNode *returnVal
 static Tag * ast_node_get_tag_return_val(AstOpProcessorReturnNode *returnVal, char* message, char *filename, int lineno) {
 
     if(returnVal == NULL || returnVal->returnType != TAG)
-        print_lineno_and_abort((message != NULL)? message : "Error returning tag. A tag return value was needed and wasn't provided", filename, lineno, ERROR_CODE);
+        print_lineno_and_abort(filename, lineno, ERROR_CODE, (message != NULL)? message : "Error returning tag. A tag return value was needed and wasn't provided");
 
     Tag *tagVal = returnVal->value.tagValue;
 

@@ -33,7 +33,7 @@ void multiLineComment(int (*input)(void)) {
 
 	}
 
-	print_lineno_and_abort("Error in File %s, Line %d : unterminated comment\n", args.inputFiles.currentFilename, yylineno, 3);
+	print_lineno_and_abort(args.inputFiles.currentFilename, yylineno, 3, "Unterminated comment");
 }
 
 char * lex_copy_string(char* string, int len) {
@@ -54,7 +54,7 @@ char * lex_copy_string(char* string, int len) {
 	k = kh_put(StrMap, stringsMap, newStr, &ret);
 
 	if(ret == -1){
-		print_and_abort("Error storing string in stringMap", 3);
+		print_and_abort(3, "Error storing string %s in stringMap", string);
 	}
 
     return kh_value(stringsMap, k) = newStr;

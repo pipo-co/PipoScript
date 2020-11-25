@@ -8,7 +8,6 @@ extern FILE *yyin;
 void yyrestart(FILE *input_file);
 
 void yyerror(char const *s) {
-
 	fprintf(stderr, "Error in File %s, Line %d: %s\n", args.inputFiles.currentFilename, yylineno, s);
 	finalize(3);
 }
@@ -67,10 +66,10 @@ Tag * execute_main(void) {
 	AstFunctionDeclarationNode *mainNode = function_symbol_table_get("main");
 
 	if(mainNode == NULL)
-		print_and_abort("Main function was not declared. Aborting\n", 4);
+		print_and_abort(4, "Main function was not declared. Aborting\n");
 
 	if(mainNode->returnType != TAG)
-		print_lineno_and_abort("File %s, Line %d: Main function was declared with invalid return type. It must be Tag. Aborting.\n", mainNode->filename, mainNode->lineno, 4);
+		print_lineno_and_abort(mainNode->filename, mainNode->lineno, 4, "Main function was declared with invalid return type. It must be Tag. Aborting.");
 
 	SymbolTable st = symbol_table_create();
 
@@ -117,8 +116,8 @@ void register_function(AstNode *node) {
 	AstFunctionDeclarationNode *functionNode = (AstFunctionDeclarationNode *) node;
 
 	if(!function_symbol_table_add(functionNode)) {
-		fprintf(stderr, "Error in File %s, Line %d: Function %s already defined\n", args.inputFiles.currentFilename, yylineno, functionNode->functionName);
+		char *name = functionNode->functionName;
 		free(functionNode);
-		finalize(3);
+		print_lineno_and_abort(args.inputFiles.currentFilename, yylineno, 3, "Error in File %s, Line %d: Function %s already defined\n", name);
 	}
 }
