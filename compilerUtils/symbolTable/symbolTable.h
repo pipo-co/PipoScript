@@ -20,8 +20,10 @@ typedef struct SymbolNode {
   char * name;
 
   int type;
-
+  bool initialized;
+  
   SymbolValue value;
+
 } SymbolNode;
 
 SymbolTable symbol_table_create();

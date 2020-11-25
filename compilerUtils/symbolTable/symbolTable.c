@@ -43,19 +43,24 @@ SymbolTable symbol_table_create(){
 
 SymbolNode * symbol_table_add(SymbolTable st, char *name, int type){
 
-    if( name == NULL){
+    if(name == NULL){
         return NULL;
     }
 
     int ret = 0;
      
     if(!symbol_node_exists(st, name)){
+
         SymbolNode *node = new_symbol_node(name, type);
+
         khiter_t k = kh_put(symbolTable, st->symbolNodes, name, &ret);
+        
         if(ret == -1){
             return NULL;
         }
+        
         kh_value(st->symbolNodes, k) = node;            
+        
         return node;      
     }
     
@@ -75,7 +80,7 @@ bool symbol_node_exists(SymbolTable st, char *name){
 
 SymbolNode * symbol_table_get(SymbolTable st, char *name){
 
-    if( name == NULL){
+    if(name == NULL){
         return NULL;
     }
     khiter_t k = kh_get(symbolTable, st->symbolNodes, name);
@@ -123,6 +128,7 @@ static SymbolNode * new_symbol_node(char *name, int type) {
 
     node->name = name;
     node->type = type;
+    node->initialized = false;
 
     return node;
 }

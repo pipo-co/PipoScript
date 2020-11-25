@@ -42,7 +42,6 @@ static int ast_node_get_int_return_val(AstOpProcessorReturnNode *returnVal, char
 static char * ast_node_get_string_return_val(AstOpProcessorReturnNode *returnVal, char* message, char *filename, int lineno);
 static Tag * ast_node_get_tag_return_val(AstOpProcessorReturnNode *returnVal, char* message, char *filename, int lineno);
 
-
 inline AstOpProcessorReturnNode * execute_ast_node(AstNode *node, SymbolTable st) {
 
     if(node == NULL)
@@ -203,14 +202,12 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
             if(valueNode != NULL)
                 free(valueNode);
 
-            print_lineno_and_abort("Invalid declaration type", node->filename, node->lineno, ERROR_CODE);
+            print_lineno_and_abort("Internal error: Not supported type.", node->filename, node->lineno, ERROR_CODE);
         }
+
+        symbol->initialized = true;
     }
     else {
-
-        if(symbol->type == TAG) {
-            symbol->value.tagValue = NULL;
-        }
 
         char * type;
 
@@ -274,16 +271,18 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
 
         Tag* tagVal = ast_node_get_tag_return_val(value, "Tried to assign an invalid type to a tag variable", node->filename, node->lineno);
         
+        fprintf(stderr, "tag %s = {name: '%s', body: '%.10s', attrCount: %d};\n", symbol->name, tagVal->name, tagVal->body, tagVal->attributes->size);
         symbol->value.tagValue = tagVal;
-        fprintf(stderr, "tag %s = {name: '%s', body: '%.10s', attrCount: %d};\n", symbol->name, symbol->value.tagValue->name, symbol->value.tagValue->body, symbol->value.tagValue->attributes->size);
     }
 
     else {
         if(value != NULL)
             free(value);
 
-        print_lineno_and_abort("Invalid data type assignment", node->filename, node->lineno, ERROR_CODE);
+        print_lineno_and_abort("Internal error: Not supported type.", node->filename, node->lineno, ERROR_CODE);
     }
+
+    symbol->initialized = true;
 
     return NULL;
 }
@@ -303,9 +302,12 @@ static AstOpProcessorReturnNode * ast_inc_dec_assignment_node_processor(AstNode 
 
     if(symbol == NULL)
         print_lineno_and_abort("Variable wasn't previously declared", node->filename, node->lineno, ERROR_CODE);
-    
+
     if(symbol->type != INT)
         print_lineno_and_abort("++ and -- operations are only aplicable to ints", node->filename, node->lineno, ERROR_CODE);
+    
+    if(!symbol->initialized)
+        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
 
     if(assignmentNode->nodeType == INC) {
         symbol->value.intValue++;
@@ -331,13 +333,13 @@ static AstOpProcessorReturnNode * ast_set_property_node_processor(AstNode *node,
 
     if(symbol == NULL)
         print_lineno_and_abort("Variable wasn't previously declared", node->filename, node->lineno, ERROR_CODE);
-    
+
     if(symbol->type != TAG)
         print_lineno_and_abort("Set property operations are only aplicable to tags", node->filename, node->lineno, ERROR_CODE);
     
-    if(symbol->value.tagValue == NULL)
+    if(!symbol->initialized)
         print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
-    
+
 
     char * stringValue = ast_node_get_string_return_val(execute_ast_node(setPropertyNode->value, st), "Type mismatch. Set property expects a string.", node->filename, node->lineno);
 
@@ -377,7 +379,7 @@ static AstOpProcessorReturnNode * ast_set_named_property_node_processor(AstNode 
     if(symbol->type != TAG)
         print_lineno_and_abort("Set property operations are only aplicable to tags", node->filename, node->lineno, ERROR_CODE);
     
-    if(symbol->value.tagValue == NULL)
+    if(!symbol->initialized)
         print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
     
 
@@ -430,6 +432,9 @@ static AstOpProcessorReturnNode * ast_append_child_node_processor(AstNode *node,
     if(symbol->type != TAG)
         print_lineno_and_abort("Append child operations are only aplicable to tags", node->filename, node->lineno, ERROR_CODE);
     
+    if(!symbol->initialized)
+        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
+    
     Tag * tagValue = ast_node_get_tag_return_val(execute_ast_node(appendChildNode->value, st), "Type mismatch. Append child expects a tag.", node->filename, node->lineno);
 
     append_tag(symbol->value.tagValue, tagValue);
@@ -457,6 +462,9 @@ static AstOpProcessorReturnNode * ast_get_property_node_processor(AstNode *node,
     
     if(symbol->type != TAG)
         print_lineno_and_abort("Get property operations are only aplicable to tags", node->filename, node->lineno, ERROR_CODE);
+
+    if(!symbol->initialized)
+        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
 
     if(getPropertyNode->propertyType == BODY) {
         return ast_node_create_string_return_val(symbol->value.tagValue->body);
@@ -489,6 +497,9 @@ static AstOpProcessorReturnNode * ast_get_named_property_node_processor(AstNode 
     
     if(symbol->type != TAG)
         print_lineno_and_abort("Get property operations are only aplicable to tags", node->filename, node->lineno, ERROR_CODE);
+
+    if(!symbol->initialized)
+        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
 
     if(getNamedPropertyNode->propertyType == ATTRIBUTE) {
         
@@ -558,6 +569,9 @@ static AstOpProcessorReturnNode * ast_symbol_reference_node_processor(AstNode *n
 
     if(symbol == NULL)
         print_lineno_and_abort("Variable wasn't previously declared", node->filename, node->lineno, ERROR_CODE);
+
+    if(!symbol->initialized)
+        print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
 
     if(symbol->type == INT) {
         fprintf(stderr, "Symbol Dereference %s (%d)\n", symbol->name, symbol->value.intValue);
