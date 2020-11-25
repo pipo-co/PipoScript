@@ -67,3 +67,5 @@ pipoCompiler
 test.pipo
 test2.pipo
 test3.pipo
+
+examples/*.html
