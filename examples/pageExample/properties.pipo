@@ -1,0 +1,56 @@
+tag margin(tag t, int top, int right, int bottom, int left){
+
+    int flag = has attribute "style" from t;
+    if(!flag) {
+        set attribute "style" from t = concat("margin-top:", concat(str(top), "px;"));
+    }
+    else {
+        set attribute "style" from t = concat(get attribute "style" from t, concat("margin-top:", concat(str(top), "px;")));
+    }
+    
+
+    set attribute "style" from t = concat(get attribute "style" from t, concat("margin-right:", concat(str(right), "px;")));
+    set attribute "style" from t = concat(get attribute "style" from t, concat("margin-bottom:", concat(str(bottom), "px;")));
+    set attribute "style" from t = concat(get attribute "style" from t, concat("margin-left:", concat(str(left), "px;")));
+
+    return t;
+}
+
+tag padding(tag t, int top, int right, int bottom, int left){
+
+    int flag = has attribute "style" from t;
+    if(!flag) {
+        set attribute "style" from t = concat("padding-top:", concat(str(top), "px;"));
+    }
+    else {
+        set attribute "style" from t = concat(get attribute "style" from t, concat("padding-top:", concat(str(top), "px;")));
+    }
+    
+
+    set attribute "style" from t = concat(get attribute "style" from t, concat("padding-right:", concat(str(right), "px;")));
+    set attribute "style" from t = concat(get attribute "style" from t, concat("padding-bottom:", concat(str(bottom), "px;")));
+    set attribute "style" from t = concat(get attribute "style" from t, concat("padding-left:", concat(str(left), "px;")));
+
+    return t;
+}
+
+tag textAlign(tag t, string textAlign){
+
+    int flag = has attribute "style" from t;
+    string align;
+
+    if(cmp(textAlign, "left") || cmp(textAlign, "right") || cmp(textAlign, "center")) {
+        align = concat(textAlign, ";");
+    }
+    else{
+        align = "center";
+    }
+    if(!flag) {
+        set attribute "style" from t = concat("text-align:", align);
+    }
+    else {
+        set attribute "style" from t = concat(get attribute "style" from t, concat("text-align:", align));
+    }
+    
+    return t;
+}
