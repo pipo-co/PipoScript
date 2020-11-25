@@ -1,0 +1,25 @@
+void uikit(tag head){
+    
+    tag link = new tag;
+    set name from link = "link";
+
+    set attribute "rel" from link = "stylesheet";
+    set attribute "href" from link = "https://cdn.jsdelivr.net/npm/uikit@3.5.9/dist/css/uikit.min.css";
+
+    append child from head = link;
+
+    tag script = new tag;
+    set name from script = "script";
+
+    set attribute "src" from script = "https://cdn.jsdelivr.net/npm/uikit@3.5.9/dist/js/uikit.min.js";
+
+    append child from head = script;
+
+    script = new tag;
+    set name from script = "script";
+
+    set attribute "src" from script = "https://cdn.jsdelivr.net/npm/uikit@3.5.9/dist/js/uikit-icons.min.js";
+
+    append child from head = script;
+
+}

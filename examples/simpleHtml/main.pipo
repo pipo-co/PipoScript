@@ -17,5 +17,7 @@ tag main() {
     set body from bodyT = "Hola mundo!";
     append child from html = bodyT;
 
+    set attribute "hola" from bodyT;
+    
     return html;
 }
