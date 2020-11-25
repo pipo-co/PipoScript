@@ -4,11 +4,10 @@
 #include "compilerUtils/symbolTable/symbolTable.h"
 #include "pipoScriptFunctions/tag.h"
 
-#define MAX_FUNC_ARGS 30
-
 // Generic AstNode
 typedef struct AstNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   struct AstNode * left;
@@ -37,6 +36,7 @@ typedef struct AstFunctionArgList {
 
 typedef struct AstIfNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   AstNode * condition;
@@ -48,6 +48,7 @@ typedef struct AstIfNode {
 
 typedef struct AstWhileNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   AstNode * condition;
@@ -57,6 +58,7 @@ typedef struct AstWhileNode {
 
 typedef struct AstForNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   AstNode * firstAssignment;
@@ -70,6 +72,7 @@ typedef struct AstForNode {
 
 typedef struct AstSymbolReferenceNode {
   int nodeType;
+  char* filename;
   int lineno;
   
   char *symbolName;
@@ -77,6 +80,7 @@ typedef struct AstSymbolReferenceNode {
 
 typedef struct AstAssignmentNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   char *symbolName;
@@ -86,6 +90,7 @@ typedef struct AstAssignmentNode {
 
 typedef struct AstDeclarationNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   int type;
@@ -97,6 +102,7 @@ typedef struct AstDeclarationNode {
 
 typedef struct AstFunctionDeclarationNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   int returnType;
@@ -109,6 +115,7 @@ typedef struct AstFunctionDeclarationNode {
 
 typedef struct AstFunctionCallNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   char *functionName;
@@ -118,6 +125,7 @@ typedef struct AstFunctionCallNode {
 
 typedef struct AstReturnNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   AstNode *value;
@@ -125,6 +133,7 @@ typedef struct AstReturnNode {
 
 typedef struct AstIntNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   int value;
@@ -132,6 +141,7 @@ typedef struct AstIntNode {
 
 typedef struct AstStringNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   char *value;
@@ -140,12 +150,14 @@ typedef struct AstStringNode {
 
 typedef struct AstTagNode {
   int nodeType;
+  char *filename;
   int lineno;
 
 } AstTagNode;
 
 typedef struct AstSetPropertyNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   int propertyType;
@@ -156,6 +168,7 @@ typedef struct AstSetPropertyNode {
 
 typedef struct AstSetNamedPropertyNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   int propertyType;
@@ -167,6 +180,7 @@ typedef struct AstSetNamedPropertyNode {
 
 typedef struct AstAppendChildNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   char *symbolName;
@@ -176,6 +190,7 @@ typedef struct AstAppendChildNode {
 
 typedef struct AstGetPropertyNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   int propertyType;
@@ -185,6 +200,7 @@ typedef struct AstGetPropertyNode {
 
 typedef struct AstGetNamedPropertyNode {
   int nodeType;
+  char* filename;
   int lineno;
 
   int propertyType;
@@ -199,43 +215,43 @@ Tag * execute_ast_tree(AstNode *tree, SymbolTable st);
 
 void free_ast_tree(AstNode *root);
 
-AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right, int lineno);
+AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right, char* filename, int lineno);
 
-AstNode * new_ast_symbol_reference_node(char *symbolName, int lineno);
+AstNode * new_ast_symbol_reference_node(char *symbolName, char* filename, int lineno);
 
-AstNode * new_ast_if_node (AstNode * condition, AstNode * ifBranch, AstNode * elseBranch, int lineno);
+AstNode * new_ast_if_node (AstNode * condition, AstNode * ifBranch, AstNode * elseBranch, char* filename, int lineno);
 
-AstNode * new_ast_while_node(int nodeType, AstNode * condition, AstNode * whileBranch, int lineno);
+AstNode * new_ast_while_node(int nodeType, AstNode * condition, AstNode * whileBranch, char* filename, int lineno);
 
-AstNode * new_ast_for_node(AstNode *firstAssignment, AstNode *condition, AstNode *lastAssignment, AstNode *forBranch, int lineno);
+AstNode * new_ast_for_node(AstNode *firstAssignment, AstNode *condition, AstNode *lastAssignment, AstNode *forBranch, char* filename, int lineno);
 
-AstNode * new_ast_declaration_node(int type, char *symbolName, AstNode *value, int lineno);
+AstNode * new_ast_declaration_node(int type, char *symbolName, AstNode *value, char* filename, int lineno);
 
-AstNode * new_ast_assignment_node(char *symbolName, AstNode *value, int lineno);
+AstNode * new_ast_assignment_node(char *symbolName, AstNode *value, char* filename, int lineno);
 
-AstNode * new_ast_inc_dec_assignment_node(int type, char *symbolName, int lineno);
+AstNode * new_ast_inc_dec_assignment_node(int type, char *symbolName, char* filename, int lineno);
 
-AstNode * new_ast_set_property_node(char *symbolName, int propertyType, AstNode *value, int lineno);
+AstNode * new_ast_set_property_node(char *symbolName, int propertyType, AstNode *value, char* filename, int lineno);
 
-AstNode * new_ast_set_named_property_node(char *symbolName, int propertyType, char *propertyName, AstNode *value, int lineno);
+AstNode * new_ast_set_named_property_node(char *symbolName, int propertyType, char *propertyName, AstNode *value, char* filename, int lineno);
 
-AstNode * new_ast_append_child_node(char *symbolName, AstNode *value, int lineno);
+AstNode * new_ast_append_child_node(char *symbolName, AstNode *value, char* filename, int lineno);
 
-AstNode * new_ast_get_property_node(char *symbolName, int propertyType, int lineno);
+AstNode * new_ast_get_property_node(char *symbolName, int propertyType, char* filename, int lineno);
 
-AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, char *propertyName, int lineno);
+AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, char *propertyName, char* filename, int lineno);
 
-AstNode * new_ast_int_node(int value, int lineno);
+AstNode * new_ast_int_node(int value, char* filename, int lineno);
 
-AstNode * new_ast_string_node(char *value, int lineno);
+AstNode * new_ast_string_node(char *value, char* filename, int lineno);
 
-AstNode * new_ast_tag_node(int lineno);
+AstNode * new_ast_tag_node(char *filename, int lineno);
 
-AstNode * new_ast_return_node(AstNode *value, int lineno);
+AstNode * new_ast_return_node(AstNode *value, char *filename, int lineno);
 
-AstNode * new_ast_function_declaration_node(int returnType, char *name, AstFunctionArgList *args, AstNode *block, int lineno);
+AstNode * new_ast_function_declaration_node(int returnType, char *name, AstFunctionArgList *args, AstNode *block, char* filename, int lineno);
 
-AstNode * new_ast_function_call_node(char *name, AstFunctionArgList *args, int lineno);
+AstNode * new_ast_function_call_node(char *name, AstFunctionArgList *args, char* filename, int lineno);
 
 // Function Auxiliary Functions
 AstFunctionArgList *ast_create_function_arg_list();

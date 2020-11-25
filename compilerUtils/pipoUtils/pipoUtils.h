@@ -11,8 +11,8 @@ void * emalloc(size_t size);
 
 void * ecalloc(size_t n, size_t size);
 
-void print_and_abort(char *message);
+void print_and_abort(char *message, int errorStatus);
 
-void print_lineno_and_abort(char *message, int lineno);
+void print_lineno_and_abort(char *message, char* filename, int lineno, int errorStatus);
 
 #endif

@@ -4,39 +4,73 @@
 #include "pipoScriptFunctions/tag.h"
 #include "pipoScriptFunctions/stringService.h"
 
-AstNode *astTree;
-SymbolTable globalSt;
+extern FILE *yyin;
+void yyrestart(FILE *input_file);
 
 void yyerror(char const *s) {
 
-	fprintf(stderr, "Error in line %d: ", yylineno);
-	fprintf(stderr, "\"%s\"\n",s);
-
+	fprintf(stderr, "Error in File %s, Line %d: %s\n", args.inputFiles.currentFilename, yylineno, s);
 	finalize(3);
 }
 
-void initialize(void) {
+FILE * initialize(void) {
+
+	// Open Output File [required]
+	FILE *output = fopen(args.outputFileName, "w");
+
+	if(output == NULL) {
+
+		perror("Error opening output file");
+		fprintf(stderr, "Without output file %s, excecution cannot continue", args.outputFileName);
+
+		input_file_handler_finalize(&args.inputFiles);
+		exit(2);
+	}
+
+	// Initialize Function Symbol Table 
 	function_symbol_table_initialize();
+
+	// Initialize Ast Functions
     initialize_ast_node_functions();
+
+	// Initialize Lexer Utils
 	initializeLex();
+
+	// Initialize Tags Library
 	tag_service_init();
+
+	// Initialize Strings Handler Library
     string_service_init();
+
+	return output;
+}
+
+void parse_input_files(void) {
+
+	FILE *currentFile;
+
+	while(currentFile = input_file_handler_dequeue(&args.inputFiles), currentFile != NULL) {
+
+		yyin = currentFile;
+
+		yyrestart(yyin);
+	
+		yyparse();
+	}
+
+	// Free And Close All Remaining Input Files
+	input_file_handler_finalize(&args.inputFiles);
 }
 
 Tag * execute_main(void) {
 
 	AstFunctionDeclarationNode *mainNode = function_symbol_table_get("main");
 
+	if(mainNode == NULL)
+		print_and_abort("Main function was not declared. Aborting\n", 4);
 
-	if(mainNode == NULL) {
-		fprintf(stderr, "Main function was not declared. Aborting\n");
-		return NULL;
-	}
-
-	if(mainNode->returnType != TAG) {
-		fprintf(stderr, "Line %d: Main function was declared with invalid return type. It must be Tag. Aborting.\n", mainNode->lineno);
-		return NULL;
-	}
+	if(mainNode->returnType != TAG)
+		print_lineno_and_abort("File %s, Line %d: Main function was declared with invalid return type. It must be Tag. Aborting.\n", mainNode->filename, mainNode->lineno, 4);
 
 	SymbolTable st = symbol_table_create();
 
@@ -47,10 +81,11 @@ Tag * execute_main(void) {
 	return t;
 }
 
-int render_final_tag(Tag * tag, FILE * out){
+int render_main_tag(Tag * tag, FILE * out){
+
 	if(tag == NULL){
-		fprintf(stderr, "No tag was return, thus, rendered the tag will not be.\n");
-		return 1;
+		fprintf(stderr, "No tag was return in main function. No tag will be rendered\n");
+		return 5;
 	}
 
 	render_tag(tag, INIT_IND, out);
@@ -60,10 +95,19 @@ int render_final_tag(Tag * tag, FILE * out){
 
 void finalize(int status) {
 
+	// Free Function Table
     function_symbol_table_free();
+
+	// Free All Remaining Symbol Tables
 	symbol_table_clean_up();
+
+	// Finalize Lex Utils
 	finalizeLex();
+
+	// Finalize Tags Library
 	tag_service_fin();
+
+	// Finalize Strings Handlers Library
     string_service_fin();
 
 	exit(status);
@@ -73,7 +117,8 @@ void register_function(AstNode *node) {
 	AstFunctionDeclarationNode *functionNode = (AstFunctionDeclarationNode *) node;
 
 	if(!function_symbol_table_add(functionNode)) {
-		fprintf(stderr, "Error in line %d: Function %s already defined", yylineno, functionNode->functionName);
+		fprintf(stderr, "Error in File %s, Line %d: Function %s already defined\n", args.inputFiles.currentFilename, yylineno, functionNode->functionName);
+		free(functionNode);
 		finalize(3);
 	}
 }

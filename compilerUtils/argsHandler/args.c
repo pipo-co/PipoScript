@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "args.h"
 
-static struct Args args;
+Args args;
 
 static void usage(const char *progname) {
     fprintf(stderr,
@@ -18,11 +18,11 @@ static void usage(const char *progname) {
     exit(1);
 }
 
-Args *parse_args(const int argc, char **argv) {
+void parse_args(const int argc, char **argv) {
 
     // Default values
+    input_file_handler_queue_initialize(&args.inputFiles);
     args.outputFileName = "index.html";
-    args.inputFileName = NULL;
     args.debug = false;
 
     int c;
@@ -53,21 +53,7 @@ Args *parse_args(const int argc, char **argv) {
         exit(1);
     }
 
-    args.inputFileName = argv[optind++];
-    
-    if (optind < argc) {
-        fprintf(stderr, "argument not accepted: ");
-        while (optind < argc) {
-            fprintf(stderr, "%s ", argv[optind++]);
-        }
-        fprintf(stderr, "\n");
+    while(optind < argc) {
+        input_file_handler_enqueue(&args.inputFiles, argv[optind++]);
     }
-
-    char *next = strrchr(args.inputFileName, '.');
-    if(next == NULL || strcmp(next, ".pipo")){
-        fprintf(stderr, "Invalid source file extension. '.pipo' files expected.\n");
-        exit(1);
-    }
-
-    return &args;
 }
