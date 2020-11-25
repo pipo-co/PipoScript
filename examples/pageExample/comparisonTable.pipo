@@ -1,0 +1,81 @@
+tag comparisonTable(){
+    tag tableContainer = new tag;
+    set name from tableContainer = "div";
+
+    tag style = new tag;
+    set name from style = "style";
+    set body from style = "table {border-collapse: collapse;border-spacing: 0;width: 100%;border: 1px solid #ddd; margin-left:50; width:1100px;}";
+    set body from style = concat(get body from style, "th, td {text-align: center;padding: 16px;}");
+    set body from style = concat(get body from style, " th:first-child, td:first-child {text-align: left;}");
+    set body from style = concat(get body from style, " tr:nth-child(even) {background-color: #f2f2f2}");
+    set body from style = concat(get body from style, " .fa-check {color: green;}");
+    set body from style = concat(get body from style, " .fa-remove {color: red;}");
+
+    append child from tableContainer = style;
+
+    tag table = new tag;
+    set name from table = "table";
+    
+
+    append child from table = firstColumnLine("Features", "Normal language", "PipoScript");
+    append child from table = columnLine("Can build tag components", "No", "Of course");
+    append child from table = columnLine("Can use strings", "No, only char *", "Yes sir");
+    append child from table = columnLine("Is super semantic", "Not much", "Like Shakespeare");
+    append child from table = columnLine("Has a cool name", "No C", "The best");
+
+    append child from tableContainer = table;
+
+    return tableContainer;
+    
+}
+
+tag firstColumnLine(string firstBody, string secondBody, string thirdBody){
+    tag tr = new tag;
+    set name from tr = "tr";
+
+    tag th = new tag;
+    set name from th = "th";
+    set body from th = firstBody;
+    set attribute "style" from th = "width:50%";
+
+    append child from tr = th;
+
+    th = new tag;
+    set name from th = "th";
+    set body from th = secondBody;
+
+    append child from tr = th;
+
+    th = new tag;
+    set name from th = "th";
+    set body from th = thirdBody;
+
+    append child from tr = th;
+
+    return tr;
+}
+
+tag columnLine(string firstBody, string secondBody, string thirdBody){
+    tag tr = new tag;
+    set name from tr = "tr";
+
+    tag td = new tag;
+    set name from td = "td";
+    set body from td = firstBody;
+
+    append child from tr = td;
+
+    td = new tag;
+    set name from td = "td";
+    set body from td = secondBody;
+
+    append child from tr = td;
+
+    td = new tag;
+    set name from td = "td";
+    set body from td = thirdBody;
+
+    append child from tr = td;
+
+    return tr;
+}

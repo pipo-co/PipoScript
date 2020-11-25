@@ -1,0 +1,11 @@
+tag main(){
+
+    tag t = new tag;
+    int i = function();
+    return t;
+}
+
+int function(){
+    int ans;
+    return ans;
+}

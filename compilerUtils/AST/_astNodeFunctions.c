@@ -711,6 +711,7 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
                 print_lineno_and_abort_shorthand(node, "Function %s has argument %s duplicated", callNode->functionName, iterDecl->symbolName);
 
             symbolNode->value = value;
+            symbolNode->initialized = true;
 
             iterCall = iterCall->next;
             iterDecl = iterDecl->next;

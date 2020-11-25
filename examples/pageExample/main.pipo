@@ -1,0 +1,38 @@
+tag main(){
+
+    tag html = new tag;
+    set name from html = "html";
+    
+    string pageTitle = "PipoScript";
+    string pageDescription = "PipoScript is a typed language build to create html like components with ease";
+    string cardTitle = "Such a great experience";
+    string cardDescription = "With pipoScript you can create 'tag' variables and then you can put them attributes and change their name and body. You will also be able to build a tree with all these tags.";
+    string altText = "PipoScript logo";
+    int size = 250;
+    int half = size/2 + 1;
+
+    append child from html = header(pageTitle, pageDescription);
+
+    tag list = new tag;
+    set name from list = "ul";
+    set attribute "style" from list = "list-style-type: none; margin-right: margin:auto;";
+    string leftList = "float: left;";
+    tag listItem;
+
+    for(int i = 0; i < 4; i++){
+
+        listItem  = new tag;
+        set name from listItem = "li";
+
+        set attribute "style" from listItem = leftList;
+        set attribute "style" from listItem = concat(get attribute "style" from listItem, "margin-right: 50; margin-bottom: 30;");
+
+        append child from listItem = imgCard("pslogo.png", altText, size, cardTitle, cardDescription);
+
+        append child from list = listItem;
+    }
+    append child from html = list;
+    append child from html = comparisonTable();
+
+    return html;
+}

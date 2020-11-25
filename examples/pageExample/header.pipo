@@ -1,0 +1,21 @@
+tag header(string pageTitle, string description) {
+
+    tag header = new tag;
+    set name from header = "div";
+
+    tag title = new tag;
+    set name from title = "h1";
+
+    set body from title = pageTitle;
+    
+    append child from header = title;
+
+    tag desc = new tag;
+    set name from desc = "p";
+
+    set body from desc = description;
+
+    append child from header = desc;
+
+    return header;
+}
