@@ -86,7 +86,7 @@ Tag * execute_main(void) {
 int render_main_tag(Tag * tag){
 
 	if(tag == NULL){
-		fprintf(stderr, "No tag was return in main function. No tag will be rendered\n");
+		fprintf(stderr, "No tag was returned in main function. No tag will be rendered\n");
 		return 5;
 	}
 

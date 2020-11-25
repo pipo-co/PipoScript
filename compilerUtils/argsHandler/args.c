@@ -48,7 +48,7 @@ void parse_args(const int argc, char **argv) {
     }
 
     if(optind >= argc){
-        fprintf(stderr, "Source file wasn't provided. \n");
+        fprintf(stderr, "No source files provided. \n");
         usage(argv[0]);
         exit(1);
     }

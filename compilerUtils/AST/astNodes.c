@@ -199,6 +199,21 @@ AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, ch
     return (AstNode *) astNode;
 }
 
+AstNode * new_ast_has_named_property_node(char *symbolName, int propertyType, char *propertyName, char* filename, int lineno) {
+
+    AstHasNamedPropertyNode * astNode = emalloc(sizeof(*astNode));
+
+    astNode->nodeType = HAS_NAMED_PROPERTY_CONST;
+    astNode->filename = filename;
+    astNode->lineno = lineno;
+
+    astNode->propertyType = propertyType;   // ATTRIBUTE
+    astNode->propertyName = propertyName;   // <string>
+    astNode->symbolName = symbolName;       // ID
+
+    return (AstNode *) astNode;
+}
+
 
 AstNode * new_ast_int_node(int value, char* filename, int lineno) {
 
@@ -367,7 +382,12 @@ void ast_free_function_arg_list(AstFunctionArgList *list) {
 #include "_astNodeFunctions.c"
 
 Tag * execute_ast_tree(AstNode *tree, SymbolTable st) {
+
+    debug_print("\n-- Starting Tree Excecution --\n");
+
     AstOpProcessorReturnNode *resultNode = execute_ast_node(tree, st);
+
+    debug_print("\n-- Ending Tree Excecution --\n\n");
 
     Tag *returnVal = NULL;
 

@@ -28,7 +28,7 @@
 
 %token <operation> INT VOID STRING TAG
 %token <operation> IF ELSE WHILE DO FOR RETURN
-%token <operation> SET GET NEW NAME BODY ATTRIBUTE FROM APPEND_CHILD
+%token <operation> SET GET HAS NEW NAME BODY ATTRIBUTE FROM APPEND_CHILD
 
 %right '='
 %left CONCAT
@@ -45,12 +45,12 @@
 
 %type <operation> AND OR '=' '>' '<' LE GE EQ NE '+' '-' '*' '/' '%' '!' INC DEC ')' '(' UMINUS
 %type <operation> CONCAT CMP LEN STR
-%type <operation> SET_PROPERTY SET_NAMED_PROPERTY GET_PROPERTY GET_NAMED_PROPERTY
+%type <operation> SET_PROPERTY SET_NAMED_PROPERTY GET_PROPERTY GET_NAMED_PROPERTY HAS_NAMED_PROPERTY
 
 %nonassoc IFX
 %nonassoc ELSE
 %nonassoc STATEMENT_LIST_CONST FUNCTION_DECLARATION_CONST FUNCTION_CALL_CONST FUNCTION_DEFINITION_LIST_CONST
-%nonassoc SET_PROPERTY_CONST SET_NAMED_PROPERTY_CONST GET_PROPERTY_CONST GET_NAMED_PROPERTY_CONST INT_CAST_CONST
+%nonassoc SET_PROPERTY_CONST SET_NAMED_PROPERTY_CONST GET_PROPERTY_CONST GET_NAMED_PROPERTY_CONST INT_CAST_CONST HAS_NAMED_PROPERTY_CONST
 
 %type <astNode> STATEMENT_LIST STATEMENT BLOCK if_statement iteration_statement return_statement declaration_statement
 %type <astNode> assignment_statement ASSIGNMENT DO_ASSIGNMENT ARITH NUM NON_ID_NUM VALUE FUNCTION_CALL function_call_statement
@@ -243,8 +243,12 @@ NON_ID_NUM
 	| ARITH						{ $$ = $1; }
 	| INT '(' STRING_VALUE ')' 	{ $$ = new_ast_node(INT_CAST_CONST, $3, NULL, args.inputFiles.currentFilename, yylineno); }
 	| LEN '(' STRING_VALUE ')'	{ $$ = new_ast_node(LEN, $3, NULL, args.inputFiles.currentFilename, yylineno); }
+
 	| CMP '(' STRING_VALUE ',' STRING_VALUE ')'
 								{ $$ = new_ast_node(CMP, $3, $5, args.inputFiles.currentFilename, yylineno); }
+
+	| HAS_NAMED_PROPERTY STRING_LITERAL FROM ID
+								{ $$ = new_ast_has_named_property_node($4, $1, $2, args.inputFiles.currentFilename, yylineno); }
 	;
 
 STRING_ARITH
@@ -282,6 +286,11 @@ GET_PROPERTY
 
 GET_NAMED_PROPERTY	
 	: GET ATTRIBUTE				{ $$ = $2; }
+	;
+
+HAS_NAMED_PROPERTY
+	: HAS ATTRIBUTE				{ $$ = $2; }
+	;
 
 ID_TYPE
 	: INT						{ $$ = $1; }

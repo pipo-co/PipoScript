@@ -209,6 +209,17 @@ typedef struct AstGetNamedPropertyNode {
 
 } AstGetNamedPropertyNode;
 
+typedef struct AstHasNamedPropertyNode {
+  int nodeType;
+  char* filename;
+  int lineno;
+
+  int propertyType;
+  char *symbolName;
+  char *propertyName;
+
+} AstHasNamedPropertyNode;
+
 void initialize_ast_node_functions();
 
 Tag * execute_ast_tree(AstNode *tree, SymbolTable st);
@@ -240,6 +251,8 @@ AstNode * new_ast_append_child_node(char *symbolName, AstNode *value, char* file
 AstNode * new_ast_get_property_node(char *symbolName, int propertyType, char* filename, int lineno);
 
 AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, char *propertyName, char* filename, int lineno);
+
+AstNode * new_ast_has_named_property_node(char *symbolName, int propertyType, char *propertyName, char* filename, int lineno);
 
 AstNode * new_ast_int_node(int value, char* filename, int lineno);
 

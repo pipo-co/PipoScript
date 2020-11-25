@@ -54,4 +54,6 @@ bool put_attribute(Tag *tag, char *attributeName, char *attributeValue);
 
 char *get_attribute(Tag *tag, const char *attributeName);
 
+bool has_attribute(Tag *tag, char *attributeName);
+
 #endif

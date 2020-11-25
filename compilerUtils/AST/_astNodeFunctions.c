@@ -490,7 +490,7 @@ static AstOpProcessorReturnNode * ast_get_property_node_processor(AstNode *node,
 }
 
 static void ast_get_property_node_destroyer(AstNode *node) {
-    AstStringNode * stringNode = (AstStringNode*) node;
+    AstGetPropertyNode * stringNode = (AstGetPropertyNode*) node;
 
     free(stringNode);
 }
@@ -511,25 +511,70 @@ static AstOpProcessorReturnNode * ast_get_named_property_node_processor(AstNode 
         print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously initialized", getNamedPropertyNode->symbolName);
 
     if(getNamedPropertyNode->propertyType == ATTRIBUTE) {
-        
-        debug_print("get attribute %s from %s;\n", getNamedPropertyNode->propertyName, symbol->name);
-        
-        return ast_node_create_string_return_val(get_attribute(symbol->value.tagValue, getNamedPropertyNode->propertyName));
 
+        if(!has_attribute(symbol->value.tagValue, getNamedPropertyNode->propertyName)) {
+            print_lineno_and_abort_shorthand(node, "Tag %s doesn't have attribute %s", symbol->name, getNamedPropertyNode->propertyName);
+        }
+
+        char *attributeValue = get_attribute(symbol->value.tagValue, getNamedPropertyNode->propertyName);
+
+        if(attributeValue == NULL) {
+            attributeValue = getNamedPropertyNode->propertyName;
+        }
+
+        debug_print("get attribute %s from %s; (%s)\n", getNamedPropertyNode->propertyName, symbol->name, attributeValue);
+        
+        return ast_node_create_string_return_val(attributeValue);
     }
 
     else
-        print_lineno_and_abort_shorthand(node, "Invalid property %d on set operation. Expecting attribute.", getNamedPropertyNode->propertyType);
+        print_lineno_and_abort_shorthand(node, "Invalid property %d on get operation. Expecting attribute.", getNamedPropertyNode->propertyType);
 
     return NULL;
 
 }
 
 static void ast_get_named_property_node_destroyer(AstNode *node) {
-    AstStringNode * stringNode = (AstStringNode*) node;
+    AstGetNamedPropertyNode * stringNode = (AstGetNamedPropertyNode*) node;
 
     free(stringNode);
+}
 
+static AstOpProcessorReturnNode * ast_has_named_property_node_processor(AstNode *node, SymbolTable st) {
+
+    AstHasNamedPropertyNode *hasNamedPropertyNode = (AstHasNamedPropertyNode*) node;
+
+    SymbolNode *symbol = symbol_table_get(st, hasNamedPropertyNode->symbolName);
+
+    if(symbol == NULL)
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously declared", hasNamedPropertyNode->symbolName);
+    
+    if(symbol->type != TAG)
+        print_lineno_and_abort_shorthand(node, "Has property operations are only aplicable to tags. %s is not a tag", hasNamedPropertyNode->symbolName);
+
+    if(!symbol->initialized)
+        print_lineno_and_abort_shorthand(node, "Variable %s wasn't previously initialized", hasNamedPropertyNode->symbolName);
+
+    if(hasNamedPropertyNode->propertyType == ATTRIBUTE) {
+
+        int hasAttribute = has_attribute(symbol->value.tagValue, hasNamedPropertyNode->propertyName);
+        
+        debug_print("has attribute %s from %s; (%d)\n", hasNamedPropertyNode->propertyName, symbol->name, hasAttribute);
+
+        return ast_node_create_int_return_val(hasAttribute);
+    }
+
+    else
+        print_lineno_and_abort_shorthand(node, "Invalid property %d on has operation. Expecting attribute.", hasNamedPropertyNode->propertyType);
+
+    return NULL;
+
+}
+
+static void ast_has_named_property_node_destroyer(AstNode *node) {
+    AstHasNamedPropertyNode * stringNode = (AstHasNamedPropertyNode*) node;
+
+    free(stringNode);
 }
 
 static AstOpProcessorReturnNode * ast_int_node_processor(AstNode *node, SymbolTable st) {
@@ -1036,6 +1081,9 @@ void initialize_ast_node_functions() {
 
     astNodeFunctions[AST_OP_POSITION(GET_NAMED_PROPERTY_CONST)].processor = ast_get_named_property_node_processor;
     astNodeFunctions[AST_OP_POSITION(GET_NAMED_PROPERTY_CONST)].destroyer = ast_get_named_property_node_destroyer;
+
+    astNodeFunctions[AST_OP_POSITION(HAS_NAMED_PROPERTY_CONST)].processor = ast_has_named_property_node_processor;
+    astNodeFunctions[AST_OP_POSITION(HAS_NAMED_PROPERTY_CONST)].destroyer = ast_has_named_property_node_destroyer;
 
     astNodeFunctions[AST_OP_POSITION(INT)].processor = ast_int_node_processor;
     astNodeFunctions[AST_OP_POSITION(INT)].destroyer = ast_int_node_destroyer;
