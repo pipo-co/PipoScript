@@ -5,7 +5,7 @@
 
 #include "compilerUtils/pipoUtils/pipoUtils.h"
 
-AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right, int lineno) {
+AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right, char* filename, int lineno) {
 
     AstNode * astNode = emalloc(sizeof(*astNode));
 
@@ -18,7 +18,7 @@ AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right, int lineno
     return astNode;
     }
 
-AstNode * new_ast_symbol_reference_node(char *symbolName, int lineno) {
+AstNode * new_ast_symbol_reference_node(char *symbolName, char* filename, int lineno) {
 
     AstSymbolReferenceNode * astNode = emalloc(sizeof(*astNode));
 
@@ -30,7 +30,7 @@ AstNode * new_ast_symbol_reference_node(char *symbolName, int lineno) {
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_if_node(AstNode * condition, AstNode * ifBranch, AstNode * elseBranch, int lineno) {
+AstNode * new_ast_if_node(AstNode * condition, AstNode * ifBranch, AstNode * elseBranch, char* filename, int lineno) {
 
     AstIfNode * astNode = emalloc(sizeof(*astNode));
 
@@ -44,7 +44,7 @@ AstNode * new_ast_if_node(AstNode * condition, AstNode * ifBranch, AstNode * els
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_while_node(int nodeType, AstNode *condition, AstNode *whileBranch, int lineno) {
+AstNode * new_ast_while_node(int nodeType, AstNode *condition, AstNode *whileBranch, char* filename, int lineno) {
 
     if(nodeType != WHILE && nodeType != DO) {
         fprintf(stderr, "new_ast_while_node: Invalid type %d. Only valid %d (WHILE) and %d (DO)", nodeType, WHILE, DO);
@@ -62,7 +62,7 @@ AstNode * new_ast_while_node(int nodeType, AstNode *condition, AstNode *whileBra
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_for_node(AstNode *firstAssignment, AstNode *condition, AstNode *lastAssignment, AstNode *forBranch, int lineno) {
+AstNode * new_ast_for_node(AstNode *firstAssignment, AstNode *condition, AstNode *lastAssignment, AstNode *forBranch, char* filename, int lineno) {
 
     AstForNode * astNode = emalloc(sizeof(*astNode));
 
@@ -77,7 +77,7 @@ AstNode * new_ast_for_node(AstNode *firstAssignment, AstNode *condition, AstNode
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_declaration_node(int type, char *symbolName, AstNode *value, int lineno) {
+AstNode * new_ast_declaration_node(int type, char *symbolName, AstNode *value, char* filename, int lineno) {
 
     AstDeclarationNode * astNode = emalloc(sizeof(*astNode));
 
@@ -91,7 +91,7 @@ AstNode * new_ast_declaration_node(int type, char *symbolName, AstNode *value, i
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_assignment_node(char *symbolName, AstNode *value, int lineno) {
+AstNode * new_ast_assignment_node(char *symbolName, AstNode *value, char* filename, int lineno) {
 
     AstAssignmentNode * astNode = emalloc(sizeof(*astNode));
 
@@ -104,7 +104,7 @@ AstNode * new_ast_assignment_node(char *symbolName, AstNode *value, int lineno) 
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_inc_dec_assignment_node(int type, char *symbolName, int lineno) {
+AstNode * new_ast_inc_dec_assignment_node(int type, char *symbolName, char* filename, int lineno) {
     
     AstAssignmentNode * astNode = emalloc(sizeof(*astNode));
 
@@ -117,7 +117,7 @@ AstNode * new_ast_inc_dec_assignment_node(int type, char *symbolName, int lineno
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_set_property_node(char *symbolName, int propertyType, AstNode *value, int lineno) {
+AstNode * new_ast_set_property_node(char *symbolName, int propertyType, AstNode *value, char* filename, int lineno) {
     
     AstSetPropertyNode * astNode = emalloc(sizeof(*astNode));
 
@@ -131,7 +131,7 @@ AstNode * new_ast_set_property_node(char *symbolName, int propertyType, AstNode 
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_set_named_property_node(char *symbolName, int propertyType, char *propertyName, AstNode *value, int lineno) {
+AstNode * new_ast_set_named_property_node(char *symbolName, int propertyType, char *propertyName, AstNode *value, char* filename, int lineno) {
     
     AstSetNamedPropertyNode * astNode = emalloc(sizeof(*astNode));
 
@@ -146,7 +146,7 @@ AstNode * new_ast_set_named_property_node(char *symbolName, int propertyType, ch
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_append_child_node(char *symbolName, AstNode *value, int lineno) {
+AstNode * new_ast_append_child_node(char *symbolName, AstNode *value, char* filename, int lineno) {
     
     AstAppendChildNode * astNode = emalloc(sizeof(*astNode));
 
@@ -159,7 +159,7 @@ AstNode * new_ast_append_child_node(char *symbolName, AstNode *value, int lineno
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_get_property_node(char *symbolName, int propertyType, int lineno) {
+AstNode * new_ast_get_property_node(char *symbolName, int propertyType, char* filename, int lineno) {
     
     AstSetPropertyNode * astNode = emalloc(sizeof(*astNode));
 
@@ -172,7 +172,7 @@ AstNode * new_ast_get_property_node(char *symbolName, int propertyType, int line
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, char *propertyName, int lineno) {
+AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, char *propertyName, char* filename, int lineno) {
     
     AstSetNamedPropertyNode * astNode = emalloc(sizeof(*astNode));
 
@@ -187,7 +187,7 @@ AstNode * new_ast_get_named_property_node(char *symbolName, int propertyType, ch
 }
 
 
-AstNode * new_ast_int_node(int value, int lineno) {
+AstNode * new_ast_int_node(int value, char* filename, int lineno) {
 
     AstIntNode * astNode = emalloc(sizeof(*astNode));
 
@@ -199,7 +199,7 @@ AstNode * new_ast_int_node(int value, int lineno) {
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_string_node(char *value, int lineno) {
+AstNode * new_ast_string_node(char *value, char* filename, int lineno) {
 
     AstStringNode * astNode = emalloc(sizeof(*astNode));
 
@@ -211,7 +211,7 @@ AstNode * new_ast_string_node(char *value, int lineno) {
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_return_node(AstNode *value, int lineno) {
+AstNode * new_ast_return_node(AstNode *value, char* filename, int lineno) {
 
     AstReturnNode * astNode = emalloc(sizeof(*astNode));
 
@@ -223,7 +223,7 @@ AstNode * new_ast_return_node(AstNode *value, int lineno) {
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_function_declaration_node(int returnType, char *name, AstFunctionArgList *args, AstNode *block, int lineno) {
+AstNode * new_ast_function_declaration_node(int returnType, char *name, AstFunctionArgList *args, AstNode *block, char* filename, int lineno) {
 
     AstFunctionDeclarationNode * astNode = emalloc(sizeof(*astNode));
 
@@ -238,7 +238,7 @@ AstNode * new_ast_function_declaration_node(int returnType, char *name, AstFunct
     return (AstNode *) astNode;
 }
 
-AstNode * new_ast_function_call_node(char *name, AstFunctionArgList *args, int lineno) {
+AstNode * new_ast_function_call_node(char *name, AstFunctionArgList *args, char* filename, int lineno) {
 
     AstFunctionCallNode * astNode = emalloc(sizeof(*astNode));
 
@@ -339,7 +339,7 @@ void ast_free_function_arg_list(AstFunctionArgList *list) {
 Tag * execute_ast_tree(AstNode *tree, SymbolTable st) {
     AstOpProcessorReturnNode *resultNode = execute_ast_node(tree, st);
 
-    Tag *returnVal;
+    Tag *returnVal = NULL;
 
     if(resultNode != NULL && resultNode->returnType == TAG)
         returnVal = resultNode->value.tagValue;
@@ -350,7 +350,7 @@ Tag * execute_ast_tree(AstNode *tree, SymbolTable st) {
     return returnVal;
 }
 
-void free_ast_tree(AstNode *node) {
+inline void free_ast_tree(AstNode *node) {
 
     if(node == NULL)
         return;

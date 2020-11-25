@@ -69,14 +69,10 @@
 %%
 
 P       
-	: FUNCTION_DEFINITION_LIST
-		{ 
-			if(yychar == YYEOF) {
-				printf("Input accepted\n");
-			}
-			else
-				yyerror("Unexpected end of program");
-		}
+	: FUNCTION_DEFINITION_LIST	{ 
+									if(yychar == YYEOF)
+										printf("Input file %s parsed successfully\n", args.inputFiles.currentFilename);
+								}
 	;
 
 FUNCTION_DEFINITION_LIST
@@ -85,7 +81,7 @@ FUNCTION_DEFINITION_LIST
 	;
 
 STATEMENT_LIST
-	: STATEMENT_LIST STATEMENT	{ $$ = new_ast_node(STATEMENT_LIST_CONST, $1, $2, yylineno); }
+	: STATEMENT_LIST STATEMENT	{ $$ = new_ast_node(STATEMENT_LIST_CONST, $1, $2, args.inputFiles.currentFilename, yylineno); }
 	|							{ $$ = NULL; }
 	;
 
@@ -101,13 +97,13 @@ STATEMENT
 FUNCTION_DEFINITION
 	: FUNCTION_RETURN_TYPE ID '(' FUNC_DECLARATION_ARG_LIST ')' '{' STATEMENT_LIST '}'	
 								{ 
-									AstNode *functionNode = new_ast_function_declaration_node($1, $2, $4, $7, yylineno);
+									AstNode *functionNode = new_ast_function_declaration_node($1, $2, $4, $7, args.inputFiles.currentFilename, yylineno);
 									register_function(functionNode);
 								}
 
 	| FUNCTION_RETURN_TYPE ID '(' ')' '{' STATEMENT_LIST '}'							
 								{ 
-									AstNode *functionNode = new_ast_function_declaration_node($1, $2, NULL, $6, yylineno);
+									AstNode *functionNode = new_ast_function_declaration_node($1, $2, NULL, $6, args.inputFiles.currentFilename, yylineno);
 									register_function(functionNode);
 								}
 	;
@@ -120,31 +116,31 @@ BLOCK
 
 if_statement
 	: IF '(' NUM ')' BLOCK %prec IFX
-								{ $$ = new_ast_if_node($3, $5, NULL, yylineno); }
+								{ $$ = new_ast_if_node($3, $5, NULL, args.inputFiles.currentFilename, yylineno); }
 
 	| IF '(' NUM ')' BLOCK ELSE BLOCK
-								{ $$ = new_ast_if_node($3, $5, $7, yylineno); }
+								{ $$ = new_ast_if_node($3, $5, $7, args.inputFiles.currentFilename, yylineno); }
 	;
 
 iteration_statement
 	: WHILE '(' NUM ')' BLOCK
-								{ $$ = new_ast_while_node(WHILE, $3, $5, yylineno); }
+								{ $$ = new_ast_while_node(WHILE, $3, $5, args.inputFiles.currentFilename, yylineno); }
 
 	| DO BLOCK WHILE '(' NUM ')' ';'
-								{ $$ = new_ast_while_node(DO, $5, $2, yylineno); }
+								{ $$ = new_ast_while_node(DO, $5, $2, args.inputFiles.currentFilename, yylineno); }
 
 	| FOR '(' DO_ASSIGNMENT ';' NUM ';' DO_ASSIGNMENT ')' BLOCK
-								{ $$ = new_ast_for_node($3, $5, $7, $9, yylineno); }
+								{ $$ = new_ast_for_node($3, $5, $7, $9, args.inputFiles.currentFilename, yylineno); }
 	;
 
 return_statement
-	: RETURN ';'				{ $$ = new_ast_return_node(NULL, yylineno); }
-	| RETURN VALUE ';'			{ $$ = new_ast_return_node($2, yylineno); }
+	: RETURN ';'				{ $$ = new_ast_return_node(NULL, args.inputFiles.currentFilename, yylineno); }
+	| RETURN VALUE ';'			{ $$ = new_ast_return_node($2, args.inputFiles.currentFilename, yylineno); }
 	;
 
 declaration_statement
-	: ID_TYPE ID ';'			{ $$ = new_ast_declaration_node($1, $2, NULL, yylineno); }
-	| ID_TYPE ID '=' VALUE ';'	{ $$ = new_ast_declaration_node($1, $2, $4, yylineno); }
+	: ID_TYPE ID ';'			{ $$ = new_ast_declaration_node($1, $2, NULL, args.inputFiles.currentFilename, yylineno); }
+	| ID_TYPE ID '=' VALUE ';'	{ $$ = new_ast_declaration_node($1, $2, $4, args.inputFiles.currentFilename, yylineno); }
 	;
 
 assignment_statement
@@ -155,22 +151,22 @@ function_call_statement
 	: FUNCTION_CALL ';'			{ $$ = $1; }
 
 FUNCTION_CALL
-	: ID '(' FUNC_ARG_LIST ')'	{ $$ = new_ast_function_call_node($1, $3, yylineno); }
-	| ID '(' ')'				{ $$ = new_ast_function_call_node($1, NULL, yylineno); }
+	: ID '(' FUNC_ARG_LIST ')'	{ $$ = new_ast_function_call_node($1, $3, args.inputFiles.currentFilename, yylineno); }
+	| ID '(' ')'				{ $$ = new_ast_function_call_node($1, NULL, args.inputFiles.currentFilename, yylineno); }
 	;
 
 ASSIGNMENT
-	: ID '=' VALUE				{ $$ = new_ast_assignment_node($1, $3, yylineno); }
-	| ID INC					{ $$ = new_ast_inc_dec_assignment_node($2, $1, yylineno); }
-	| ID DEC					{ $$ = new_ast_inc_dec_assignment_node($2, $1, yylineno); }
+	: ID '=' VALUE				{ $$ = new_ast_assignment_node($1, $3, args.inputFiles.currentFilename, yylineno); }
+	| ID INC					{ $$ = new_ast_inc_dec_assignment_node($2, $1, args.inputFiles.currentFilename, yylineno); }
+	| ID DEC					{ $$ = new_ast_inc_dec_assignment_node($2, $1, args.inputFiles.currentFilename, yylineno); }
 	| SET_PROPERTY FROM ID '=' VALUE
-								{ $$ = new_ast_set_property_node($3, $1, $5, yylineno); }
+								{ $$ = new_ast_set_property_node($3, $1, $5, args.inputFiles.currentFilename, yylineno); }
 
 	| SET_NAMED_PROPERTY STRING_LITERAL FROM ID '=' VALUE
-								{ $$ = new_ast_set_named_property_node($4, $1, $2, $6, yylineno); }
+								{ $$ = new_ast_set_named_property_node($4, $1, $2, $6, args.inputFiles.currentFilename, yylineno); }
 
 	| APPEND_CHILD FROM ID '=' VALUE
-								{ $$ = new_ast_append_child_node($3, $5, yylineno); }
+								{ $$ = new_ast_append_child_node($3, $5, args.inputFiles.currentFilename, yylineno); }
 	;
 
 SET_PROPERTY
@@ -183,7 +179,7 @@ SET_NAMED_PROPERTY
 
 DO_ASSIGNMENT
 	: ASSIGNMENT				{ $$ = $1; }
-	| ID_TYPE ID '=' VALUE		{ $$ = new_ast_declaration_node($1, $2, $4, yylineno); }
+	| ID_TYPE ID '=' VALUE		{ $$ = new_ast_declaration_node($1, $2, $4, args.inputFiles.currentFilename, yylineno); }
 	|							{ $$ = NULL; }
 	;
 
@@ -215,61 +211,61 @@ FUNC_ARG_LIST
 	;
         
 ARITH
-	: NUM '+' NUM 				{ $$ = new_ast_node($2, $1, $3, yylineno); }
-	| NUM '-' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
-	| NUM '*' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
-	| NUM '/' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
-	| NUM '%' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
-	| NUM '<' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
-	| NUM '>' NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
-	| NUM LE NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
-	| NUM GE NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
-	| NUM EQ NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
-	| NUM NE NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
-	| NUM OR NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
-	| NUM AND NUM				{ $$ = new_ast_node($2, $1, $3, yylineno); }
-	| '!' NUM					{ $$ = new_ast_node($1, $2, NULL, yylineno); }
-	| '-' NUM %prec UMINUS		{ $$ = new_ast_node(UMINUS, $2, NULL, yylineno); }
+	: NUM '+' NUM 				{ $$ = new_ast_node($2, $1, $3, args.inputFiles.currentFilename, yylineno); }
+	| NUM '-' NUM				{ $$ = new_ast_node($2, $1, $3, args.inputFiles.currentFilename, yylineno); }
+	| NUM '*' NUM				{ $$ = new_ast_node($2, $1, $3, args.inputFiles.currentFilename, yylineno); }
+	| NUM '/' NUM				{ $$ = new_ast_node($2, $1, $3, args.inputFiles.currentFilename, yylineno); }
+	| NUM '%' NUM				{ $$ = new_ast_node($2, $1, $3, args.inputFiles.currentFilename, yylineno); }
+	| NUM '<' NUM				{ $$ = new_ast_node($2, $1, $3, args.inputFiles.currentFilename, yylineno); }
+	| NUM '>' NUM				{ $$ = new_ast_node($2, $1, $3, args.inputFiles.currentFilename, yylineno); }
+	| NUM LE NUM				{ $$ = new_ast_node($2, $1, $3, args.inputFiles.currentFilename, yylineno); }
+	| NUM GE NUM				{ $$ = new_ast_node($2, $1, $3, args.inputFiles.currentFilename, yylineno); }
+	| NUM EQ NUM				{ $$ = new_ast_node($2, $1, $3, args.inputFiles.currentFilename, yylineno); }
+	| NUM NE NUM				{ $$ = new_ast_node($2, $1, $3, args.inputFiles.currentFilename, yylineno); }
+	| NUM OR NUM				{ $$ = new_ast_node($2, $1, $3, args.inputFiles.currentFilename, yylineno); }
+	| NUM AND NUM				{ $$ = new_ast_node($2, $1, $3, args.inputFiles.currentFilename, yylineno); }
+	| '!' NUM					{ $$ = new_ast_node($1, $2, NULL, args.inputFiles.currentFilename, yylineno); }
+	| '-' NUM %prec UMINUS		{ $$ = new_ast_node(UMINUS, $2, NULL, args.inputFiles.currentFilename, yylineno); }
 	| '(' NUM ')'				{ $$ = $2; }
 	;
 
 NUM
-	: ID						{ $$ = new_ast_symbol_reference_node($1, yylineno); }
+	: ID						{ $$ = new_ast_symbol_reference_node($1, args.inputFiles.currentFilename, yylineno); }
 	| FUNCTION_CALL				{ $$ = $1; }
 	| NON_ID_NUM				{ $$ = $1; }
 	;
 
 NON_ID_NUM
-	: INT_LITERAL				{ $$ = new_ast_int_node($1, yylineno); }
+	: INT_LITERAL				{ $$ = new_ast_int_node($1, args.inputFiles.currentFilename, yylineno); }
 	| ARITH						{ $$ = $1; }
-	| INT '(' STRING_VALUE ')' 	{ $$ = new_ast_node(INT_CAST_CONST, $3, NULL, yylineno); }
-	| LEN '(' STRING_VALUE ')'	{ $$ = new_ast_node(LEN, $3, NULL, yylineno); }
+	| INT '(' STRING_VALUE ')' 	{ $$ = new_ast_node(INT_CAST_CONST, $3, NULL, args.inputFiles.currentFilename, yylineno); }
+	| LEN '(' STRING_VALUE ')'	{ $$ = new_ast_node(LEN, $3, NULL, args.inputFiles.currentFilename, yylineno); }
 	| CMP '(' STRING_VALUE ',' STRING_VALUE ')'
-								{ $$ = new_ast_node(CMP, $3, $5, yylineno); }
+								{ $$ = new_ast_node(CMP, $3, $5, args.inputFiles.currentFilename, yylineno); }
 	;
 
 STRING_ARITH
 	: CONCAT '(' STRING_VALUE ',' STRING_VALUE ')'
-								{ $$ = new_ast_node(CONCAT, $3, $5, yylineno); }
+								{ $$ = new_ast_node(CONCAT, $3, $5, args.inputFiles.currentFilename, yylineno); }
 	;
 
 STRING_VALUE
-	: ID						{ $$ = new_ast_symbol_reference_node($1, yylineno); }
+	: ID						{ $$ = new_ast_symbol_reference_node($1, args.inputFiles.currentFilename, yylineno); }
 	| FUNCTION_CALL				{ $$ = $1; }
 	| NON_ID_STRING_VALUE		{ $$ = $1; }
 	;
 
 NON_ID_STRING_VALUE
-	: STRING_LITERAL			{ $$ = new_ast_string_node($1, yylineno); }
+	: STRING_LITERAL			{ $$ = new_ast_string_node($1, args.inputFiles.currentFilename, yylineno); }
 	| STRING_ARITH				{ $$ = $1; }
-	| STR '(' NUM ')'			{ $$ = new_ast_node(STR, $3, NULL, yylineno); }
-	| GET_PROPERTY FROM ID		{ $$ = new_ast_get_property_node($3, $1, yylineno); }
+	| STR '(' NUM ')'			{ $$ = new_ast_node(STR, $3, NULL, args.inputFiles.currentFilename, yylineno); }
+	| GET_PROPERTY FROM ID		{ $$ = new_ast_get_property_node($3, $1, args.inputFiles.currentFilename, yylineno); }
 	| GET_NAMED_PROPERTY STRING_LITERAL FROM ID
-								{ $$ = new_ast_get_named_property_node($4, $1, $2, yylineno); }
+								{ $$ = new_ast_get_named_property_node($4, $1, $2, args.inputFiles.currentFilename, yylineno); }
 	;
 
 VALUE
-	: ID						{ $$ = new_ast_symbol_reference_node($1, yylineno); }
+	: ID						{ $$ = new_ast_symbol_reference_node($1, args.inputFiles.currentFilename, yylineno); }
 	| FUNCTION_CALL				{ $$ = $1; }
 	| NON_ID_STRING_VALUE		{ $$ = $1; }
 	| NON_ID_NUM				{ $$ = $1; }
@@ -300,35 +296,20 @@ FUNCTION_RETURN_TYPE
 
 int main(int argc, char *argv[]) {
 
-	FILE *output;
-	extern FILE *yyin; 
+	parse_args(argc, argv);
 
-	Args *args = parse_args(argc, argv);
-  
-    yyin = fopen(args->inputFileName, "r");
+	FILE *output = initialize();
 
-	if(yyin == NULL) {
-		perror("Error opening input file");
-		exit(1);
-	}
-	
-	output = fopen(args->outputFileName, "w");
-
-	if(output == NULL) {
-		perror("Error opening output file");
-		fclose(yyin);
-		exit(1);
-	}
-
-	initialize();
-
-	yyparse();
-	
-	fclose(yyin);
+	parse_input_files();
 
 	Tag * tag = execute_main();
+
+	printf("All input files excecuted successfully. Proceeding to render main tag\n");
 	
-	int status = render_final_tag(tag, output);
+	int status = render_main_tag(tag, output);
+
+	if(status == 0)
+		printf("Main tag rendered successfully to output file %s.\n", args.outputFileName);
 
 	fclose(output);
 

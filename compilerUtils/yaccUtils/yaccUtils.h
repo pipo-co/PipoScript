@@ -11,6 +11,7 @@
 #include "compilerUtils/argsHandler/args.h"
 #include "compilerUtils/functionSymbolTable/functionSymbolTable.h"
 #include "pipoScriptFunctions/tag.h"
+#include "compilerUtils/argsHandler/args.h"
 
 // Lex global variables
 extern char yytext[];
@@ -19,19 +20,17 @@ extern int yylineno;
 // Lexer
 int yylex();
 
-// Global variables
-extern AstNode *astTree;
-extern SymbolTable globalSt;
-
 
 // Yacc Error Function
 void yyerror(char const *s);
 
-void initialize(void);
+FILE * initialize(void);
+
+void parse_input_files(void);
 
 Tag * execute_main(void);
 
-int render_final_tag(Tag * tag, FILE * out);
+int render_main_tag(Tag * tag, FILE * out);
 
 void finalize(int status);
 

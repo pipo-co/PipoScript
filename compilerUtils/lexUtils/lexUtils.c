@@ -1,5 +1,8 @@
 #include "lexUtils.h"
+
 #include "libraries/khash.h"
+#include "compilerUtils/pipoUtils/pipoUtils.h"
+#include "compilerUtils/argsHandler/args.h"
 
 KHASH_MAP_INIT_STR(StrMap, char *)
 
@@ -29,13 +32,13 @@ void multiLineComment(int (*input)(void)) {
 		prev = c;
 
 	}
-	fprintf(stderr, "Error in line %d : unterminated comment\n", yylineno);
-	exit(2);
+
+	print_lineno_and_abort("Error in File %s, Line %d : unterminated comment\n", args.inputFiles.currentFilename, yylineno, 3);
 }
 
 char * lex_copy_string(char* string, int len) {
 	
-	string[len]=0;
+	string[len] = 0;
 	
 	khiter_t k = kh_get(StrMap, stringsMap, string);
 	int ret;
@@ -51,7 +54,7 @@ char * lex_copy_string(char* string, int len) {
 	k = kh_put(StrMap, stringsMap, newStr, &ret);
 
 	if(ret == -1){
-		print_and_abort("Error storing string in stringMap");
+		print_and_abort("Error storing string in stringMap", 3);
 	}
 
     return kh_value(stringsMap, k) = newStr;
@@ -62,12 +65,10 @@ static void init_static_string_handler() {
 }
 
 static void finalize_static_string_handler() {
-	
-	for (khiter_t k = kh_begin(stringsMap); k != kh_end(stringsMap); ++k){
-        if (kh_exist(stringsMap, k)){
-            free(kh_value(stringsMap, k));
-        }
-    }
+
+	char *val;
+
+	kh_foreach_value(stringsMap, val, free(val));
 
 	kh_destroy(StrMap, stringsMap);
 }
