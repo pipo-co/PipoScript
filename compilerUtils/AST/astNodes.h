@@ -224,7 +224,7 @@ void initialize_ast_node_functions();
 
 Tag * execute_ast_tree(AstNode *tree, SymbolTable st);
 
-void free_ast_tree(AstNode *root);
+void free_ast_tree(AstNode *tree);
 
 AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right, char* filename, int lineno);
 

@@ -1,5 +1,6 @@
 CC ?= gcc
-CFLAGS ?= -Wall -pedantic -std=c99 -ggdb -fsanitize=address -fno-omit-frame-pointer -I$(PWD)
+XFLAGS ?= -ggdb -fsanitize=address -fno-omit-frame-pointer
+CFLAGS = -Wall -pedantic -Wno-newline-eof -D_POSIX_C_SOURCE -std=c99 -I$(PWD) $(XFLAGS)
 
 COMPILER_UTILS_PATH=compilerUtils/*
 COMPILER_UTILS_SOURCE_FILES = $(foreach dir, $(COMPILER_UTILS_PATH), $(wildcard $(dir)/[^_]*.c))
@@ -20,10 +21,10 @@ all: $(COMPILER)
 $(COMPILER): $(LEX) $(YACC) $(COMPILER_UTILS_OBJECTS) $(PIPO_FUNCTIONS_OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@
 
-$(LEX): c.l
+$(LEX): pipoScript.l
 	lex $<
 
-$(YACC): c.y
+$(YACC): pipoScript.y
 	yacc -v -t -d $< -Wno-yacc
 
 examples: FORCE $(EXAMPLES_OUTPUTS)

@@ -40,8 +40,9 @@ typedef struct AstOpFunctions {
 
 static AstOpFunctions astNodeFunctions[AST_OP_COUNT];
 
-// Main function
+// Main functions
 static AstOpProcessorReturnNode * execute_ast_node(AstNode *node, SymbolTable st);
+static void free_ast_node(AstNode *node);
 
 // Return Value Auxiliary Functions
 static AstOpProcessorReturnNode * ast_node_create_int_return_val(int val);
@@ -55,7 +56,7 @@ static Tag * ast_node_get_tag_return_val(AstOpProcessorReturnNode *returnVal, ch
 // Aux Functions
 static char * ast_node_get_type_name(int type);
 
-inline AstOpProcessorReturnNode * execute_ast_node(AstNode *node, SymbolTable st) {
+inline static AstOpProcessorReturnNode * execute_ast_node(AstNode *node, SymbolTable st) {
 
     if(node == NULL)
         return NULL;
@@ -63,6 +64,16 @@ inline AstOpProcessorReturnNode * execute_ast_node(AstNode *node, SymbolTable st
     int nodeType = node->nodeType;
 
     return astNodeFunctions[AST_OP_POSITION(nodeType)].processor(node, st);
+}
+
+inline static void free_ast_node(AstNode *node) {
+
+    if(node == NULL)
+        return;
+
+    int nodeType = node->nodeType;
+
+    astNodeFunctions[AST_OP_POSITION(nodeType)].destroyer(node);
 }
 
 static AstOpProcessorReturnNode * ast_if_node_processor(AstNode *node, SymbolTable st) {
@@ -80,9 +91,9 @@ static AstOpProcessorReturnNode * ast_if_node_processor(AstNode *node, SymbolTab
 static void ast_if_node_destroyer(AstNode *node) {
     AstIfNode * ifNode = (AstIfNode*) node;
 
-    free_ast_tree(ifNode->condition);
-    free_ast_tree(ifNode->ifBranch);
-    free_ast_tree(ifNode->elseBranch);
+    free_ast_node(ifNode->condition);
+    free_ast_node(ifNode->ifBranch);
+    free_ast_node(ifNode->elseBranch);
 
     free(ifNode);
 }
@@ -112,8 +123,8 @@ static AstOpProcessorReturnNode * ast_while_node_processor(AstNode *node , Symbo
 static void ast_while_node_destroyer(AstNode *node) {
     AstWhileNode * whileNode = (AstWhileNode*) node;
 
-    free_ast_tree(whileNode->condition);
-    free_ast_tree(whileNode->whileBranch);
+    free_ast_node(whileNode->condition);
+    free_ast_node(whileNode->whileBranch);
 
     free(whileNode);
 }
@@ -169,10 +180,10 @@ static AstOpProcessorReturnNode * ast_for_node_processor(AstNode *node, SymbolTa
 static void ast_for_node_destroyer(AstNode *node) {
     AstForNode * forNode = (AstForNode*) node;
 
-    free_ast_tree(forNode->condition);
-    free_ast_tree(forNode->firstAssignment);
-    free_ast_tree(forNode->lastAssignment);
-    free_ast_tree(forNode->forBranch);
+    free_ast_node(forNode->condition);
+    free_ast_node(forNode->firstAssignment);
+    free_ast_node(forNode->lastAssignment);
+    free_ast_node(forNode->forBranch);
 
     free(forNode);
 }
@@ -242,7 +253,7 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
 static void ast_declaration_node_destroyer(AstNode *node) {
     AstDeclarationNode * declarationNode = (AstDeclarationNode*) node;
 
-    free_ast_tree(declarationNode->value);
+    free_ast_node(declarationNode->value);
 
     free(declarationNode);
 }
@@ -303,7 +314,7 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
 static void ast_assignment_node_destroyer(AstNode *node) {
     AstAssignmentNode * assignmentNode = (AstAssignmentNode*) node;
 
-    free_ast_tree(assignmentNode->value);
+    free_ast_node(assignmentNode->value);
 
     free(assignmentNode);
 }
@@ -374,7 +385,7 @@ static AstOpProcessorReturnNode * ast_set_property_node_processor(AstNode *node,
 static void ast_set_property_node_destroyer(AstNode *node) {
     AstSetPropertyNode * setPropertyNode = (AstSetPropertyNode*) node;
 
-    free_ast_tree(setPropertyNode->value);
+    free_ast_node(setPropertyNode->value);
 
     free(setPropertyNode);
 }
@@ -426,7 +437,7 @@ static AstOpProcessorReturnNode * ast_set_named_property_node_processor(AstNode 
 static void ast_set_named_property_node_destroyer(AstNode *node) {
     AstSetNamedPropertyNode * setNamedPropertyNode = (AstSetNamedPropertyNode*) node;
 
-    free_ast_tree(setNamedPropertyNode->value);
+    free_ast_node(setNamedPropertyNode->value);
 
     free(setNamedPropertyNode);
 }
@@ -458,7 +469,7 @@ static AstOpProcessorReturnNode * ast_append_child_node_processor(AstNode *node,
 static void ast_append_child_node_destroyer(AstNode *node) {
     AstAppendChildNode *appendChildNode = (AstAppendChildNode*) node;
 
-    free_ast_tree(appendChildNode->value);
+    free_ast_node(appendChildNode->value);
 
     free(appendChildNode);
 }
@@ -694,7 +705,7 @@ static AstOpProcessorReturnNode * ast_return_node_processor(AstNode *node, Symbo
 static void ast_return_node_destroyer(AstNode *node) {
     AstReturnNode * returnNode = (AstReturnNode*) node;
 
-    free_ast_tree(returnNode->value);
+    free_ast_node(returnNode->value);
 
     free(returnNode);
 }
@@ -704,7 +715,7 @@ static void ast_function_declaration_node_destroyer(AstNode *node) {
 
     ast_free_function_arg_list(declarationNode->args);
 
-    free_ast_tree(declarationNode->block);
+    free_ast_node(declarationNode->block);
 
     free(declarationNode);
 }
@@ -1039,8 +1050,8 @@ static AstOpProcessorReturnNode * ast_cast_int_node_processor(AstNode *node, Sym
 
 static void ast_node_destroyer(AstNode *node) {
 
-    free_ast_tree(node->left);
-    free_ast_tree(node->right);
+    free_ast_node(node->left);
+    free_ast_node(node->right);
 
     free(node);
 }
