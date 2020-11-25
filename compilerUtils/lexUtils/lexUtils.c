@@ -10,6 +10,8 @@ typedef khash_t(StrMap) StringsMap;
 
 StringsMap * stringsMap;
 
+extern int yylex_destroy(void);
+
 static void init_static_string_handler();
 static void finalize_static_string_handler();
 

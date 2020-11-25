@@ -400,12 +400,7 @@ Tag * execute_ast_tree(AstNode *tree, SymbolTable st) {
     return returnVal;
 }
 
-inline void free_ast_tree(AstNode *node) {
+void free_ast_tree(AstNode *tree) {
 
-    if(node == NULL)
-        return;
-
-    int nodeType = node->nodeType;
-
-    astNodeFunctions[AST_OP_POSITION(nodeType)].destroyer(node);
+    free_ast_node(tree);
 }

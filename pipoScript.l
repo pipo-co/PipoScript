@@ -8,9 +8,11 @@ HEX				[a-fA-F0-9]
 
 %}
 
+%option nounput
+
 %option yylineno
 
-%option nodefault
+%option warn nodefault
 
 %%
 "/*"							{ multiLineComment(input); }
