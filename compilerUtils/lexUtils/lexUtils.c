@@ -19,6 +19,9 @@ void initializeLex(){
 
 void finalizeLex(){
 	finalize_static_string_handler();
+
+	// Since Flex 2.5.9
+	yylex_destroy();
 }
 
 void multiLineComment(int (*input)(void)) {
