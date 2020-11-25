@@ -1,15 +1,18 @@
-# PipoScript
+# PipoCompiler
 
-## C Compiler using Lex and Yacc to create HTML from custom syntax
+PipoScript Compiler using Lex and Yacc to create HTML from custom syntax
 
-Todo List:
+## Authors
 
-- Implement Symbol Table with HashMap
+- [Brandy Tobias](https://github.com/tobiasbrandy)
+- [Pannunzio Faustino](https://github.com/Fpannunzio)
+- [Sagues Ignacio](https://github.com/isagues)
+- [Vazquez Ignacio](https://github.com/igvazquez)
 
-- Verify Symbol Table state on variable declaration and assignment
+## Examples
 
-- Add secure way to end with errors
+`make examples` -> output in examples/.
 
-- Implement Functions
+## Compile
 
-- Test throughly language syntax and edge cases
+`make all`

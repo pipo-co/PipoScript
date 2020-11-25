@@ -1,0 +1,16 @@
+tag polygon(string fill, string stroke){
+    tag svg = new tag;
+    set name from svg = "svg";
+    set attribute "width" from svg = str(300);
+    set attribute "height" from svg = str(200);
+    set body from svg = "Your browser doesn't support SVG";
+    
+    tag polygon = new tag;
+    set name from polygon = "polygon";
+    set attribute "points" from polygon = "100,10 40,198 190,78 10,78 160,198";
+    set attribute "style" from polygon = concat(concat("fill:",fill),concat(concat(";stroke:", stroke), ";stroke-width:5;fill-rule:evenodd;"));
+
+    append child from svg = polygon;
+
+    return svg;
+}

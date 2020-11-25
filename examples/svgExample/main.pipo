@@ -1,0 +1,23 @@
+tag main(){
+
+    tag html = new tag;
+    set name from html = "html";
+    
+    string blue = "blue";
+    string yellow = "yellow";
+    string text = "PipoScript";
+    int width = 1300;
+    int height = 150;
+
+    append child from html = polygon(blue, yellow);
+
+    append child from html = polygon(yellow, blue);
+
+    append child from html = fancyText(text, yellow, blue, width, height);
+
+    append child from html = polygon(yellow, blue);
+
+    append child from html = polygon(blue, yellow);
+
+    return html;
+}
