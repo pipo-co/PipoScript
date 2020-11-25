@@ -1,0 +1,125 @@
+tag main(){
+
+    tag html = new tag;
+    set name from html = "html";
+    
+
+    tag svg = new tag;
+    set name from svg = "svg";
+    set attribute "width" from svg = str(300);
+    set attribute "height" from svg = str(200);
+    set body from svg = "Your browser doesn't support SVG";
+    
+    tag polygon = new tag;
+    set name from polygon = "polygon";
+
+    set attribute "points" from polygon = "100,10 40,198 190,78 10,78 160,198";
+    set attribute "style" from polygon = "fill:yellow;stroke:blue;stroke-width:5;fill-rule:evenodd;";
+
+    append child from svg = polygon;
+
+    append child from html = svg;
+
+    svg = new tag;
+    set name from svg = "svg";
+    set attribute "width" from svg = str(300);
+    set attribute "height" from svg = str(200);
+    set body from svg = "Your browser doesn't support SVG";
+    
+    polygon = new tag;
+    set name from polygon = "polygon";
+
+    set attribute "points" from polygon = "100,10 40,198 190,78 10,78 160,198";
+    set attribute "style" from polygon = "fill:yellow;stroke:blue;stroke-width:5;fill-rule:evenodd;";
+
+    append child from svg = polygon;
+
+    append child from html = svg;
+
+    svg = new tag;
+    set name from svg = "svg";
+    set attribute "width" from svg = str(1300);
+    set attribute "height" from svg = str(150);
+    set body from svg = "Your browser doesn't support SVG";
+
+    tag defs = new tag;
+    set name from defs = "defs";
+
+    tag gradient = new tag;
+    set name from gradient = "linearGradient";
+
+    string grad = "grad1";
+    string zerop = "0%";
+    string hundredp = "100%";
+
+    set attribute "id" from gradient = grad;
+    set attribute "x1" from gradient = zerop;
+    set attribute "y1" from gradient = zerop;
+    set attribute "x2" from gradient = hundredp;
+    set attribute "y2" from gradient = zerop;
+
+    tag stop = new tag;
+    set name from stop = "stop";
+
+    set attribute "offset" from stop = zerop;
+    set attribute "style" from stop = "stop-color:rgb(0,0,255);stop-opacity:1";
+    
+    append child from gradient = stop;
+
+    stop = new tag;
+    set name from stop = "stop";
+
+    set attribute "offset" from stop = hundredp;
+    set attribute "style" from stop = "stop-color:rgb(255,255,0);stop-opacity:1";
+    
+    append child from gradient = stop;
+    
+    append child from defs = gradient;
+
+    append child from svg = defs;
+
+    tag ellipse = new tag;
+    set name from ellipse = "ellipse";
+
+
+    set attribute "cx" from ellipse = str(250);
+    set attribute "cy" from ellipse = str(70);
+    set attribute "rx" from ellipse = str(200);
+    set attribute "ry" from ellipse = str(55);
+    set attribute "fill" from ellipse = concat(concat("url(#", grad), ")");
+
+    append child from svg = ellipse;
+
+    tag text = new tag;
+    set name from text = "text";
+
+    set attribute "fill" from text = "#ffffff";
+    set attribute "font-size" from text = str(45);
+    set attribute "font-family" from text = "Verdana";
+    set attribute "x" from text = str(140);
+    set attribute "y" from text = str(86);
+
+    set body from text = "PipoScript";
+
+    append child from svg = text;
+
+    append child from html = svg;
+
+    svg = new tag;
+    set name from svg = "svg";
+    set attribute "width" from svg = str(300);
+    set attribute "height" from svg = str(200);
+    set body from svg = "Your browser doesn't support SVG";
+    
+    polygon = new tag;
+    set name from polygon = "polygon";
+
+    set attribute "points" from polygon = "100,10 40,198 190,78 10,78 160,198";
+    set attribute "style" from polygon = "fill:yellow;stroke:blue;stroke-width:5;fill-rule:evenodd;";
+
+    append child from svg = polygon;
+
+    append child from html = svg;
+
+    return html;
+}
