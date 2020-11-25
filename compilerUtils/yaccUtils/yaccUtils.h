@@ -24,13 +24,13 @@ int yylex();
 // Yacc Error Function
 void yyerror(char const *s);
 
-FILE * initialize(void);
+void initialize(void);
 
 void parse_input_files(void);
 
 Tag * execute_main(void);
 
-int render_main_tag(Tag * tag, FILE * out);
+int render_main_tag(Tag * tag);
 
 void finalize(int status);
 

@@ -5,17 +5,20 @@
 #include "pipoScriptFunctions/stringService.h"
 
 extern FILE *yyin;
-void yyrestart(FILE *input_file);
+
+static FILE *output;
+
+extern void yyrestart(FILE *input_file);
 
 void yyerror(char const *s) {
 	fprintf(stderr, "Error in File %s, Line %d: %s\n", args.inputFiles.currentFilename, yylineno, s);
 	finalize(3);
 }
 
-FILE * initialize(void) {
+void initialize(void) {
 
 	// Open Output File [required]
-	FILE *output = fopen(args.outputFileName, "w");
+	output = fopen(args.outputFileName, "w");
 
 	if(output == NULL) {
 
@@ -40,8 +43,6 @@ FILE * initialize(void) {
 
 	// Initialize Strings Handler Library
     string_service_init();
-
-	return output;
 }
 
 void parse_input_files(void) {
@@ -80,14 +81,14 @@ Tag * execute_main(void) {
 	return t;
 }
 
-int render_main_tag(Tag * tag, FILE * out){
+int render_main_tag(Tag * tag){
 
 	if(tag == NULL){
 		fprintf(stderr, "No tag was return in main function. No tag will be rendered\n");
 		return 5;
 	}
 
-	render_tag(tag, INIT_IND, out);
+	render_tag(tag, INIT_IND, output);
 
 	return 0;
 }
@@ -109,6 +110,16 @@ void finalize(int status) {
 	// Finalize Strings Handlers Library
     string_service_fin();
 
+	// Close Output File
+	fclose(output);
+
+	// If finalizing with errors, delete created output file
+	if(status != 0) {
+		if(remove(args.outputFileName) == -1) {
+			perror("Couldn't remove output file, even though tag rendering failed");
+		}
+	}
+
 	exit(status);
 }
 
@@ -118,6 +129,6 @@ void register_function(AstNode *node) {
 	if(!function_symbol_table_add(functionNode)) {
 		char *name = functionNode->functionName;
 		free(functionNode);
-		print_lineno_and_abort(args.inputFiles.currentFilename, yylineno, 3, "Error in File %s, Line %d: Function %s already defined\n", name);
+		print_lineno_and_abort(args.inputFiles.currentFilename, yylineno, 3, "Function %s already defined\n", name);
 	}
 }

@@ -302,7 +302,7 @@ int main(int argc, char *argv[]) {
 
 	parse_args(argc, argv);
 
-	FILE *output = initialize();
+	initialize();
 
 	parse_input_files();
 
@@ -310,12 +310,10 @@ int main(int argc, char *argv[]) {
 
 	printf("All input files excecuted successfully. Proceeding to render main tag\n");
 	
-	int status = render_main_tag(tag, output);
+	int status = render_main_tag(tag);
 
 	if(status == 0)
 		printf("Main tag rendered successfully to output file %s.\n", args.outputFileName);
-
-	fclose(output);
 
 	finalize(status);
 }
