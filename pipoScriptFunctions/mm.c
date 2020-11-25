@@ -1,5 +1,7 @@
 #include "mm.h"
+
 #include "tag.h"
+#include "compilerUtils/pipoUtils/pipoUtils.h"
 
 MemoryManagerHeader memory_manager_init(NodeFreer freer){
 
@@ -13,9 +15,9 @@ MemoryManagerHeader memory_manager_init(NodeFreer freer){
 
 void *memory_manager_alloc(MemoryManagerHeader *mm, size_t size){
 
-    void *ans = malloc(size);
+    void *ans = emalloc(size);
 
-    MemoryManagerNode *node = malloc(sizeof(*node));
+    MemoryManagerNode *node = emalloc(sizeof(*node));
     
     node->next = NULL;
     node->ptr = ans;

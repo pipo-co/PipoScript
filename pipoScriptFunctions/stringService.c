@@ -18,7 +18,7 @@ void string_service_fin() {
 
 char *itoa2(int i) {
 
-    char * buffer = memory_manager_alloc(&mm ,MAX_INT_SIZE);
+    char * buffer = memory_manager_alloc(&mm, MAX_INT_SIZE);
 
     sprintf(buffer,"%d", i);
 
