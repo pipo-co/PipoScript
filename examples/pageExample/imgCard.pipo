@@ -1,0 +1,42 @@
+tag imgCard(string img, string alt, int size, string cardTitle, string cardDescription){
+
+    tag card = new tag; 
+    set name from card = "div";
+
+    tag style = new tag;
+    set name from style = "style";
+    set body from style = ".card  {box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);transition: 0.3s;width: 40%;}";
+    set body from style = concat(get body from style, ".card:hover {box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);}");
+    set body from style = concat(get body from style, " .container {padding: 2px 16px;}");
+
+    append child from card = style;
+
+    tag imgCard = new tag;
+    set name from imgCard = "div";
+
+    set attribute "class" from imgCard = "card";
+    set attribute "style" from imgCard = concat(concat("width:", str(size)),"px");
+
+    tag cardImg = new tag;
+    set name from cardImg = "img";
+
+    set attribute "src" from cardImg = img;
+    set attribute "alt" from cardImg = alt;
+    set attribute "style" from cardImg = "width:100%";
+    
+    append child from imgCard = cardImg;
+
+    tag cardBody = new tag;
+    set name from cardBody = "div";
+
+    set attribute "class" from cardBody = "container";
+    
+    append child from cardBody = header(cardTitle, cardDescription);
+    
+    append child from imgCard = cardBody;
+
+    append child from card = imgCard;
+    
+
+    return card;
+}
