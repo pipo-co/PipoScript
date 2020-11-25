@@ -39,7 +39,7 @@ tag main(){
     svg = new tag;
     set name from svg = "svg";
     set attribute "width" from svg = str(1300);
-    set attribute "height" from svg = str(500);
+    set attribute "height" from svg = str(150);
     set body from svg = "Your browser doesn't support SVG";
 
     tag defs = new tag;
@@ -102,22 +102,6 @@ tag main(){
     set body from text = "PipoScript";
 
     append child from svg = text;
-
-    append child from html = svg;
-
-    svg = new tag;
-    set name from svg = "svg";
-    set attribute "width" from svg = str(300);
-    set attribute "height" from svg = str(200);
-    set body from svg = "Your browser doesn't support SVG";
-    
-    polygon = new tag;
-    set name from polygon = "polygon";
-
-    set attribute "points" from polygon = "100,10 40,198 190,78 10,78 160,198";
-    set attribute "style" from polygon = "fill:yellow;stroke:blue;stroke-width:5;fill-rule:evenodd;";
-
-    append child from svg = polygon;
 
     append child from html = svg;
 
