@@ -441,6 +441,8 @@ static void ast_set_named_property_node_destroyer(AstNode *node) {
 
     free_ast_node(setNamedPropertyNode->value);
 
+    free_ast_node(setNamedPropertyNode->propertyName);
+
     free(setNamedPropertyNode);
 }
 
@@ -506,9 +508,9 @@ static AstOpProcessorReturnNode * ast_get_property_node_processor(AstNode *node,
 }
 
 static void ast_get_property_node_destroyer(AstNode *node) {
-    AstGetPropertyNode * stringNode = (AstGetPropertyNode*) node;
+    AstGetPropertyNode * getPropertyNode = (AstGetPropertyNode*) node;
 
-    free(stringNode);
+    free(getPropertyNode);
 }
 
 static AstOpProcessorReturnNode * ast_get_named_property_node_processor(AstNode *node, SymbolTable st) {
@@ -553,9 +555,11 @@ static AstOpProcessorReturnNode * ast_get_named_property_node_processor(AstNode 
 }
 
 static void ast_get_named_property_node_destroyer(AstNode *node) {
-    AstGetNamedPropertyNode * stringNode = (AstGetNamedPropertyNode*) node;
+    AstGetNamedPropertyNode * getNamedPropertyNode = (AstGetNamedPropertyNode*) node;
 
-    free(stringNode);
+    free_ast_node(getNamedPropertyNode->propertyName);
+
+    free(getNamedPropertyNode);
 }
 
 static AstOpProcessorReturnNode * ast_has_named_property_node_processor(AstNode *node, SymbolTable st) {
@@ -592,9 +596,11 @@ static AstOpProcessorReturnNode * ast_has_named_property_node_processor(AstNode 
 }
 
 static void ast_has_named_property_node_destroyer(AstNode *node) {
-    AstHasNamedPropertyNode * stringNode = (AstHasNamedPropertyNode*) node;
+    AstHasNamedPropertyNode * hasNamedPropertyNode = (AstHasNamedPropertyNode*) node;
 
-    free(stringNode);
+    free_ast_node(hasNamedPropertyNode->propertyName);
+
+    free(hasNamedPropertyNode);
 }
 
 static AstOpProcessorReturnNode * ast_int_node_processor(AstNode *node, SymbolTable st) {
