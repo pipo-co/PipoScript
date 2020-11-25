@@ -5,6 +5,7 @@
 #include "compilerUtils/functionSymbolTable/functionSymbolTable.h"
 #include "compilerUtils/pipoUtils/pipoUtils.h"
 #include "pipoScriptFunctions/stringService.h"
+#include "compilerUtils/argsHandler/args.h"
 
 #define ERROR_CODE 4
 
@@ -12,6 +13,9 @@
 #define AST_OP_COUNT (int)(ASCII_TABLE_SIZE + LAST - FIRST)
 
 #define AST_OP_POSITION(op) (int)((op < ASCII_TABLE_SIZE)? op : ASCII_TABLE_SIZE + op - FIRST - 1)
+
+#define debug_print(...) \
+            do { if (args.debug) fprintf(stderr, __VA_ARGS__); } while (0)
 
 typedef struct AstOpProcessorReturnNode {
     int returnType;
@@ -55,7 +59,7 @@ inline AstOpProcessorReturnNode * execute_ast_node(AstNode *node, SymbolTable st
 static AstOpProcessorReturnNode * ast_if_node_processor(AstNode *node, SymbolTable st) {
     AstIfNode * ifNode = (AstIfNode*) node;
 
-    fprintf(stderr, "IF\n");
+    debug_print("IF\n");
 
     if(ast_node_get_int_return_val(execute_ast_node(ifNode->condition, st), "Missing if condition return value (int)", node->filename, node->lineno))
         return execute_ast_node(ifNode->ifBranch, st);
@@ -77,7 +81,7 @@ static void ast_if_node_destroyer(AstNode *node) {
 static AstOpProcessorReturnNode * ast_while_node_processor(AstNode *node , SymbolTable st) {
     AstWhileNode * whileNode = (AstWhileNode*) node;
 
-    fprintf(stderr, "WHILE\n");
+    debug_print("WHILE\n");
 
     AstOpProcessorReturnNode *returnNode;
 
@@ -108,7 +112,7 @@ static void ast_while_node_destroyer(AstNode *node) {
 static AstOpProcessorReturnNode * ast_do_while_node_processor(AstNode *node, SymbolTable st) {
     AstWhileNode * doNode = (AstWhileNode*) node;
 
-    fprintf(stderr, "DO\n");
+    debug_print("DO\n");
 
     AstOpProcessorReturnNode *returnNode;
 
@@ -130,7 +134,7 @@ static AstOpProcessorReturnNode * ast_do_while_node_processor(AstNode *node, Sym
 static AstOpProcessorReturnNode * ast_for_node_processor(AstNode *node, SymbolTable st) {
     AstForNode * forNode = (AstForNode*) node;
 
-    fprintf(stderr, "FOR\n");
+    debug_print("FOR\n");
 
     AstOpProcessorReturnNode *returnNode;
 
@@ -185,17 +189,17 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
 
         if(symbol->type == INT) {
             symbol->value.intValue = ast_node_get_int_return_val(valueNode, NULL, node->filename, node->lineno);
-            fprintf(stderr, "int %s = %d;\n", symbol->name, symbol->value.intValue);
+            debug_print("int %s = %d;\n", symbol->name, symbol->value.intValue);
         }
 
         else if(symbol->type == STRING){
             symbol->value.stringValue = ast_node_get_string_return_val(valueNode, NULL, node->filename, node->lineno);
-            fprintf(stderr, "string %s = %s;\n", symbol->name, symbol->value.stringValue);
+            debug_print("string %s = %s;\n", symbol->name, symbol->value.stringValue);
         }
         
         else if(symbol->type == TAG){
             symbol->value.tagValue = ast_node_get_tag_return_val(valueNode, NULL, node->filename, node->lineno);
-            fprintf(stderr, "tag %s = {name: '%s', body: '%.10s', attrCount: %d};\n", symbol->name, symbol->value.tagValue->name, symbol->value.tagValue->body,symbol->value.tagValue->attributes->size);
+            debug_print("tag %s = {name: '%s', body: '%.10s', attrCount: %d};\n", symbol->name, symbol->value.tagValue->name, symbol->value.tagValue->body,symbol->value.tagValue->attributes->size);
         }
 
         else {
@@ -220,7 +224,7 @@ static AstOpProcessorReturnNode * ast_declaration_node_processor(AstNode *node, 
             type = "tag"; break;
         }
 
-        fprintf(stderr, "%s %s;\n", type, symbol->name);
+        debug_print("%s %s;\n", type, symbol->name);
     }
 
     return NULL;
@@ -255,7 +259,7 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
         
         int intVal = ast_node_get_int_return_val(value, "Tried to assign an invalid type to an int variable", node->filename, node->lineno);
 
-        fprintf(stderr, "%s = %d;\n", symbol->name, intVal);
+        debug_print("%s = %d;\n", symbol->name, intVal);
         symbol->value.intValue = intVal;
     }
 
@@ -263,7 +267,7 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
 
         char* stringVal = ast_node_get_string_return_val(value, "Tried to assign an invalid type to a string variable", node->filename, node->lineno);
 
-        fprintf(stderr, "%s = %s;\n", symbol->name, stringVal);
+        debug_print("%s = %s;\n", symbol->name, stringVal);
         symbol->value.stringValue = stringVal;
     }
 
@@ -271,7 +275,7 @@ static AstOpProcessorReturnNode * ast_assignment_node_processor(AstNode *node, S
 
         Tag* tagVal = ast_node_get_tag_return_val(value, "Tried to assign an invalid type to a tag variable", node->filename, node->lineno);
         
-        fprintf(stderr, "tag %s = {name: '%s', body: '%.10s', attrCount: %d};\n", symbol->name, tagVal->name, tagVal->body, tagVal->attributes->size);
+        debug_print("tag %s = {name: '%s', body: '%.10s', attrCount: %d};\n", symbol->name, tagVal->name, tagVal->body, tagVal->attributes->size);
         symbol->value.tagValue = tagVal;
     }
 
@@ -311,12 +315,12 @@ static AstOpProcessorReturnNode * ast_inc_dec_assignment_node_processor(AstNode 
 
     if(assignmentNode->nodeType == INC) {
         symbol->value.intValue++;
-        fprintf(stderr, "%s++ => %s = %d;\n", symbol->name, symbol->name, symbol->value.intValue);
+        debug_print("%s++ => %s = %d;\n", symbol->name, symbol->name, symbol->value.intValue);
     }
 
     else if(assignmentNode->nodeType == DEC){
         symbol->value.intValue--;
-        fprintf(stderr, "%s-- => %s = %d;\n", symbol->name, symbol->name, symbol->value.intValue);
+        debug_print("%s-- => %s = %d;\n", symbol->name, symbol->name, symbol->value.intValue);
     }
 
     else
@@ -345,12 +349,12 @@ static AstOpProcessorReturnNode * ast_set_property_node_processor(AstNode *node,
 
     if(setPropertyNode->propertyType == BODY) {
         symbol->value.tagValue->body = stringValue;
-        fprintf(stderr, "set body from %s = %s;\n", symbol->name, stringValue);
+        debug_print("set body from %s = %s;\n", symbol->name, stringValue);
     }
 
     else if(setPropertyNode->propertyType == NAME) {
         symbol->value.tagValue->name = stringValue;
-        fprintf(stderr, "set name from %s = %s;\n", symbol->name, stringValue);
+        debug_print("set name from %s = %s;\n", symbol->name, stringValue);
     }
 
     else
@@ -390,7 +394,7 @@ static AstOpProcessorReturnNode * ast_set_named_property_node_processor(AstNode 
                 print_and_abort("Error adding attribute. Problem on internal hashing.", ERROR_CODE);
             }
             
-            fprintf(stderr, "set attribute %s from %s;\n", setNamedPropertyNode->propertyName, symbol->name);
+            debug_print("set attribute %s from %s;\n", setNamedPropertyNode->propertyName, symbol->name);
         }
         
         else {
@@ -400,7 +404,7 @@ static AstOpProcessorReturnNode * ast_set_named_property_node_processor(AstNode 
                 print_and_abort("Error adding attribute. Problem on internal hashing.", ERROR_CODE);
             }
             
-            fprintf(stderr, "set attribute %s from %s = %s;\n", setNamedPropertyNode->propertyName, symbol->name, stringValue);
+            debug_print("set attribute %s from %s = %s;\n", setNamedPropertyNode->propertyName, symbol->name, stringValue);
         }
         
     }
@@ -438,7 +442,7 @@ static AstOpProcessorReturnNode * ast_append_child_node_processor(AstNode *node,
     Tag * tagValue = ast_node_get_tag_return_val(execute_ast_node(appendChildNode->value, st), "Type mismatch. Append child expects a tag.", node->filename, node->lineno);
 
     append_tag(symbol->value.tagValue, tagValue);
-    fprintf(stderr, "append child from %s = %s;\n", symbol->name, tagValue->name);
+    debug_print("append child from %s = %s;\n", symbol->name, tagValue->name);
 
     return NULL;
 }
@@ -503,7 +507,7 @@ static AstOpProcessorReturnNode * ast_get_named_property_node_processor(AstNode 
 
     if(getNamedPropertyNode->propertyType == ATTRIBUTE) {
         
-        fprintf(stderr, "get attribute %s from %s;\n", getNamedPropertyNode->propertyName, symbol->name);
+        debug_print("get attribute %s from %s;\n", getNamedPropertyNode->propertyName, symbol->name);
         
         return ast_node_create_string_return_val(get_attribute(symbol->value.tagValue, getNamedPropertyNode->propertyName));
 
@@ -526,8 +530,6 @@ static void ast_get_named_property_node_destroyer(AstNode *node) {
 static AstOpProcessorReturnNode * ast_int_node_processor(AstNode *node, SymbolTable st) {
     AstIntNode * intNode = (AstIntNode*) node;
 
-    // fprintf(stderr, "%d", intNode->value);
-
     return ast_node_create_int_return_val(intNode->value);
 }
 
@@ -539,8 +541,6 @@ static void ast_int_node_destroyer(AstNode *node) {
 
 static AstOpProcessorReturnNode * ast_string_node_processor(AstNode *node, SymbolTable st) {
     AstStringNode * stringNode = (AstStringNode*) node;
-
-    // fprintf(stderr, "%s", stringNode->value);
 
     return ast_node_create_string_return_val(stringNode->value);
 }
@@ -574,19 +574,19 @@ static AstOpProcessorReturnNode * ast_symbol_reference_node_processor(AstNode *n
         print_lineno_and_abort("Variable wasn't previously initialized", node->filename, node->lineno, ERROR_CODE);
 
     if(symbol->type == INT) {
-        fprintf(stderr, "Symbol Dereference %s (%d)\n", symbol->name, symbol->value.intValue);
+        debug_print("Symbol Dereference %s (%d)\n", symbol->name, symbol->value.intValue);
 
         return ast_node_create_int_return_val(symbol->value.intValue);
     }
 
     else if(symbol->type == STRING) {
-        fprintf(stderr, "Symbol Dereference %s (%s)\n", symbol->name, symbol->value.stringValue);
+        debug_print("Symbol Dereference %s (%s)\n", symbol->name, symbol->value.stringValue);
 
         return ast_node_create_string_return_val(symbol->value.stringValue);
     }
 
     else if(symbol->type == TAG) {
-        fprintf(stderr, "Symbol Dereference %s ({name: '%s', body: '%.10s', attrCount: %d})\n", symbol->name,  symbol->value.tagValue->name, symbol->value.tagValue->body,symbol->value.tagValue->attributes->size);
+        debug_print("Symbol Dereference %s ({name: '%s', body: '%.10s', attrCount: %d})\n", symbol->name,  symbol->value.tagValue->name, symbol->value.tagValue->body,symbol->value.tagValue->attributes->size);
 
         return ast_node_create_tag_return_val(symbol->value.tagValue);
     }
@@ -612,7 +612,7 @@ static AstOpProcessorReturnNode * ast_return_node_processor(AstNode *node, Symbo
         returnValueNode = ast_node_create_void_return_val();
         returnValueNode->returnGenerated = true;
 
-        fprintf(stderr, "return;\n");
+        debug_print("return;\n");
         return returnValueNode;
     }
 
@@ -621,19 +621,19 @@ static AstOpProcessorReturnNode * ast_return_node_processor(AstNode *node, Symbo
 
     // Print Log
     if(returnValueNode->returnType == VOID)
-        fprintf(stderr, "return;\n");
+        debug_print("return;\n");
 
     else if(returnValueNode->returnType == INT)
-        fprintf(stderr, "return %d;\n", returnValueNode->value.intValue);
+        debug_print("return %d;\n", returnValueNode->value.intValue);
 
     else if(returnValueNode->returnType == STRING)
-        fprintf(stderr, "return %s;\n", returnValueNode->value.stringValue);
+        debug_print("return %s;\n", returnValueNode->value.stringValue);
 
     else if(returnValueNode->returnType == TAG)
-        fprintf(stderr, "return {name: '%s', body: '%.10s', attrCount: %d};\n", returnValueNode->value.tagValue->name, returnValueNode->value.tagValue->body, returnValueNode->value.tagValue->attributes->size);
+        debug_print("return {name: '%s', body: '%.10s', attrCount: %d};\n", returnValueNode->value.tagValue->name, returnValueNode->value.tagValue->body, returnValueNode->value.tagValue->attributes->size);
 
     else
-        fprintf(stderr, "return ???; [ERROR: return value isn't defined]\n");
+        debug_print("return ???; [ERROR: return value isn't defined]\n");
 
     return returnValueNode;
 }
@@ -718,11 +718,11 @@ static AstOpProcessorReturnNode * ast_function_call_node_processor(AstNode *node
 
     }
 
-    fprintf(stderr, "\nStart Function %s {\n", callNode->functionName);
+    debug_print("\nStart Function %s {\n", callNode->functionName);
 
     AstOpProcessorReturnNode *returnNode = execute_ast_node(declarationNode->block, functionST);
 
-    fprintf(stderr, "} End Function %s\n", callNode->functionName);
+    debug_print("} End Function %s\n", callNode->functionName);
 
     symbol_table_free(functionST);
 
@@ -778,7 +778,7 @@ static AstOpProcessorReturnNode * ast_and_node_processor(AstNode *node, SymbolTa
 
     int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of && must be ints", node->filename, node->lineno);
 
-    fprintf(stderr, "(%d && %d)", left, right);
+    debug_print("(%d && %d)", left, right);
 
     return ast_node_create_int_return_val(left && right);
 }
@@ -789,7 +789,7 @@ static AstOpProcessorReturnNode * ast_or_node_processor(AstNode *node, SymbolTab
 
     int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of || must be ints", node->filename, node->lineno);
 
-    fprintf(stderr, "(%d || %d)", left, right);
+    debug_print("(%d || %d)", left, right);
 
     return ast_node_create_int_return_val(left || right);
 }
@@ -800,7 +800,7 @@ static AstOpProcessorReturnNode * ast_gt_node_processor(AstNode *node, SymbolTab
 
     int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of > must be ints", node->filename, node->lineno);
 
-    fprintf(stderr, "(%d > %d)", left, right);
+    debug_print("(%d > %d)", left, right);
 
     return ast_node_create_int_return_val(left > right);
 }
@@ -811,7 +811,7 @@ static AstOpProcessorReturnNode * ast_lt_node_processor(AstNode *node, SymbolTab
 
     int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of < must be ints", node->filename, node->lineno);
 
-    fprintf(stderr, "(%d < %d)", left, right);
+    debug_print("(%d < %d)", left, right);
 
     return ast_node_create_int_return_val(left < right);
 }
@@ -822,7 +822,7 @@ static AstOpProcessorReturnNode * ast_ge_node_processor(AstNode *node, SymbolTab
 
     int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of >= must be ints", node->filename, node->lineno);
 
-    fprintf(stderr, "(%d >= %d)", left, right);
+    debug_print("(%d >= %d)", left, right);
 
     return ast_node_create_int_return_val(left >= right);
 }
@@ -833,7 +833,7 @@ static AstOpProcessorReturnNode * ast_le_node_processor(AstNode *node, SymbolTab
 
     int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of <= must be ints", node->filename, node->lineno);
 
-    fprintf(stderr, "(%d <= %d)", left, right);
+    debug_print("(%d <= %d)", left, right);
 
     return ast_node_create_int_return_val(left <= right);
 }
@@ -844,7 +844,7 @@ static AstOpProcessorReturnNode * ast_eq_node_processor(AstNode *node, SymbolTab
 
     int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of == must be ints", node->filename, node->lineno);
 
-    fprintf(stderr, "(%d == %d)", left, right);
+    debug_print("(%d == %d)", left, right);
 
     return ast_node_create_int_return_val(left == right);
 }
@@ -855,7 +855,7 @@ static AstOpProcessorReturnNode * ast_ne_node_processor(AstNode *node, SymbolTab
 
     int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of != must be ints", node->filename, node->lineno);
 
-    fprintf(stderr, "(%d != %d)", left, right);
+    debug_print("(%d != %d)", left, right);
 
     return ast_node_create_int_return_val(left != right);
 }
@@ -866,7 +866,7 @@ static AstOpProcessorReturnNode * ast_sum_node_processor(AstNode *node, SymbolTa
 
     int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of + must be ints", node->filename, node->lineno);
 
-    fprintf(stderr, "(%d + %d)", left, right);
+    debug_print("(%d + %d)", left, right);
 
     return ast_node_create_int_return_val(left + right);
 }
@@ -877,7 +877,7 @@ static AstOpProcessorReturnNode * ast_minus_node_processor(AstNode *node, Symbol
 
     int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of - must be ints", node->filename, node->lineno);
 
-    fprintf(stderr, "(%d - %d)", left, right);
+    debug_print("(%d - %d)", left, right);
 
     return ast_node_create_int_return_val(left - right);
 }
@@ -888,7 +888,7 @@ static AstOpProcessorReturnNode * ast_mult_node_processor(AstNode *node, SymbolT
 
     int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of * must be ints", node->filename, node->lineno);
 
-    fprintf(stderr, "(%d * %d)", left, right);
+    debug_print("(%d * %d)", left, right);
 
     return ast_node_create_int_return_val(left * right);
 }
@@ -899,7 +899,7 @@ static AstOpProcessorReturnNode * ast_div_node_processor(AstNode *node, SymbolTa
 
     int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of / must be ints", node->filename, node->lineno);
 
-    fprintf(stderr, "(%d / %d)", left, right);
+    debug_print("(%d / %d)", left, right);
 
     return ast_node_create_int_return_val(left / right);
 }
@@ -910,7 +910,7 @@ static AstOpProcessorReturnNode * ast_mod_node_processor(AstNode *node, SymbolTa
 
     int right = ast_node_get_int_return_val(execute_ast_node(node->right, st), "Both operators of %% must be ints", node->filename, node->lineno);
 
-    fprintf(stderr, "(%d %% %d)", left, right);
+    debug_print("(%d %% %d)", left, right);
 
     return ast_node_create_int_return_val(left % right);
 }
@@ -919,7 +919,7 @@ static AstOpProcessorReturnNode * ast_neg_node_processor(AstNode *node, SymbolTa
 
     int val = ast_node_get_int_return_val(execute_ast_node(node->left, st), "Operator of ! must be an int", node->filename, node->lineno);
 
-    fprintf(stderr, "!(%d)", val);
+    debug_print("!(%d)", val);
 
     return ast_node_create_int_return_val(!val); 
 }
@@ -928,7 +928,7 @@ static AstOpProcessorReturnNode * ast_uminus_node_processor(AstNode *node, Symbo
 
     int val = ast_node_get_int_return_val(execute_ast_node(node->left, st), "You can only negate an int", node->filename, node->lineno);
 
-    fprintf(stderr, "-(%d)", val);
+    debug_print("-(%d)", val);
 
     return ast_node_create_int_return_val(-val); 
 }
@@ -939,7 +939,7 @@ static AstOpProcessorReturnNode * ast_cmp_node_processor(AstNode *node, SymbolTa
 
     char *val2 = ast_node_get_string_return_val(execute_ast_node(node->right, st), "You can only compare two strings", node->filename, node->lineno);
 
-    fprintf(stderr, "cmp(%s, %s)\n", val1, val2);
+    debug_print("cmp(%s, %s)\n", val1, val2);
 
     return ast_node_create_int_return_val(strcmp(val1, val2));
 }
@@ -950,7 +950,7 @@ static AstOpProcessorReturnNode * ast_concat_node_processor(AstNode *node, Symbo
 
     char *val2 = ast_node_get_string_return_val(execute_ast_node(node->right, st), "You can only concat two strings", node->filename, node->lineno);
 
-    fprintf(stderr, "concat(%s, %s)\n", val1, val2);
+    debug_print("concat(%s, %s)\n", val1, val2);
 
     return ast_node_create_string_return_val(joinStrings(val1, val2)); 
 }
@@ -959,7 +959,7 @@ static AstOpProcessorReturnNode * ast_len_node_processor(AstNode *node, SymbolTa
 
     char *val = ast_node_get_string_return_val(execute_ast_node(node->left, st), "You can only calculate the length of a string", node->filename, node->lineno);
 
-    fprintf(stderr, "len(%s)\n", val);
+    debug_print("len(%s)\n", val);
 
     return ast_node_create_int_return_val(strlen(val)); 
 }
@@ -968,7 +968,7 @@ static AstOpProcessorReturnNode * ast_str_node_processor(AstNode *node, SymbolTa
 
     int val = ast_node_get_int_return_val(execute_ast_node(node->left, st), "You tried to cast an int to string, yet an int wasn't provided", node->filename, node->lineno);
 
-    fprintf(stderr, "str(%d)\n", val);
+    debug_print("str(%d)\n", val);
 
     return ast_node_create_string_return_val(itoa2(val)); 
 }
@@ -977,7 +977,7 @@ static AstOpProcessorReturnNode * ast_cast_int_node_processor(AstNode *node, Sym
 
     char *val = ast_node_get_string_return_val(execute_ast_node(node->left, st), "You tried to cast a string to int, yet a string wasn't provided", node->filename, node->lineno);
 
-    fprintf(stderr, "int(%s)", val);
+    debug_print("int(%s)", val);
 
     return ast_node_create_int_return_val(atoi(val)); 
 }

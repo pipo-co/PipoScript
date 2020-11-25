@@ -48,7 +48,7 @@ FILE * input_file_handler_dequeue(InputFileQueue *q) {
         extension = strrchr(q->currentFilename, '.');
 
         if(extension == NULL || strcmp(extension, ".pipo")) {
-            fprintf(stderr, "Invalid source file extension of file %s. '.pipo' extension is mandatory.\n", q->currentFilename);
+            fprintf(stderr, "Invalid source file extension of file %s. '.pipo' extension is mandatory. Ignoring file.\n", q->currentFilename);
             continue;
         }
 
