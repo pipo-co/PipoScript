@@ -1,0 +1,7 @@
+tag main(){
+    tag t;
+    int a;
+    int b = a;
+    return t;
+
+}

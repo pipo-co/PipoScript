@@ -1,5 +1,6 @@
 CC ?= gcc
 CFLAGS ?= -Wall -pedantic -std=c99 -ggdb -fsanitize=address -fno-omit-frame-pointer -I$(PWD)
+PFLAGS ?= 
 
 COMPILER_UTILS_PATH=compilerUtils/*
 COMPILER_UTILS_SOURCE_FILES = $(foreach dir, $(COMPILER_UTILS_PATH), $(wildcard $(dir)/[^_]*.c))
@@ -29,11 +30,11 @@ $(YACC): c.y
 examples: FORCE $(EXAMPLES_OUTPUTS)
 
 errors: FORCE $(COMPILER)
-	cd errors; COMPILER=../$(COMPILER) ./run.sh
+	cd errors; COMPILER="../$(COMPILER) $(PFLAGS)" ./run.sh
 	
 
 %.html: % $(COMPILER)
-	$(COMPILER) -o $@ $(wildcard $</*.pipo)
+	$(COMPILER) $(PFLAGS) -o $@ $(wildcard $</*.pipo)
 
 clean:
 	rm -f $(LEX) y.output y.tab.h $(YACC) $(COMPILER) $(COMPILER_UTILS_OBJECTS) $(PIPO_FUNCTIONS_OBJECTS) $(EXAMPLES_OUTPUTS)

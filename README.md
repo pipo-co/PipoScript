@@ -13,6 +13,10 @@ PipoScript Compiler using Lex and Yacc to create HTML from custom syntax
 
 `make examples` -> output in examples/.
 
+## Errors
+
+`make errors`
+
 ## Compile
 
 `make all`
