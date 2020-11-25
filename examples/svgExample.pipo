@@ -3,7 +3,26 @@ tag main(){
     tag html = new tag;
     set name from html = "html";
     
+    string blue = "blue";
+    string yellow = "yellow";
+    string text = "PipoScript";
+    int width = 1300;
+    int height = 150;
 
+    append child from html = polygon(blue, yellow);
+
+    append child from html = polygon(yellow, blue);
+
+    append child from html = fancyText(text, yellow, blue, width, height);
+
+    append child from html = polygon(yellow, blue);
+
+    append child from html = polygon(blue, yellow);
+
+    return html;
+}
+
+tag polygon(string fill, string stroke){
     tag svg = new tag;
     set name from svg = "svg";
     set attribute "width" from svg = str(300);
@@ -12,34 +31,19 @@ tag main(){
     
     tag polygon = new tag;
     set name from polygon = "polygon";
-
     set attribute "points" from polygon = "100,10 40,198 190,78 10,78 160,198";
-    set attribute "style" from polygon = "fill:yellow;stroke:blue;stroke-width:5;fill-rule:evenodd;";
+    set attribute "style" from polygon = concat(concat("fill:",fill),concat(concat(";stroke:", stroke), ";stroke-width:5;fill-rule:evenodd;"));
 
     append child from svg = polygon;
 
-    append child from html = svg;
+    return svg;
+}
 
-    svg = new tag;
+tag fancyText(string innerText, string leftColor, string rightColor, int width, int height){
+    tag svg = new tag;
     set name from svg = "svg";
-    set attribute "width" from svg = str(300);
-    set attribute "height" from svg = str(200);
-    set body from svg = "Your browser doesn't support SVG";
-    
-    polygon = new tag;
-    set name from polygon = "polygon";
-
-    set attribute "points" from polygon = "100,10 40,198 190,78 10,78 160,198";
-    set attribute "style" from polygon = "fill:yellow;stroke:blue;stroke-width:5;fill-rule:evenodd;";
-
-    append child from svg = polygon;
-
-    append child from html = svg;
-
-    svg = new tag;
-    set name from svg = "svg";
-    set attribute "width" from svg = str(1300);
-    set attribute "height" from svg = str(150);
+    set attribute "width" from svg = str(width);
+    set attribute "height" from svg = str(height);
     set body from svg = "Your browser doesn't support SVG";
 
     tag defs = new tag;
@@ -62,15 +66,14 @@ tag main(){
     set name from stop = "stop";
 
     set attribute "offset" from stop = zerop;
-    set attribute "style" from stop = "stop-color:rgb(0,0,255);stop-opacity:1";
-    
+    set attribute "style" from stop = concat(concat("stop-color:", leftColor),";stop-opacity:1");
     append child from gradient = stop;
 
     stop = new tag;
     set name from stop = "stop";
 
     set attribute "offset" from stop = hundredp;
-    set attribute "style" from stop = "stop-color:rgb(255,255,0);stop-opacity:1";
+    set attribute "style" from stop = concat(concat("stop-color:", rightColor),";stop-opacity:1");
     
     append child from gradient = stop;
     
@@ -99,27 +102,9 @@ tag main(){
     set attribute "x" from text = str(140);
     set attribute "y" from text = str(86);
 
-    set body from text = "PipoScript";
+    set body from text = innerText;
 
     append child from svg = text;
 
-    append child from html = svg;
-
-    svg = new tag;
-    set name from svg = "svg";
-    set attribute "width" from svg = str(300);
-    set attribute "height" from svg = str(200);
-    set body from svg = "Your browser doesn't support SVG";
-    
-    polygon = new tag;
-    set name from polygon = "polygon";
-
-    set attribute "points" from polygon = "100,10 40,198 190,78 10,78 160,198";
-    set attribute "style" from polygon = "fill:yellow;stroke:blue;stroke-width:5;fill-rule:evenodd;";
-
-    append child from svg = polygon;
-
-    append child from html = svg;
-
-    return html;
+    return svg;
 }
