@@ -54,6 +54,8 @@ void parse_input_files(void) {
 		yyin = currentFile;
 
 		yyrestart(yyin);
+
+		yylineno = 1;
 	
 		yyparse();
 	}
