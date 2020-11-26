@@ -1,6 +1,5 @@
 DIGIT			[0-9]
 LETTER			[a-zA-Z_]
-HEX				[a-fA-F0-9]
 
 %{
 
