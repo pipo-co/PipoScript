@@ -12,7 +12,7 @@ static void usage(const char *progname) {
         "\n"
         "   -h                  Imprime la ayuda y termina.\n"
         "   -D                  Debug: Activar logs.\n"
-        "   -o <file_name>      Archivo de saldia.  Por defecto index.html.\n"
+        "   -o <file_name>      Archivo de salida.  Por defecto index.html.\n"
         "\n",
         progname);
     exit(0);
