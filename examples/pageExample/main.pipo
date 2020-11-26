@@ -11,7 +11,7 @@ tag main(){
     append child from html = head;
 
     string pageTitle = "PipoScript";
-    string pageDescription = "PipoScript is a typed language build to create html like components with ease";
+    string pageDescription = "PipoScript is a typed language built to create html like components with ease";
     string align = "center";
     append child from html = textAlign(padding(margin(header(pageTitle, pageDescription), 0, 0, 30, 50), 30, 0, 0, 0), align);
     

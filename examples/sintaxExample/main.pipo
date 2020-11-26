@@ -1,0 +1,66 @@
+tag main(){
+
+    string tagName = "div";
+    string tagBody = "body";
+    string attr = "style";
+    string font = "font-family: verdana;";
+
+    int number = 123;
+
+    tag html = new tag;
+    set name from html = "html";
+
+    tag div = new tag;
+    set name from div = tagName;
+    set body from div = concat(tagBody, str(number)); 
+    
+    set attribute attr from div = "text-align:center";
+
+    append child from html = div;
+
+    if(len(tagName) > 0) {
+        tagName = "h1";
+    }
+
+    if(len(tagName) == 0) {
+        tagName = "h4";
+    }
+    else if(len(tagName) <= 1) {
+        tagName = "h3";
+    }
+    else if(len(tagName) <= 2) {
+        tagName = "h2";
+    }
+    else {
+        tagName = "h1";
+    }
+
+    if(cmp(tagBody, "This important title")){
+        tagBody = "This important title";
+    }
+
+    if(number % 2 == 1){
+        number = 321;
+    }
+
+    tag h1 = new tag;
+    set name from h1 = tagName;
+    set body from h1 = concat(tagBody, str(number)); 
+    set attribute attrN(attr) from h1 = concat(attrValue("color:blue;"), attrValue(font));
+    
+    append child from div = retTag(h1);
+    
+    return html;
+}
+
+string attrN(string at){
+    return at;
+}
+
+string attrValue(string attrValue){
+    return attrValue;
+}
+
+tag retTag(tag t){
+    return t;
+}

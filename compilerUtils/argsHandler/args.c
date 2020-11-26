@@ -7,7 +7,7 @@
 Args args;
 
 static void usage(const char *progname) {
-    fprintf(stderr,
+    fprintf(stdin,
         "Usage: %s [OPTIONS] source_files ... \n"
         "\n"
         "   -h                  Imprime la ayuda y termina.\n"
@@ -15,7 +15,7 @@ static void usage(const char *progname) {
         "   -o <file_name>      Archivo de saldia.  Por defecto index.html.\n"
         "\n",
         progname);
-    exit(1);
+    exit(0);
 }
 
 void parse_args(const int argc, char **argv) {

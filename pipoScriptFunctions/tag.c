@@ -85,14 +85,14 @@ bool has_attribute(Tag *tag, char *attributeName) {
 void render_tag(Tag *t, int ind, FILE * out) {
 
     // <#name# #attribute_1_name#=#attribute_1_value# #attribute_n_name#=#attribute_n_value#>
-    for (size_t i = 0; i < ind; i++) fputc('\t', out);
+    for (int i = 0; i < ind; i++) fputc('\t', out);
     fprintf(out, "<%s", t->name);
     render_attributes(t, out);
     fprintf(out, ">\n");
 
     // #body#
     if(t->body != NULL){
-        for (size_t i = 0; i < ind; i++) fputc('\t', out);
+        for (int i = 0; i < ind; i++) fputc('\t', out);
         fprintf(out, "\t%s\n", t->body);
     }
 
@@ -100,7 +100,7 @@ void render_tag(Tag *t, int ind, FILE * out) {
     render_node_list(t->children.first, ind, out);
 
     // </#name#>
-    for (size_t i = 0; i < ind; i++) fputc('\t', out);    
+    for (int i = 0; i < ind; i++) fputc('\t', out);    
     fprintf(out, "</%s>\n", t->name);
 }
 

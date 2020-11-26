@@ -1,6 +1,6 @@
 CC ?= gcc
 XFLAGS ?= -ggdb -fsanitize=address -fno-omit-frame-pointer
-CFLAGS = -Wall -pedantic -Wno-newline-eof -D_POSIX_C_SOURCE -std=c99 -I$(PWD) $(XFLAGS)
+CFLAGS = -Wextra -Wall -pedantic -Wno-unused-parameter -Wno-newline-eof -D_POSIX_C_SOURCE -std=c99 -I$(PWD) $(XFLAGS)
 
 COMPILER_UTILS_PATH=compilerUtils/*
 COMPILER_UTILS_SOURCE_FILES = $(foreach dir, $(COMPILER_UTILS_PATH), $(wildcard $(dir)/[^_]*.c))
