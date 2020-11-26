@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "compilerUtils/functionSymbolTable/functionSymbolTable.h"
-#include "compilerUtils/pipoUtils/pipoUtils.h"
+#include "utils/errorHandling.h"
 #include "pipoScriptFunctions/stringService.h"
 #include "compilerUtils/argsHandler/args.h"
 

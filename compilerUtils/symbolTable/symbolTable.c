@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include "compilerUtils/pipoUtils/pipoUtils.h"
+#include "utils/errorHandling.h"
 #include "libraries/khash.h"
 
 KHASH_MAP_INIT_STR(symbolTable, SymbolNode *)

@@ -8,11 +8,11 @@ Args args;
 
 static void usage(const char *progname) {
     fprintf(stderr,
-        "Usage: %s [OPTION]... [SOURCE_FILE] \n"
+        "Usage: %s [OPTIONS] source_files ... \n"
         "\n"
         "   -h                  Imprime la ayuda y termina.\n"
         "   -D                  Debug: Activar logs.\n"
-        "   -o <file_name>      Archivo de saldia.\n"
+        "   -o <file_name>      Archivo de saldia.  Por defecto index.html.\n"
         "\n",
         progname);
     exit(1);

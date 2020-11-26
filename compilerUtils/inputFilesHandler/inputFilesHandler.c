@@ -1,6 +1,6 @@
 #include "compilerUtils/inputFilesHandler/inputFilesHandler.h"
 
-#include "compilerUtils/pipoUtils/pipoUtils.h"
+#include "utils/errorHandling.h"
 #include <string.h>
 
 void input_file_handler_queue_initialize(InputFileQueue *q) {

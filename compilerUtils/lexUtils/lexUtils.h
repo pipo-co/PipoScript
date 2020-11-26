@@ -7,7 +7,7 @@
 #include "compilerUtils/AST/astNodes.h"
 #include "y.tab.h"
 
-#include "compilerUtils/pipoUtils/pipoUtils.h"
+#include "utils/errorHandling.h"
 
 extern int yylineno;
 

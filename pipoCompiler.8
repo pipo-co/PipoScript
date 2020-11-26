@@ -1,0 +1,29 @@
+.\" Macros
+.ds PX \s-1POSIX\s+1
+.de EXAMPLE .\" Format de los ejemplos
+.RS 10
+.BR "\\$1"
+.RE
+..
+
+.TH pipoCompiler 1 "29 de noviembre 2020" TLA-ITBA PIPO
+.LO 8
+.SH NAME
+pipoCompiler \- compilador de PipoScript
+
+.SH SINOPSIS
+.HP 10
+.B  pipoCompiler
+[OPTIONS] source_files ...
+
+.SH OPCIONES
+
+
+.IP "\fB-h\fR"
+Imprime la ayuda y termina.
+
+.IP "\fB\-o\fB \fIoutput-path\fR"
+Direccion y nombre de salida del archivo generado.  Por defecto \fI index.html\fR.
+
+.IP "\fB\-D\fB"
+Modo debug. Imprimir mensajes detallando el proceso de compialcion.

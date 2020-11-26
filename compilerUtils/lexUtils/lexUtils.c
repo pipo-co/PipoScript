@@ -1,7 +1,7 @@
 #include "lexUtils.h"
 
 #include "libraries/khash.h"
-#include "compilerUtils/pipoUtils/pipoUtils.h"
+#include "utils/errorHandling.h"
 #include "compilerUtils/argsHandler/args.h"
 
 KHASH_MAP_INIT_STR(StrMap, char *)

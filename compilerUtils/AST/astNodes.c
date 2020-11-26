@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "compilerUtils/pipoUtils/pipoUtils.h"
+#include "utils/errorHandling.h"
 
 AstNode * new_ast_node(int nodeType, AstNode * left, AstNode * right, char* filename, int lineno) {
 
