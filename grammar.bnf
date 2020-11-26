@@ -1,0 +1,128 @@
+    $accept ::= P $end
+
+    P ::= FUNCTION_DEFINITION_LIST
+
+    FUNCTION_DEFINITION_LIST ::= FUNCTION_DEFINITION_LIST FUNCTION_DEFINITION
+                            | %empty
+
+    STATEMENT_LIST ::= STATEMENT_LIST STATEMENT
+                  | %empty
+
+    STATEMENT ::= if_statement
+            | iteration_statement
+            | return_statement
+            | declaration_statement
+            | assignment_statement
+            | function_call_statement
+
+   FUNCTION_DEFINITION ::= FUNCTION_RETURN_TYPE ID '(' FUNC_DECLARATION_ARG_LIST ')' '{' STATEMENT_LIST '}'
+                      | FUNCTION_RETURN_TYPE ID '(' ')' '{' STATEMENT_LIST '}'
+
+   BLOCK ::= '{' STATEMENT_LIST '}'
+        | STATEMENT
+        | ';'
+
+   if_statement ::= IF '(' NUM ')' BLOCK
+               | IF '(' NUM ')' BLOCK ELSE BLOCK
+
+   iteration_statement ::= WHILE '(' NUM ')' BLOCK
+                      | DO BLOCK WHILE '(' NUM ')' ';'
+                      | FOR '(' DO_ASSIGNMENT ';' NUM ';' DO_ASSIGNMENT ')' BLOCK
+
+   return_statement ::= RETURN ';'
+                   | RETURN VALUE ';'
+
+   declaration_statement ::= ID_TYPE ID ';'
+                        | ID_TYPE ID '=' VALUE ';'
+
+   assignment_statement ::= ASSIGNMENT ';'
+
+   function_call_statement ::= FUNCTION_CALL ';'
+
+   FUNCTION_CALL ::= ID '(' FUNC_ARG_LIST ')'
+                | ID '(' ')'
+
+   ASSIGNMENT ::= ID '=' VALUE
+             | ID INC
+             | ID DEC
+             | SET_PROPERTY FROM ID '=' VALUE
+             | SET_NAMED_PROPERTY STRING_VALUE FROM ID
+             | SET_NAMED_PROPERTY STRING_VALUE FROM ID '=' VALUE
+             | APPEND_CHILD FROM ID '=' VALUE
+
+   SET_PROPERTY ::= SET BODY
+               | SET NAME
+
+   SET_NAMED_PROPERTY ::= SET ATTRIBUTE
+
+   DO_ASSIGNMENT ::= ASSIGNMENT
+                | ID_TYPE ID '=' VALUE
+                | %empty
+
+   FUNC_DECLARATION_ARG_LIST ::= FUNC_DECLARATION_ARG_LIST ',' ID_TYPE ID
+                            | ID_TYPE ID
+
+   FUNC_ARG_LIST ::= FUNC_ARG_LIST ',' VALUE
+                | VALUE
+
+   ARITH ::= NUM '+' NUM
+        | NUM '-' NUM
+        | NUM '*' NUM
+        | NUM '/' NUM
+        | NUM '%' NUM
+        | NUM '<' NUM
+        | NUM '>' NUM
+        | NUM LE NUM
+        | NUM GE NUM
+        | NUM EQ NUM
+        | NUM NE NUM
+        | NUM OR NUM
+        | NUM AND NUM
+        | '!' NUM
+        | '-' NUM
+        | '(' NUM ')'
+
+   NUM ::= ID
+      | FUNCTION_CALL
+      | NON_ID_NUM
+
+   NON_ID_NUM ::= INT_LITERAL
+             | ARITH
+             | INT '(' STRING_VALUE ')'
+             | LEN '(' STRING_VALUE ')'
+             | CMP '(' STRING_VALUE ',' STRING_VALUE ')'
+              | HAS_NAMED_PROPERTY STRING_VALUE FROM ID
+
+   STRING_ARITH ::= CONCAT '(' STRING_VALUE ',' STRING_VALUE ')'
+
+   STRING_VALUE ::= ID
+               | FUNCTION_CALL
+               | NON_ID_STRING_VALUE
+
+   NON_ID_STRING_VALUE ::= STRING_LITERAL
+                      | STRING_ARITH
+                      | STR '(' NUM ')'
+                      | GET_PROPERTY FROM ID
+                      | GET_NAMED_PROPERTY STRING_VALUE FROM ID
+
+   VALUE ::= ID
+        | FUNCTION_CALL
+        | NON_ID_STRING_VALUE
+        | NON_ID_NUM
+        | NEW TAG
+
+   GET_PROPERTY ::= GET BODY
+               | GET NAME
+
+   GET_NAMED_PROPERTY ::= GET ATTRIBUTE
+
+   HAS_NAMED_PROPERTY ::= HAS ATTRIBUTE
+
+   ID_TYPE ::= INT
+          | STRING
+          | TAG
+
+   FUNCTION_RETURN_TYPE ::= VOID
+                       | INT
+                       | STRING
+                       | TAG

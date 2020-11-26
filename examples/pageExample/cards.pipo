@@ -10,7 +10,7 @@ tag cards(){
     set name from div = "div";
     set attribute "style" from div = "display:flex;";
 
-    append child from div = margin(imgCard("https://cdn.discordapp.com/attachments/740587722703634504/781015574380675132/pslogo.png", altText, size, cardTitle, cardDescription),int("30"), int("40"), 30, 40);
+    append child from div = margin(imgCard("https://media.discordapp.net/attachments/740587722703634504/781221382620053504/pslogo2.png", altText, size, cardTitle, cardDescription),int("30"), int("40"), 30, 40);
 
     if (len(cardDescription) > 0){
         cardDescription = "PipoScript is a really easy to learn language. However, it will allow you to make components and use them in your code so you don't have to repeat code.";
