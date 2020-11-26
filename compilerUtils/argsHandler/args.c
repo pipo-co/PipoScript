@@ -7,15 +7,15 @@
 Args args;
 
 static void usage(const char *progname) {
-    fprintf(stderr,
+    fprintf(stdin,
         "Usage: %s [OPTION]... [SOURCE_FILE] \n"
         "\n"
         "   -h                  Imprime la ayuda y termina.\n"
         "   -D                  Debug: Activar logs.\n"
-        "   -o <file_name>      Archivo de saldia.\n"
+        "   -o <file_name>      Archivo de salida.\n"
         "\n",
         progname);
-    exit(1);
+    exit(0);
 }
 
 void parse_args(const int argc, char **argv) {

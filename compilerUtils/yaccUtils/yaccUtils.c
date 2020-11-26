@@ -74,6 +74,9 @@ Tag * execute_main(void) {
 	if(mainNode->returnType != TAG)
 		print_lineno_and_abort(mainNode->filename, mainNode->lineno, 4, "Main function was declared with invalid return type. It must be Tag. Aborting.");
 
+	if(mainNode->args != NULL && mainNode->args->argCount > 0)
+		print_lineno_and_abort(mainNode->filename, mainNode->lineno, 4, "Main function cannot be declared with arguments. Aborting.");
+
 	SymbolTable st = symbol_table_create();
 
 	Tag * t = execute_ast_tree(mainNode->block, st);
