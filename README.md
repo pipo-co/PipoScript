@@ -2,7 +2,7 @@
 
 PipoCompiler es un compilador implementado con Lex y Yacc para el lenguaje PipoScript.
 
-PipoScript es un lenguaje tipado con sintaxis basada en C cuyo objetivo es generar HTML de manera modular y parametrizada, mejorando la reutilización y mantenibilidad del código. Cuenta con 3 tipos de datos principales, números enteros, cadenas de caracteres y etiquetas. Cuenta con funcionalidades como gran parte de las operaciones aritméticas ofrecidas por C, funciones nativas para el manejo de strings, capacidad para generar y separar funcionalidades disjuntas en funciones, y a lo largo de múltiples archivos.
+PipoScript es un lenguaje tipado con sintaxis basada en C cuyo objetivo es generar HTML de manera modular y parametrizada, mejorando la reutilización y mantenibilidad del código.
 
 Una explicacion mas detallada del lenguaje y el proceso de desarrollo se puede encontrar en `Informe.pdf`.
 
