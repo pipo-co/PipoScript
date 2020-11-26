@@ -2,7 +2,7 @@
 
 PipoCompiler es un compilador implementado con Lex y Yacc para el lenguaje PipoScript.
 
-PipoScript es un lenguaje tipado con sintaxis basada en C. Cuenta con 3 tipos de datos principales, números enteros, cadenas de caracteres y etiquetas. Cuenta con funcionalidades como gran parte de las operaciones aritméticas ofrecidas por C, funciones nativas para el manejo de strings, capacidad para generar y separar funcionalidades disjuntas en funciones y a lo largo de múltiples archivos.
+PipoScript es un lenguaje tipado con sintaxis basada en C cuyo objetivo es generar HTML de manera modular y parametrizada, mejorando la reutilización y mantenibilidad del código. Cuenta con 3 tipos de datos principales, números enteros, cadenas de caracteres y etiquetas. Cuenta con funcionalidades como gran parte de las operaciones aritméticas ofrecidas por C, funciones nativas para el manejo de strings, capacidad para generar y separar funcionalidades disjuntas en funciones, y a lo largo de múltiples archivos.
 
 ## Authors
 
@@ -31,24 +31,25 @@ Estos modulos estan compuestos por
 
 ### Pipo Script Functions
 
-Sumado a las funciones de compilacion, las cuales tienen un caracter mas general, existen otras que son necesarias exclusivamente para el manejo de PipoScript. Estas ultimas se encuentran en el modulo `pipoScriptFunctions`. Consta de 2 partes principales. 
+Sumado a las funciones de compilacion, las cuales tienen un caracter mas general, existen otras que son necesarias exclusivamente para el manejo de PipoScript. Estas ultimas se encuentran en el modulo `pipoScriptFunctions`. Consta de 2 partes principales.
 
-Por un lado se encuentra el manejo de tags, estructura de datos central ofrecida por el lenguaje. Para esto es necesario definir la estructura de datos subyacente e implementar funciones para manipularla de manera simple y correcta. 
+Por un lado se encuentra el manejo de tags, estructura de datos central ofrecida por el lenguaje. Para esto es necesario definir la estructura de datos subyacente e implementar funciones para manipularla de manera simple y correcta.
 
-Por otro lado, se encuentra el manejo de strings. Para liberar de la responsabilidad del manejo de la memoria al usuario a la hora de utilizar strings es necesario tener una estructura lo administre. Principalmente que se encargue de almacenar, manipular y, cuando termina la ejecucion, liberar los recursos necesarios.
+Por otro lado, se encuentra el manejo de strings. Para liberar de la responsabilidad del manejo de la memoria al usuario a la hora de utilizar strings es necesario tener una estructura que lo administre. Principalmente que se encargue de almacenar, manipular y, cuando termina la ejecucion, liberar los recursos necesarios.
 
 ### Utils
 
 Este modulo consta de utilidades de caracter general. Actualmente la unica funcionalidad ofrecida es `errorHandling` que provee funciones para cortar la ejecucion de manera centralizada y asegurandose de liberar todos los recursos. Ademas, ofrece funciones wrappers para solicitar memoria dinamica y cortar ejecucion en caso de error.
+
 ### Libraries
 
-Teniendo en cuenta que no es necesario reinventar la rueda, muchas veces es util aprovechar y utilizar librerias externas. Si bien en este caso, la unica libreria empleada es [KHash](https://github.com/attractivechaos/klib/blob/master/khash.h), consideramos que el codigo que no es de nuestra autoria deberia estar claramente separado. 
+Teniendo en cuenta que no es necesario reinventar la rueda, muchas veces es util aprovechar y utilizar librerias externas. Si bien en este caso la unica libreria empleada es [KHash](https://github.com/attractivechaos/klib/blob/master/khash.h), consideramos que el codigo que no es de nuestra autoria debe estar claramente separado.
 
 ## Compilacion
 
-Teniendo en cuenta la estructura del codigo ya detallada, se evidencia la necesidad de utilizar una herramienta que asista en el proceso de compilacion. Para esto se utilizo GNU Make y se definio una serie de recetas para llevar a cabo este proceso de manera automatica.
+Teniendo en cuenta la estructura del codigo ya detallada, se evidencia la necesidad de utilizar una herramienta que asista en el proceso de compilacion. Para esto se utilizo GNU Make y se definió una serie de recetas para llevar a cabo este proceso de manera automática.
 
-Para compilar todo el compilador, valga al redundancia, se utiliza `make all` o `make`. Esta rutina se encargara de generar y ejecutar a Lex y Yacc y posteriormente, compilar los archivos resultantes junto a todos los modulos ya detallados. Ademas, se ofrecen algunas opciones a la hora compilar.
+Para compilar todo el compilador, valga al redundancia, se utiliza `make all` o `make`. Esta rutina se encargara de generar y ejecutar a Lex y Yacc, y posteriormente compilar los archivos resultantes junto a todos los modulos ya detallados. Ademas, se ofrecen algunas opciones a la hora compilar.
 
 ### Compilador
 
@@ -56,7 +57,7 @@ Por default se utiliza como compilador cc. Este puede ser modificado definiendo 
 
 ### Flags de compilacion
 
-Para asegurarnos que el proceso de compilacion se realice de manera correcta sin generar errores se definieron una serie de flags de compilacion obligatorios. Estos son `-Wall -pedantic -Wno-newline-eof -D_POSIX_C_SOURCE -std=c99 -I$(PWD)`. Sumado a los flags obligatorios, se utiliza otra serie de flags utiles para el desarrollo del proyecto, estos son `-ggdb -fsanitize=address -fno-omit-frame-pointer`. Teniendo en cuenta que estos pueden no ser de interes, es posible deshabilitarlos definiendo la variable `XFLAGS` vacia o, en caso de querer agregar flags de compilacion propios, con aquellos que sean de interes.
+Para asegurarnos que el proceso de compilacion se realice de manera correcta sin generar errores se definieron una serie de flags de compilacion obligatorios. Estos son `-Wextra -Wall -pedantic -Wno-unused-parameter -Wno-newline-eof -D_POSIX_C_SOURCE -std=c99 -I$(PWD)`. Sumado a los flags obligatorios, se utiliza otra serie de flags utiles para el desarrollo del proyecto, estos son `-ggdb -fsanitize=address -fno-omit-frame-pointer`. Teniendo en cuenta que estos pueden no ser de interes, es posible deshabilitarlos definiendo la variable `XFLAGS` vacia o, en caso de querer agregar flags de compilacion propios, con aquellos que sean de interes.
 
 ### Limpieza
 
@@ -64,7 +65,7 @@ Ademas de `make all` se ofrece `make clean` para hacer la limpieza de todos los 
 
 ## Utilizacion del compilador
 
-Por defecto el ejecutable del compilador se generara en la carpeta raiz y se llamara `pipoCompiler`. Aunque, esto puede ser modificado definiendo la variable de entorno COMPILER si se desea generar el compilador con otro nombre. Para su utilizacion basta con llamar al mismo pasando como parametro los archivos fuentes a compilar. Como resultado, en caso de exito, se obtendra un unico archivo HTML llamado `index.html`, a menos que se especifique otro nombre de salida.
+Por defecto el ejecutable del compilador se generara en la carpeta raiz y se llamara `pipoCompiler`. Esto puede ser modificado definiendo la variable de entorno COMPILER si se desea generar el compilador con otro nombre. Para su utilizacion basta con llamar al mismo pasando como parametro los archivos fuentes a compilar. Como resultado, en caso de exito, se obtendra un unico archivo HTML llamado `index.html`, a menos que se especifique otro nombre de salida.
 
 En caso de querer tener un mayor control en el proceso de compilacion, el compilador ofrece una serie de parametros que pueden ser utilizados a la hora de ejecutarlo. La lista de los mismos junto a su explicacion puede ser obtenida ejecutando `./pipoCompiler -h` o accediendo al man del compilador (`pipoCompiler.8`).
 
@@ -74,7 +75,7 @@ Un ejemplo de compilacion seria `./pipoCompiler -o profile.html main.pipo cssHel
 
 ## Ejemplos
 
-Para hacer una pequeña demostracion de las capacidades del lenguaje y el correcto funcionamiento del compilador se incluye en la carpeta `examples` una serie de ejemplos listos para ser procesados por el compilador. De todas formas, para hacer este proceso un poco mas sencillo, se ofrece como rutina de Make `make examples`. Esta se encarga de compilar de manera correcta todos los ejemplos y generar el archivo HTML de salida con el nombre correspondiente. 
+Para hacer una pequeña demostracion de las capacidades del lenguaje y el correcto funcionamiento del compilador se incluye en la carpeta `examples` una serie de ejemplos listos para ser procesados por el compilador. De todas formas, para hacer este proceso un poco mas sencillo, se ofrece como rutina de Make `make examples`. Esta se encarga de compilar de manera correcta todos los ejemplos y generar el archivo HTML de salida con el nombre correspondiente.
 
 > **Pro tip:** si se desea compilar un programa con multiples archivos, basta con generar una nueva carpeta en el modulo de examples con el nombre de preferencia y aprovechar la rutina `make examples` para compilar por nosotros.
 
